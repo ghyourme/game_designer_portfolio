@@ -1,17 +1,26 @@
+import { Hero } from "@/features/home/Hero";
+import { Introduction } from "@/features/home/Introduction";
+import { FeaturedProjects } from "@/features/home/FeaturedProjects";
+import { FeaturedAnalysis } from "@/features/home/FeaturedAnalysis";
+import { CallToAction } from "@/features/home/CallToAction";
+
 /**
  * Home (임시 placeholder)
  *
  * 참고 문서: docs/INFORMATION_ARCHITECTURE.md - 2.1 Home
  *
- * 실제 포트폴리오 콘텐츠는 아직 연결하지 않은 임시 페이지.
+ * Hero → Introduction → Featured Projects → Featured Analysis → Call To Action
+ * 순서로 Home의 5개 섹션을 조합한다. 각 섹션은 독립적인 placeholder 컴포넌트이며,
+ * 실제 콘텐츠와 JSON 데이터는 아직 연결하지 않았다.
  */
 export default function Home() {
   return (
-    <div>
-      <h1>Game Designer Portfolio</h1>
-      <p>게임 기획자 포트폴리오 웹사이트입니다. 콘텐츠는 준비 중입니다.</p>
-      {/* TODO: Hero, 핵심 역량 요약, Featured Projects, Featured Analysis, About 미리보기, CTA 섹션 구현 예정 */}
-      {/* TODO: profile.json, skills.json, projects.json, analysis.json 연동 예정 */}
-    </div>
+    <>
+      <Hero />
+      <Introduction />
+      <FeaturedProjects />
+      <FeaturedAnalysis />
+      <CallToAction />
+    </>
   );
 }
