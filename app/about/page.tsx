@@ -1,17 +1,33 @@
+import { AboutHero } from "@/features/about/AboutHero";
+import { AboutSummary } from "@/features/about/AboutSummary";
+import { DesignPhilosophy } from "@/features/about/DesignPhilosophy";
+import { CoreStrength } from "@/features/about/CoreStrength";
+import { CareerTimeline } from "@/features/about/CareerTimeline";
+import { SkillOverview } from "@/features/about/SkillOverview";
+import { WorkingProcess } from "@/features/about/WorkingProcess";
+import { CallToAction } from "@/features/about/CallToAction";
+
 /**
- * About (임시 placeholder)
+ * About
  *
  * 참고 문서: docs/INFORMATION_ARCHITECTURE.md - 2.2 About
  *
- * Home보다 깊은 수준에서 배경, 설계 철학, 강점을 전달하는 페이지.
+ * AboutHero → AboutSummary → DesignPhilosophy → CoreStrength → CareerTimeline →
+ * SkillOverview → WorkingProcess → CallToAction 순서로 About의 8개 섹션을 조합하는
+ * 조립 전용 페이지. getSkills() 외 실제 데이터(profile.json, resume.json) 연동은
+ * 아직 하지 않았다.
  */
 export default function AboutPage() {
   return (
-    <div>
-      <h1>About</h1>
-      <p>자기소개 및 설계 철학 페이지입니다. 콘텐츠는 준비 중입니다.</p>
-      {/* TODO: 소개, 설계 철학, 역량 개요, 경력 하이라이트, CTA 섹션 구현 예정 */}
-      {/* TODO: profile.json, skills.json 연동 예정 (companies.json은 콘텐츠 큐레이션 참고용) */}
-    </div>
+    <>
+      <AboutHero />
+      <AboutSummary />
+      <DesignPhilosophy />
+      <CoreStrength />
+      <CareerTimeline />
+      <SkillOverview />
+      <WorkingProcess />
+      <CallToAction />
+    </>
   );
 }

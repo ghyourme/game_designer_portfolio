@@ -1,0 +1,1 @@
+export { CoreStrength } from "./CoreStrength";

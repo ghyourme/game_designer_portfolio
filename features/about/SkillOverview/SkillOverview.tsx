@@ -1,0 +1,44 @@
+import { getSkills } from "@/lib/data";
+import { Section } from "@/components/ui/Section";
+import { Container } from "@/components/ui/Container";
+import { Tag } from "@/components/ui/Tag";
+
+/**
+ * SkillOverview
+ *
+ * 참고 문서: docs/INFORMATION_ARCHITECTURE.md - 2.2 About (구성 섹션 4. 기술 분류)
+ *
+ * 책임:
+ * - getSkills()로 skills.json을 읽어 4개 분류(systemDesign/contentDesign/analysis/tools)의
+ *   기술을 Tag로 나열하는, 데이터 기반의 정량적 기술 분류 섹션이다.
+ * - CoreStrength(자기 서술형 정성적 강점)와 역할이 겹치지 않도록, 여기서는 skills.json이
+ *   관리하는 구조화된 스킬 데이터만 다룬다.
+ * - 등록된 스킬이 하나도 없으면 Empty State를 보여준다 (현재 data/skills.json은 4개 분류
+ *   모두 빈 배열이라 항상 이 경로를 탄다).
+ */
+export function SkillOverview() {
+  const skills = getSkills();
+  const allSkills = [
+    ...skills.systemDesign,
+    ...skills.contentDesign,
+    ...skills.analysis,
+    ...skills.tools,
+  ];
+
+  return (
+    <Section>
+      <Container>
+        <h2>Skill Overview</h2>
+        {allSkills.length === 0 ? (
+          <p>등록된 기술 정보가 없습니다.</p>
+        ) : (
+          <div>
+            {allSkills.map((skill) => (
+              <Tag key={skill.name}>{skill.name}</Tag>
+            ))}
+          </div>
+        )}
+      </Container>
+    </Section>
+  );
+}

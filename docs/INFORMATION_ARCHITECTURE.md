@@ -52,21 +52,26 @@
 | 목적 | Home보다 깊은 수준에서 후보자의 배경, 설계 철학, 강점을 전달한다. |
 | 대상 사용자 | Home을 보고 더 알고 싶어진 채용 담당자, 철학/사고방식을 평가하려는 시니어 기획자 |
 | 사용자 목표 | 이 사람이 어떤 방식으로 사고하고 일하는 기획자인지 이해한다. |
-| CTA | "이력서 보기", "프로젝트 보기" |
+| CTA | "프로젝트 보기", "이력서 보기", "연락하기" |
 
 **구성 섹션 (상단 → 하단)**
-1. 소개 — 배경, 간단한 자기소개
-2. 설계 철학 / 일하는 방식
-3. 역량 개요 — 시스템 기획 / 콘텐츠 기획 / 분석 / 도구 활용 4개 분류별 요약
-4. 경력 하이라이트 (짧은 형태, 전체 이력은 Resume 페이지가 담당)
-5. Resume/Projects로 이동하는 CTA
+1. 소개 — 이름/희망 직무/한 줄 소개 + 짧은 자기소개, 기획자로서의 방향성 (AboutHero, AboutSummary)
+2. 설계 철학 / 일하는 방식 (DesignPhilosophy)
+3. 핵심 강점 — 기획자로서 스스로 규정하는 핵심 강점을 Tag/Badge로 요약 (CoreStrength)
+4. 기술 분류 — `skills.json` 기반 시스템 기획 / 콘텐츠 기획 / 분석 / 도구 활용 4개 분류 요약 (SkillOverview)
+5. 경력 하이라이트 (짧은 형태, 전체 이력은 Resume 페이지가 담당) (CareerTimeline)
+6. 기획 프로세스 — Problem → Research → Design → Validate → Improve 단계 소개 (WorkingProcess)
+7. Resume/Projects/Contact로 이동하는 마무리 CTA (CallToAction)
+
+3(핵심 강점)과 4(기술 분류)는 둘 다 "역량"을 다루지만 성격이 다르다: 핵심 강점은 스스로 규정한 정성적 강점(예: 커뮤니케이션, 분석력)이고, 기술 분류는 `skills.json`이 데이터로 관리하는 정량적 분류다. 이 둘을 하나의 섹션으로 합치지 않고 분리한다.
 
 **주요 컴포넌트**
-- Section, Timeline, Tag, Button
+- Section, Container, Card, Tag, Badge, Button
 
 **예상 데이터 소스**
-- `profile.json` (배경, 자기소개)
-- `skills.json` (역량 개요)
+- `profile.json` (소개, 설계 철학, 핵심 강점)
+- `skills.json` (기술 분류)
+- `resume.json` (경력 하이라이트)
 - `companies.json` — 목표 회사 정보는 화면에 직접 나열되기보다, 어떤 강점과 사례를 강조할지 결정하는 **콘텐츠 큐레이션 참고 자료**로 사용된다 (`docs/DATA_MODEL.md` §9)
 
 ---
