@@ -11,6 +11,16 @@
  * fontFamily는 app/layout.tsx에서 이미 로드하는 Geist 폰트의 CSS 변수
  * (--font-sans, --font-mono, app/globals.css @theme inline 참고)를 그대로 참조해
  * 폰트 로딩 방식을 이중으로 정의하지 않는다.
+ *
+ * fontSize/fontWeight는 Tailwind 기본 스케일과 값이 정확히 동일하다 (text-xs~text-5xl,
+ * font-normal/font-medium/font-bold). 컴포넌트에서는 이 유틸리티를 그대로 쓰면 된다.
+ * fontWeight의 기본 단계는 "regular"가 아니라 "normal"로 명명한다 — lineHeight.normal,
+ * letterSpacing.normal과 동일한 단어를 써서 "기본값"을 가리키는 표현을 파일 전체에서
+ * 통일하고, CSS의 font-weight: normal / Tailwind의 font-normal과도 이름이 맞는다.
+ * lineHeight/letterSpacing은 Tailwind 기본값과 근소하게 다르지만(leading-tight=1.25 vs
+ * 여기 1.2 등) 그 차이가 시각적으로 무의미해, 지금은 Tailwind 기본 leading-*, tracking-*
+ * 유틸리티를 그대로 사용하고 이 파일의 값은 의미 참고용으로만 유지한다.
+ * (TODO: 정확히 일치시켜야 할 필요가 생기면 app/globals.css에 --leading-*, --tracking-* 재정의)
  */
 
 export const typography = {
@@ -30,7 +40,7 @@ export const typography = {
     "5xl": "3rem",
   },
   fontWeight: {
-    regular: 400,
+    normal: 400,
     medium: 500,
     bold: 700,
   },

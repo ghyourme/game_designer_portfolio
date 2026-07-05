@@ -7,15 +7,26 @@ import type { ReactNode } from "react";
  *
  * 책임:
  * - "Featured", "Case Study"와 같은 짧은 상태나 구분을 강조해 보여준다.
- * - 주요 콘텐츠와 경쟁하지 않는 수준의 짧은 시선 끌기 역할만 한다. (구현 예정)
- *
- * 아직 스타일과 비즈니스 로직은 포함하지 않는다.
+ * - 주요 콘텐츠와 경쟁하지 않는 수준의 짧은 시선 끌기 역할만 한다.
+ * - Tag(중립적 분류)와 구분되도록 variant에 따라 강조색을 사용한다.
  */
 export interface BadgeProps {
   children?: ReactNode;
-  // TODO: variant (featured | case-study 등) props 정의
+  variant?: "featured" | "info" | "neutral";
 }
 
-export function Badge({ children }: BadgeProps) {
-  return <span>{children}</span>;
+const VARIANT_CLASSES: Record<Required<BadgeProps>["variant"], string> = {
+  featured: "bg-brand-secondary text-text-inverse",
+  info: "bg-state-info text-text-inverse",
+  neutral: "bg-background-muted text-text-secondary",
+};
+
+export function Badge({ children, variant = "featured" }: BadgeProps) {
+  return (
+    <span
+      className={`inline-flex items-center rounded-sm px-2 py-0.5 text-xs font-medium uppercase tracking-wide ${VARIANT_CLASSES[variant]}`}
+    >
+      {children}
+    </span>
+  );
 }

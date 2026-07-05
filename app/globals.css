@@ -1,8 +1,69 @@
 @import "tailwindcss";
 
+/**
+ * 이 파일은 styles/*.ts의 디자인 토큰 값을 Tailwind CSS의 테마 시스템에 연결한다.
+ * styles/*.ts가 TS 코드에서 참조하는 단일 소스라면, 이 :root/@theme 블록은
+ * 같은 값을 Tailwind 유틸리티 클래스(rounded-md, shadow-sm, bg-brand-primary 등)로
+ * 노출하는 CSS 쪽 대응 표현이다. 두 파일의 값은 반드시 함께 갱신해야 한다.
+ *
+ * spacing과 typography의 fontSize/fontWeight는 Tailwind 기본 스케일과
+ * 이미 값이 동일하므로 여기서 다시 정의하지 않는다 (styles/spacing.ts,
+ * styles/typography.ts의 매핑 주석 참고).
+ *
+ * duration/easing(animation.ts)은 @theme에 등록해도 이름 있는 유틸리티(duration-fast 등)가
+ * 생성되지 않는 것을 빌드 결과로 확인했다. 그래서 :root 변수로만 선언하고, 컴포넌트에서는
+ * Tailwind의 임의값 문법(예: duration-[var(--duration-fast)])으로 참조한다.
+ *
+ * --color-border-muted는 --color-background-muted와 값이 완전히 같고 어디서도 쓰이지
+ * 않아 제거했다 (styles/colors.ts 리뷰 참고). --color-focus는 --color-brand-primary를
+ * 독립 리터럴로 중복 선언하지 않고 그 값을 그대로 참조한다.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* styles/colors.ts */
+  --color-brand-primary: #2563eb;
+  --color-brand-secondary: #1e293b;
+
+  --color-text-primary: #111827;
+  --color-text-secondary: #4b5563;
+  --color-text-disabled: #9ca3af;
+  --color-text-inverse: #ffffff;
+
+  --color-background-base: #ffffff;
+  --color-background-elevated: #f9fafb;
+  --color-background-muted: #f3f4f6;
+  --color-background-inverse: #111827;
+
+  --color-border-default: #e5e7eb;
+
+  --color-state-success: #16a34a;
+  --color-state-warning: #d97706;
+  --color-state-error: #dc2626;
+  --color-state-info: #0284c7;
+
+  --color-focus: var(--color-brand-primary);
+
+  /* styles/radius.ts — Tailwind 기본 스케일과 값이 달라 명시적으로 재정의한다 */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* styles/shadow.ts — Tailwind 기본 스케일과 값이 달라 명시적으로 재정의한다 */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+
+  /* styles/animation.ts */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+
+  /* 기존 body 배경/텍스트 — 위 컬러 토큰의 얇은 별칭으로 통일 (하위 호환 유지) */
+  --background: var(--color-background-base);
+  --foreground: var(--color-text-primary);
 }
 
 @theme inline {
@@ -10,13 +71,32 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-brand-primary: var(--color-brand-primary);
+  --color-brand-secondary: var(--color-brand-secondary);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-disabled: var(--color-text-disabled);
+  --color-text-inverse: var(--color-text-inverse);
+  --color-background-base: var(--color-background-base);
+  --color-background-elevated: var(--color-background-elevated);
+  --color-background-muted: var(--color-background-muted);
+  --color-background-inverse: var(--color-background-inverse);
+  --color-border-default: var(--color-border-default);
+  --color-state-success: var(--color-state-success);
+  --color-state-warning: var(--color-state-warning);
+  --color-state-error: var(--color-state-error);
+  --color-state-info: var(--color-state-info);
+  --color-focus: var(--color-focus);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
 }
 
 body {
