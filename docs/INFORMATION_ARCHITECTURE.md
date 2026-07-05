@@ -98,21 +98,33 @@
 
 | 항목 | 내용 |
 |------|------|
-| 목적 | 문제→접근→해결→결과 구조로 하나의 프로젝트를 깊이 있게 증명한다. |
+| 목적 | 프로젝트 개요부터 회고까지 9단계 공식 구조(`docs/CONTENT_GUIDE.md` §3과 동일)로 하나의 프로젝트를 깊이 있게 증명한다. |
 | 대상 사용자 | 깊이를 평가하려는 시니어/리드 기획자가 1차 대상, 특정 역할 적합성을 확인하려는 채용 담당자가 2차 대상 |
 | 사용자 목표 | 이 프로젝트에서 후보자가 실제로 무엇을 맡았고 어떻게 사고했는지 이해한다. |
 | CTA | "PDF 다운로드", "다른 프로젝트 보기" |
 
-**구성 섹션 (상단 → 하단, `docs/DATA_MODEL.md` §5 프로젝트 데이터 모델 순서 기반)**
-1. 헤더 — title, subtitle, cover, role, genre, platform, period, team, tags
-2. 개요 (overview)
-3. 문제 정의 (problem)
-4. 접근 및 해결 (contribution, systems, contents, solution)
-5. 결과 (result)
-6. 갤러리 (gallery)
-7. 관련 PDF (pdf) — 설계 문서 다운로드/미리보기
-8. 사용 역량 (skills)
-9. 다른 프로젝트로 이동하는 내비게이션
+**구성 섹션 (상단 → 하단)**
+
+헤더 — title, subtitle, cover, role, genre, platform, period, team, tags (9개 공식 섹션에는 포함되지 않는, 페이지 최상단의 메타 정보 블록)
+
+이후 `docs/CONTENT_GUIDE.md` §3과 동일한 순서·명칭의 9개 공식 섹션이 이어진다 (`docs/DATA_MODEL.md` §5 프로젝트 데이터 모델 필드와의 대응은 괄호로 표기):
+
+1. 프로젝트 개요 (overview)
+2. 담당 역할 (contribution)
+3. 목표 (goal)
+4. 문제 정의 (problem)
+5. 접근 과정 (approach)
+6. 시스템 설계 (systems)
+7. 핵심 기능 (features)
+8. 결과 (result)
+9. 회고 (retrospective)
+
+마지막으로 다른 프로젝트로 이동하는 내비게이션이 온다.
+
+Gallery, 관련 PDF, 사용 역량(skills)은 더 이상 독립된 섹션이 아니라, 위 9개 섹션 내부에서 사용하는 **UI 요소**로 정의한다:
+- **사용 역량(skills)** — "2. 담당 역할" 섹션 안에서 Tag 목록으로 함께 표시한다.
+- **관련 PDF(pdf)** — "6. 시스템 설계" 섹션 안에서 PDF Preview Card로 다운로드/미리보기를 제공한다.
+- **갤러리(gallery)** — "7. 핵심 기능" 섹션 안에서 이미지 갤러리(Modal로 확대)로 함께 표시한다.
 
 **주요 컴포넌트**
 - Section, Badge, Tag, Modal(갤러리 확대), PDF Preview Card, Button

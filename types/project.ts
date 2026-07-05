@@ -21,13 +21,15 @@ export interface Project {
   team: string;
   contribution: string;
   overview: string;
+  goal: string;
   problem: string;
-  solution: string;
+  approach: string;
   result: string;
+  retrospective: string;
   /** TODO: systems 항목의 세부 구조는 문서에 정의되어 있지 않음 */
   systems: unknown[];
-  /** TODO: contents 항목의 세부 구조는 문서에 정의되어 있지 않음 */
-  contents: unknown[];
+  /** TODO: features 항목의 세부 구조는 문서에 정의되어 있지 않음 */
+  features: unknown[];
   skills: string[];
   tags: string[];
   gallery: string[];

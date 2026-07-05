@@ -70,7 +70,9 @@
 
 ## 5. 프로젝트 데이터 모델
 
-프로젝트는 다음 구조를 가진다:
+프로젝트는 다음 구조를 가진다. Project Detail의 공식 9단계 섹션 구조(`docs/CONTENT_GUIDE.md` §3, `docs/INFORMATION_ARCHITECTURE.md` §2.4와 동일)를 기준으로 필드명을 맞췄다.
+
+**헤더 메타 정보** (9개 섹션에는 포함되지 않는, 페이지 상단 요약 정보)
 
 - id
 - slug
@@ -78,25 +80,37 @@
 - subtitle
 - thumbnail
 - cover
-- role
+- role — 담당 역할의 짧은 요약 라벨 (예: "시스템 기획자"). 서술형 내용은 아래 contribution이 담당한다.
 - genre
 - platform
 - period
 - team
-- contribution
-- overview
-- problem
-- solution
-- result
-- systems
-- contents
-- skills
 - tags
-- gallery
-- pdf
 - featured
 
+**9단계 섹션 본문** (`docs/CONTENT_GUIDE.md` §3 순서와 동일)
+
+| 순서 | 섹션명 | 필드명 |
+|------|--------|--------|
+| 1 | 프로젝트 개요 | overview |
+| 2 | 담당 역할 | contribution — role(짧은 라벨)을 서술형으로 풀어낸 내용 |
+| 3 | 목표 | goal |
+| 4 | 문제 정의 | problem |
+| 5 | 접근 과정 | approach |
+| 6 | 시스템 설계 | systems |
+| 7 | 핵심 기능 | features |
+| 8 | 결과 | result |
+| 9 | 회고 | retrospective |
+
+**섹션 내부에서 사용하는 지원 필드** (독립 섹션이 아니라 위 섹션들 안에서 UI 요소로 쓰인다 — `docs/INFORMATION_ARCHITECTURE.md` §2.4 참고)
+
+- skills — "2. 담당 역할" 섹션 안에서 Tag 목록으로 함께 표시
+- pdf — "6. 시스템 설계" 섹션 안에서 PDF Preview Card로 표시
+- gallery — "7. 핵심 기능" 섹션 안에서 이미지 갤러리로 표시
+
 이 구조는 모든 프로젝트에 동일하게 적용된다.
+
+> **변경 이력**: 이전에는 `solution`, `contents`라는 필드명을 썼다. `solution`은 "접근 과정" 섹션의 의미(문제를 해결한 결과물이 아니라 해결해 나간 과정/방법론)와 더 정확히 맞도록 `approach`로 이름을 바꿨고, `contents`는 "게임 콘텐츠"처럼 읽혀 "핵심 기능"이라는 섹션 의도와 어긋나 `features`로 이름을 바꿨다. `goal`, `retrospective`는 9단계 구조에 있던 "목표", "회고" 섹션에 대응하는 필드가 없어 새로 추가했다. `types/project.ts`와 `app/projects/[slug]/page.tsx`도 이 이름으로 동기화되었다 (`data/projects.json`은 현재 빈 배열이라 실제 데이터 마이그레이션은 해당 없음).
 
 ---
 

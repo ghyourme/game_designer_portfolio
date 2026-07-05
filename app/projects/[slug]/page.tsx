@@ -16,11 +16,10 @@ interface ProjectDetailPageProps {
  * getProjects()에서 slug로 단일 프로젝트를 조회한다. 아직 projects.json이 비어 있어
  * 항상 찾지 못하는 경로를 타지만, 데이터가 채워지면 즉시 아래 구조로 렌더링된다.
  *
- * 9개 섹션과 Project 필드 대응(콘텐츠 연동 시 참고):
- * 프로젝트 개요→overview, 담당 역할→contribution, 문제 정의→problem,
- * 접근 과정→solution, 시스템 설계→systems, 핵심 기능→contents, 결과→result.
- * "목표"와 "회고"는 docs/DATA_MODEL.md의 Project 모델에 대응 필드가 아직 없다 —
- * 콘텐츠를 연동하기 전에 문서를 먼저 보강해야 한다. (self-review에서 발견한 개선사항)
+ * 9개 섹션과 Project 필드 대응(콘텐츠 연동 시 참고, docs/DATA_MODEL.md §5와 동일):
+ * 프로젝트 개요→overview, 담당 역할→contribution, 목표→goal, 문제 정의→problem,
+ * 접근 과정→approach, 시스템 설계→systems, 핵심 기능→features, 결과→result,
+ * 회고→retrospective.
  */
 const DETAIL_SECTION_TITLES = [
   "프로젝트 개요",
