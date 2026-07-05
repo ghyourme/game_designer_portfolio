@@ -2,6 +2,7 @@ import { getSkills } from "@/lib/data";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { Tag } from "@/components/ui/Tag";
+import { flattenSkills } from "@/utils/skills";
 
 /**
  * SkillOverview
@@ -15,15 +16,11 @@ import { Tag } from "@/components/ui/Tag";
  *   관리하는 구조화된 스킬 데이터만 다룬다.
  * - 등록된 스킬이 하나도 없으면 Empty State를 보여준다 (현재 data/skills.json은 4개 분류
  *   모두 빈 배열이라 항상 이 경로를 탄다).
+ * - Resume의 SkillSummary와 동일한 데이터를 동일한 방식으로 나열하므로, 분류 병합
+ *   로직은 utils/skills.ts(flattenSkills)로 공유한다.
  */
 export function SkillOverview() {
-  const skills = getSkills();
-  const allSkills = [
-    ...skills.systemDesign,
-    ...skills.contentDesign,
-    ...skills.analysis,
-    ...skills.tools,
-  ];
+  const allSkills = flattenSkills(getSkills());
 
   return (
     <Section>

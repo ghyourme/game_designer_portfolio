@@ -1,8 +1,14 @@
 {
-  "personalInfo": {},
+  "personalInfo": {
+    "name": "이름 placeholder",
+    "role": "시스템 기획자",
+    "email": "email@placeholder.com",
+    "phone": "010-0000-0000",
+    "location": "위치 placeholder",
+    "summary": "짧은 이력 요약 placeholder"
+  },
   "career": [],
   "projectExperience": [],
-  "skills": [],
   "education": [],
   "awards": []
 }

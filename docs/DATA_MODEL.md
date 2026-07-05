@@ -129,14 +129,30 @@
 
 ## 7. 이력서 데이터 모델
 
-이력서는 다음 정보를 포함한다:
+이력서는 다음 정보를 포함한다. Project Model(§5), Profile Model(§12)과 동일한 원칙(평면 구조, 실제로 소비하는 Feature가 있는 필드만 정의)으로 아래와 같이 구체화한다.
 
-- 개인 정보
-- 경력 사항
-- 프로젝트 경험
-- 기술 스택
-- 교육 정보
-- 수상 및 기타 활동
+**개인 정보 (personalInfo)** — `docs/INFORMATION_ARCHITECTURE.md` §2.8 "1. 개인 정보"를 ResumeHero(신원/연락처)와 ResumeSummary(요약 문단)로 나눠 사용한다.
+
+| 필드 | 설명 | 사용하는 Feature |
+|------|------|------|
+| name | 이름 | ResumeHero |
+| role | 역할/직무 | ResumeHero |
+| email | 이메일 | ResumeHero |
+| phone | 전화번호 | ResumeHero |
+| location | 거주 지역 | ResumeHero |
+| summary | 짧은 이력 요약 문단 | ResumeSummary |
+
+**경력 사항 (career)** — 항목 배열. 각 항목: `id`, `company`, `role`, `period`, `description`. (ExperienceTimeline)
+
+**프로젝트 경험 (projectExperience)** — 항목 배열. 각 항목: `id`, `title`, `role`, `period`, `description`. `projects.json`의 전체 케이스 스터디와는 다른, 이력서용 축약 목록이다. (ProjectExperience)
+
+**교육 정보 (education)** — 항목 배열. 각 항목: `id`, `school`, `degree`, `period`. (Education)
+
+**기술 스택** — 이 섹션은 별도 `resume.skills` 필드를 두지 않는다. `skills.json`(§8)을 `getSkills()`로 그대로 재사용한다 — About의 SkillOverview와 동일한 데이터 소스를 공유해, 스킬 데이터가 두 곳에서 따로 관리되며 어긋나는 것을 막는다.
+
+**수상 및 기타 활동 (awards)** — 항목 배열. 세부 필드는 아직 정의하지 않는다. 이 섹션을 렌더링하는 Feature가 `features/resume/`에 아직 없어(2026-XX Resume 페이지 1차 구현 범위 밖), 실제로 소비하는 곳이 생기기 전까지 구조를 추측하지 않는다. (`types/resume.ts`에도 동일한 TODO가 남아있다)
+
+이 구조는 `resume.json` 전체에 적용되며, 이력서(§7)와 프로필(§12)은 목록이 아닌 단일 레코드이므로 §4 공통 데이터 규칙(id/slug/tags/status/order 등)을 따르지 않는다. 다만 career/projectExperience/education처럼 내부에 항목 배열을 담는 필드는, 목록 렌더링 시 안정적인 React key로 쓸 `id`를 각 항목에 둔다.
 
 ---
 
