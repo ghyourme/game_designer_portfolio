@@ -1,18 +1,51 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { getNavigation } from "@/lib/data";
+
 /**
  * Header
  *
- * 참고 문서: docs/DESIGN_SYSTEM.md - 6. Component Library (Navigation)
+ * 참고 문서:
+ * - docs/DESIGN_SYSTEM.md - 6. Component Library (Navigation)
+ * - docs/INFORMATION_ARCHITECTURE.md - 3. 사이트맵, 4. 내비게이션 흐름
  *
  * 책임:
- * - 모든 페이지 상단에 위치하는 전역 내비게이션 영역을 제공하는 placeholder.
- * - 아직 메뉴 항목은 포함하지 않는다. (data/navigation.json 연동은 구현 예정)
+ * - 모든 페이지 상단에 위치하는 전역 내비게이션 영역을 제공한다.
+ * - data/navigation.json(getNavigation)을 유일한 데이터 소스로 사용하며 메뉴 항목을
+ *   하드코딩하지 않는다. order 기준으로 정렬하고, isActive(노출 여부)가 true인
+ *   항목만 렌더링한다.
+ * - 현재 경로와 항목의 path를 비교해 방문 중인 페이지에 aria-current="page"를 부여한다.
+ *   (이 "현재 페이지 활성 상태"는 항목 데이터의 isActive와는 다른, 렌더링 시점의 값이다)
  *
- * 스타일과 비즈니스 로직은 포함하지 않는다.
+ * 스타일은 최소 구조 이상으로 구현하지 않는다.
  */
 export function Header() {
+  const pathname = usePathname();
+  const items = getNavigation()
+    .filter((item) => item.isActive)
+    .sort((a, b) => a.order - b.order);
+
   return (
     <header>
-      {/* TODO: data/navigation.json 기반 전역 내비게이션 메뉴 구현 예정 */}
+      <nav aria-label="Global navigation">
+        <ul>
+          {items.map((item) => {
+            const isCurrentPage = pathname === item.path;
+            return (
+              <li key={item.path}>
+                <Link
+                  href={item.path}
+                  aria-current={isCurrentPage ? "page" : undefined}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </header>
   );
 }

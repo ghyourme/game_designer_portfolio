@@ -1,1 +1,9 @@
-[]
+[
+  { "label": "Home", "path": "/", "order": 1, "isActive": true },
+  { "label": "About", "path": "/about", "order": 2, "isActive": true },
+  { "label": "Projects", "path": "/projects", "order": 3, "isActive": true },
+  { "label": "Analysis", "path": "/analysis", "order": 4, "isActive": true },
+  { "label": "Personal Works", "path": "/personal", "order": 5, "isActive": true },
+  { "label": "Resume", "path": "/resume", "order": 6, "isActive": true },
+  { "label": "Contact", "path": "/contact", "order": 7, "isActive": true }
+]
