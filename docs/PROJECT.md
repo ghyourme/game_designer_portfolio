@@ -1,155 +1,125 @@
-# Project Charter
+# 프로젝트 목표 문서
 
-| Field | Value |
-|-------|-------|
-| Version | 1.1 |
-| Owner | Project Owner |
-| Created | 2026-07-04 |
-| Last Updated | 2026-07-04 |
+## 1. 프로젝트 개요
 
-## 1. Project Overview
-
-### Project Name
+### 프로젝트 이름
 
 Game Designer Portfolio
 
-### Purpose
+### 목적
 
-This project exists to design, build, and maintain a professional portfolio website that presents the owner's work, thinking, and qualifications as a game designer to hiring teams at target game studios. The portfolio is both a showcase of past design work and a demonstration of the owner's ability to plan, structure, and execute a polished digital product.
+이 프로젝트는 게임 기획자로서의 작업물, 사고 방식, 역량을 체계적으로 보여주기 위한 전문 포트폴리오 웹사이트를 설계하고 구축하고 유지하는 것을 목표로 한다.
 
-### Background
+이 포트폴리오는 단순한 이력서가 아니라, 게임 디자인 능력을 구조적으로 증명하는 살아있는 서비스이다.
 
-Game design roles are evaluated not only on creative ideas but on the candidate's ability to communicate systems, content, and analytical thinking clearly. A static resume or slide deck is insufficient to convey the depth of system design, content design, and game analysis skills expected by competitive studios. This project addresses that gap by providing an interactive, well-structured, and maintainable web portfolio purpose-built for game design hiring processes.
+### 배경
 
-### Target Audience
+게임 기획 직무는 단순한 아이디어가 아니라 시스템 설계 능력, 콘텐츠 설계 능력, 분석 능력을 함께 평가한다.
 
-- Recruiters and HR staff performing initial screening.
-- Lead and senior game designers evaluating design thinking and craft.
-- Hiring managers comparing candidates for system or content design roles.
-- Internal stakeholders (the owner) using the site as a living record of design work.
+이러한 역량은 정적인 문서나 슬라이드만으로 충분히 전달되기 어렵다.
 
-## 2. Project Philosophy
+이 프로젝트는 이를 해결하기 위해 설계된 인터랙티브 포트폴리오 시스템이다.
 
-This portfolio is not intended to be a collection of documents.
+---
 
-It is designed as a product.
+## 2. 목표
 
-Every interaction should communicate the author's design thinking, attention to detail, and ability to solve problems through structured design.
+| 번호 | 목표 | 성공 기준 |
+|------|------|----------|
+| 1 | 완전한 포트폴리오 구축 | 필수 섹션(Home, About, Projects, Analysis, Personal Works, Resume, Contact) 구현 |
+| 2 | 취업 성과 | 목표 회사 1곳 이상 인터뷰 확보 |
+| 3 | 시스템 기획 역량 증명 | 최소 3개 시스템 설계 문서 |
+| 4 | 콘텐츠 기획 역량 증명 | 최소 2개 콘텐츠 설계 문서 |
+| 5 | 분석 능력 증명 | 2개 이상 게임 분석 문서 |
+| 6 | UX 품질 | Core Web Vitals “Good” 수준 유지 |
+| 7 | 지속적 업데이트 | 월 1개 이상 콘텐츠 추가 |
+| 8 | 유지보수성 | 모든 구조 문서 최신 상태 유지 |
 
-The portfolio itself is treated as a living software product rather than a static website.
+---
 
-## 3. Goals
+## 3. 목표 회사
 
-| # | Goal | Measure of Success |
-|---|------|---------------------|
-| 1 | Present a complete, professional portfolio | All required sections (Home, About, Projects, Analysis, Personal Works, Resume, Contact) are published and content-complete |
-| 2 | Secure interviews at target companies | At least 1 interview invitation from one of the five target companies within the first 6 months of active applications |
-| 3 | Demonstrate system design competency | At least 3 in-depth system design case studies published |
-| 4 | Demonstrate content design competency | At least 2 in-depth content design case studies published |
-| 5 | Demonstrate analytical rigor | At least 2 published game analysis/teardown documents referencing target companies' products or genres |
-| 6 | Deliver a high-quality user experience | Core Web Vitals in the "Good" range on production; no critical accessibility violations |
-| 7 | Maintain a sustainable content pipeline | New case study or analysis added at a defined cadence (e.g., at least once per month) without breaking existing structure |
-| 8 | Keep the codebase maintainable long-term | Documentation kept current with every structural change; no undocumented architectural decisions |
+| 회사 | 설명 |
+|------|------|
+| 넥슨 | 대규모 라이브 서비스 게임 |
+| 데브캣 | 내러티브 중심 시스템 게임 |
+| 데브시스터즈 | IP 기반 모바일 게임 |
+| 슈퍼센트 | 하이퍼캐주얼 게임 |
+| 111퍼센트 | 시뮬레이션/캐주얼 게임 |
 
-## 4. Project Scope
+---
 
-### In Scope
+## 4. 목표 직무
 
-- Portfolio Website
-- Project Showcase
-- PDF Viewer
-- Search & Filtering
-- Responsive Design
-- Accessibility
-- SEO
-- AI-assisted development workflow
+- 시스템 기획자
+- 콘텐츠 기획자
 
-### Out of Scope
+두 역할 모두를 동시에 증명할 수 있는 구조로 설계한다.
 
-- CMS
-- User Authentication
-- Backend APIs
-- Database
-- Admin Dashboard
+---
 
-## 5. Target Companies
+## 5. 기술 스택
 
-| Company | Notes |
-|---------|-------|
-| Nexon | Large-scale live-service and mobile/PC game publisher |
-| DevCAT | Internal studio known for narrative-driven, systems-heavy titles |
-| Devsisters | Mobile-first studio with strong content and IP-driven design |
-| Supercent | Hyper-casual and casual mobile game publisher |
-| 111Percent | Mobile game developer known for narrative and simulation genres |
+| 영역 | 기술 |
+|------|------|
+| 웹 프레임워크 | Next.js |
+| UI | React |
+| 언어 | TypeScript |
+| 스타일 | Tailwind CSS |
+| AI 도구 | Claude Code |
+| 버전 관리 | GitHub |
+| IDE | VS Code |
+| MCP | Model Context Protocol |
 
-The portfolio content, tone, and case study selection should be curated with these companies' genres, audiences, and design philosophies in mind.
+---
 
-## 6. Target Positions
+## 6. 개발 원칙
 
-- **Game System Designer** — focus on mechanics, balancing, progression, economy, and systemic interactions.
-- **Game Content Designer** — focus on level design, narrative content, quest/mission design, and player-facing content pipelines.
+| 원칙 | 설명 |
+|------|------|
+| 문서 우선 | 모든 개발은 문서에서 시작 |
+| JSON 우선 | 콘텐츠는 데이터로 관리 |
+| 컴포넌트 중심 | UI는 재사용 가능한 단위로 구성 |
+| UX 우선 | 사용자 경험이 코드보다 우선 |
+| 유지보수성 | 장기 업데이트 가능 구조 |
+| 확장성 | 콘텐츠 증가에 대응 가능 |
+| 접근성 | 모든 사용자 고려 |
 
-The portfolio must clearly demonstrate competency for both positions, since the two roles emphasize different (though overlapping) skill sets.
+---
 
-## 7. Technology Stack
+## 7. 포트폴리오 구조
 
-| Layer | Technology |
-|-------|------------|
-| Web Framework | Next.js |
-| UI Library | React |
-| Language | TypeScript |
-| Styling | Tailwind CSS |
-| AI Development Assistant | Claude Code |
-| Version Control / Hosting | GitHub |
-| Editor | VS Code |
-| AI Tooling Integration | MCP (Model Context Protocol) |
+| 섹션 | 설명 |
+|------|------|
+| Home | 전체 소개 |
+| About | 자기소개 및 철학 |
+| Projects | 프로젝트 상세 |
+| Analysis | 게임 분석 |
+| Personal Works | 개인 작업 |
+| Resume | 이력 |
+| Contact | 연락 |
 
-This stack was selected to balance modern web development best practices with an efficient, AI-assisted development workflow.
+---
 
-## 8. Development Principles
+## 8. 완료 기준
 
-| Principle | Description |
-|-----------|--------------|
-| Documentation First | No significant work begins without corresponding documentation; documentation is the source of truth for scope and decisions. |
-| JSON First | Content and structured data are modeled and authored before being bound to presentation, ensuring content can evolve independently of UI. |
-| Component First | Functionality and presentation are designed as reusable, composable units rather than one-off implementations. |
-| UX First | Decisions prioritize the experience of the person reviewing the portfolio (recruiters, designers) over developer convenience. |
-| Maintainability | The project must remain understandable and modifiable by the owner months or years later without relearning it from scratch. |
-| Scalability | The structure must accommodate a growing number of projects, case studies, and analyses without requiring redesign. |
-| Accessibility | The portfolio must be usable by people with disabilities and must meet recognized accessibility standards. |
+다음 조건을 만족하면 프로젝트 완료로 간주한다:
 
-## 9. Portfolio Structure
+- 모든 섹션 구현 완료
+- 모든 문서 최신 상태 유지
+- 배포 완료
+- 반응형 지원
+- 성능/접근성 기준 충족
+- 실제 취업 활용 가능 상태
 
-| Section | Purpose |
-|---------|---------|
-| Home | First impression; summarizes who the owner is and highlights key work. |
-| About | Background, philosophy, skills, and career narrative. |
-| Projects | Detailed case studies of game design projects, organized by system or content focus. |
-| Analysis | Game analysis and teardown write-ups demonstrating analytical and critical design thinking. |
-| Personal Works | Independent or side projects not tied to formal employment or coursework. |
-| Resume | Formal, downloadable/viewable summary of experience, education, and skills. |
-| Contact | Ways for recruiters and studios to reach the owner. |
+---
 
-## 10. Definition of Done
+## 9. 성공 기준
 
-The project is considered complete for a given release when all of the following conditions are met:
+- 목표 회사 인터뷰 발생
+- 3~5분 내 전체 역량 파악 가능
+- 시스템/콘텐츠 역량 구분 명확
+- 유지보수 가능한 구조
+- 실제 서비스 수준의 완성도
 
-- All sections listed in the Portfolio Structure are implemented and populated with real content (no placeholder or lorem ipsum text).
-- All documentation in `docs/` is up to date and accurately reflects the current state of the project.
-- The site is deployed and publicly accessible at a stable production URL.
-- The site has been reviewed for accessibility, performance, and cross-browser/cross-device compatibility.
-- All known critical and high-priority issues have been resolved.
-- Content has been proofread for grammar, clarity, and professional tone.
-- The Resume and Contact sections are verified accurate and current.
-- The owner has reviewed and approved the final result against the goals defined in Section 3.
-
-## 11. Success Criteria
-
-The portfolio will be considered successful if it achieves the following outcomes:
-
-- It generates interview opportunities at one or more of the target companies or comparable studios.
-- Reviewers (recruiters and designers) can understand the owner's design thinking and craft within a few minutes of browsing.
-- The site clearly differentiates the owner's skill set for both System Designer and Content Designer roles.
-- The portfolio remains easy to update and extend as new projects and analyses are produced.
-- The site reflects a level of polish, clarity, and structure consistent with the quality bar expected at the target companies.
-- The owner can confidently reference the portfolio as an accurate, current representation of their design capabilities at any point in time.
+---

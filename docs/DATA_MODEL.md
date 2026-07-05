@@ -1,189 +1,182 @@
-# Data Model
+# 데이터 모델
 
-This document defines every JSON data model used by the Game Designer Portfolio. It describes structures conceptually — field names, meaning, and relationships — not implementation code. It should be read alongside `docs/PROJECT.md` (goals and scope), `CLAUDE.md` (working rules), and `docs/ARCHITECTURE.md` (how data flows into components and pages).
+이 문서는 Game Designer Portfolio에서 사용되는 모든 JSON 데이터 구조의 설계 기준을 정의한다.
 
-## 1. Purpose
+이 문서는 구현 코드가 아니라 **데이터 구조의 개념 설계 문서**이다.
 
-Per the **JSON First** principle established in the project charter and architecture, all portfolio content — projects, analyses, resume facts, contact details, navigation — is defined as structured data rather than embedded in components or pages.
+---
 
-This matters for a portfolio specifically because:
+## 1. 목적
 
-- The owner must be able to add, edit, or retire content (a new case study, an updated resume entry) without touching UI code.
-- Content changes should never risk introducing UI bugs, and UI changes should never risk altering content.
-- A hiring reviewer's experience depends on consistent presentation across many content items; consistency is only guaranteed if every item conforms to the same defined shape.
-- The site's long-term maintainability depends on the owner (or any future contributor) being able to reason about "what content exists" independently of "how it's displayed."
+이 프로젝트는 모든 콘텐츠를 데이터 기반으로 관리한다.
 
-Every JSON file described in this document is a contract: components render whatever conforms to it, and nothing else.
+즉, UI가 아니라 **JSON 데이터가 시스템을 결정하는 구조**이다.
 
-## 2. Design Principles
+이 방식은 다음을 가능하게 한다:
 
-- **JSON First** — Content is authored and structured as data before any UI is built to display it. If a piece of content doesn't yet have a defined shape here, it is not ready to be wired into a component.
-- **Separation of Content and UI** — Data files describe *what* content is; they contain no styling, layout, or presentation instructions. Components decide *how* content appears.
-- **Scalability** — Adding a new project, analysis, or skill is a matter of adding a new entry to an existing file, not modifying schema or code. The models must accommodate growth in volume without redesign.
-- **Maintainability** — Every model favors explicit, self-describing fields over clever or overloaded ones, so the schema remains understandable without cross-referencing code.
-- **Reusability** — Where content overlaps across pages (e.g., a skill referenced by both a project and the resume, a company referenced by both the charter's target list and a project's relevance tag), models reference shared entities by identifier rather than duplicating data.
+- 콘텐츠 확장성 확보
+- UI와 데이터 분리
+- 유지보수 용이성
+- 자동화된 페이지 생성
 
-## 3. Data Directory
+---
 
-All portfolio content lives under `data/`, one file per content domain:
+## 2. 설계 원칙
 
-| File | Responsibility |
-|------|-----------------|
-| `profile.json` | The owner's core identity: name, title, tagline, short bio, and summary content used primarily on Home and About. |
-| `resume.json` | The structured, formal record of experience, education, and qualifications, used to render and export the Resume page. |
-| `projects.json` | The collection of game design case studies shown on the Projects page and linked from Home. |
-| `analysis.json` | The collection of game analysis and teardown write-ups shown on the Analysis page. |
-| `personal.json` | The collection of independent or side works shown on the Personal Works page. |
-| `skills.json` | The canonical list of skills and skill categories referenced by projects, analyses, and the resume. |
-| `companies.json` | The canonical list of target companies (per `docs/PROJECT.md` Section 5), referenced for relevance tagging and any company-oriented views. |
-| `navigation.json` | The structure of global and footer navigation, consumed by the site's layout. |
-| `settings.json` | Site-wide, non-content configuration: site title, default SEO metadata, social/contact links, and similar global values. |
+- JSON First 구조
+- 데이터와 UI 분리
+- 확장 가능한 구조
+- 유지보수 중심 설계
+- 재사용 가능한 데이터 구조
 
-Each file is independently maintainable: editing `projects.json` never requires touching `skills.json`, even though projects reference skills by identifier.
+---
 
-## 4. Common Rules
+## 3. 데이터 디렉토리 구조
 
-The following fields recur across models and carry consistent meaning wherever they appear:
+이 프로젝트는 다음 JSON 파일을 기반으로 동작한다:
 
-| Field | Meaning |
-|-------|---------|
-| `id` | A stable, unique identifier for the entry within its file. Never reused, never repurposed, and never used for display. |
-| `slug` | A URL-safe, human-readable identifier used for routing (e.g., a project's detail page path). Unique within its content type. |
-| `title` | The primary display name of the entry. |
-| `description` | A short, plain-language summary of the entry, suitable for previews, cards, and metadata. |
-| `createdAt` | The date the entry was authored, in ISO 8601 date format. |
-| `updatedAt` | The date the entry was last substantively revised, in ISO 8601 date format. |
-| `featured` | A boolean flag indicating the entry should be prioritized in summary views (e.g., Home highlights). |
-| `tags` | A list of keywords used for filtering, search, and cross-referencing (e.g., skills, genres, companies). |
-| `status` | The publication state of the entry (e.g., published, draft, archived), used to control visibility without deleting content. |
-| `order` | An explicit sort position used where content must appear in a curated order rather than by date. |
+- profile.json : 사용자 기본 정보
+- resume.json : 이력 정보
+- projects.json : 프로젝트 데이터
+- analysis.json : 게임 분석 콘텐츠
+- personal.json : 개인 작업물
+- skills.json : 기술 및 역량 정보
+- companies.json : 목표 회사 정보
+- navigation.json : 메뉴 구조
+- settings.json : 시스템 설정
 
-Naming conventions:
+각 파일은 독립적인 역할을 가진다.
 
-- Field names use `camelCase` throughout.
-- `slug` values use lowercase `kebab-case`.
-- Dates are always ISO 8601 (`YYYY-MM-DD`); no locale-specific date formats.
-- Boolean fields are named as affirmative predicates (`featured`, not `isNotFeatured`).
-- Identifiers referencing another model's entry are named `<model>Id` (e.g., `skillId`) or, for lists, `<model>Ids`.
-- Every content-bearing file's entries include at minimum `id`, `slug`, `title`, and `status`, even if a given content type has no immediate use for the others.
+---
 
-## 5. Project Model
+## 4. 공통 데이터 규칙
 
-Represents a single game design case study shown on the Projects page.
+모든 데이터는 다음 기준을 따른다:
 
-| Field | Description |
-|-------|--------------|
-| `id` | Unique identifier for the project. |
-| `slug` | URL-safe identifier used for the project's detail page route. |
-| `title` | The project's display name. |
-| `subtitle` | A short supporting line clarifying the project's focus or context (e.g., role or genre framing). |
-| `thumbnail` | Reference to the image asset used in list and card views. |
-| `cover` | Reference to the larger hero image asset used on the project's detail page. |
-| `role` | The owner's role on the project (e.g., System Designer, Content Designer), matching the Target Positions defined in `docs/PROJECT.md`. |
-| `genre` | The genre(s) of the game the project relates to. |
-| `platform` | The platform(s) the project targeted (e.g., mobile, PC, console). |
-| `period` | The timeframe during which the work was done. |
-| `team` | A description of the team context (e.g., team size or composition) relevant to the project. |
-| `contribution` | A concise statement of the owner's specific, personal contribution, distinct from the team's overall output. |
-| `overview` | A short narrative summary of the project as a whole, used as an introduction on the detail page. |
-| `problem` | The design problem or challenge the project addressed. |
-| `solution` | The approach or design solution the owner developed. |
-| `result` | The outcome or impact of the work, including any measurable or observed effects. |
-| `systems` | A description of the systems designed or affected (relevant primarily for System Designer-focused case studies). |
-| `contents` | A description of the content designed or affected (relevant primarily for Content Designer-focused case studies). |
-| `skills` | A list of skill identifiers (referencing `skills.json`) demonstrated by the project. |
-| `tags` | Keywords for filtering and cross-referencing, which may include genre, platform, or company relevance. |
-| `gallery` | A list of supporting image asset references illustrating the project. |
-| `pdf` | An optional reference to a supporting PDF document (e.g., a detailed design document) for the project. |
-| `featured` | Whether the project should be prioritized in summary views such as Home. |
+- id : 고유 식별자
+- slug : URL 경로
+- title : 제목
+- description : 설명
+- createdAt : 생성일
+- updatedAt : 수정일
+- featured : 주요 콘텐츠 여부
+- tags : 검색 및 분류용 태그
+- status : 상태값
+- order : 정렬 순서
 
-`systems` and `contents` are described separately because the charter requires the portfolio to demonstrate both System Designer and Content Designer competency; a single project may populate one or both, depending on its focus.
+모든 데이터는 일관된 구조를 유지해야 한다.
 
-## 6. Analysis Model
+---
 
-Represents a single game analysis or teardown write-up shown on the Analysis page.
+## 5. 프로젝트 데이터 모델
 
-An analysis entry is conceptually similar to a project but oriented around critique of an external game rather than the owner's own design work. It includes:
+프로젝트는 다음 구조를 가진다:
 
-- Identification and routing fields consistent with the Common Rules (`id`, `slug`, `title`, `status`, `tags`, `featured`, `createdAt`, `updatedAt`).
-- A **subject** describing the game, feature, or system being analyzed, and, where relevant, the studio or genre context.
-- A **focus** describing the analytical lens applied (e.g., a specific system, a content pattern, a monetization mechanic).
-- A **summary** giving a short, high-level takeaway of the analysis.
-- A **body** representing the structured written content of the analysis (organized into logical sections rather than a single unstructured block, so the UI can render consistent headings and layout across all analyses).
-- Optional **references** to the relevant target companies (via `companies.json`) or skills (via `skills.json`) the analysis relates to.
-- Optional supporting media (`thumbnail`, `gallery`) and an optional `pdf` reference, consistent with the Project Model.
+- id
+- slug
+- title
+- subtitle
+- thumbnail
+- cover
+- role
+- genre
+- platform
+- period
+- team
+- contribution
+- overview
+- problem
+- solution
+- result
+- systems
+- contents
+- skills
+- tags
+- gallery
+- pdf
+- featured
 
-The Analysis Model deliberately mirrors the Project Model's supporting fields (media, tags, skills) so that both content types can share list, card, and detail-view components.
+이 구조는 모든 프로젝트에 동일하게 적용된다.
 
-## 7. Resume Model
+---
 
-Represents the structured content backing the Resume page and any exportable resume document.
+## 6. 분석 데이터 모델
 
-The resume is organized as a small set of distinct sections rather than a single flat record:
+게임 분석 콘텐츠는 다음 구조를 따른다:
 
-- **Basic information** — name, title/headline, contact summary, and a link to a downloadable resume asset.
-- **Summary** — a short professional summary statement.
-- **Experience** — an ordered list of roles, each describing an organization, title, period, and a summary of responsibilities or achievements relevant to game design.
-- **Education** — an ordered list of academic or training entries, each with an institution, credential, and period.
-- **Skills reference** — a reference into `skills.json` rather than a duplicated list, ensuring the resume and the rest of the site draw on the same canonical skill definitions.
-- **Certifications or additional qualifications** — an optional ordered list of relevant credentials.
+- 기본 정보 (제목, 설명, 태그)
+- 분석 대상 게임
+- 시스템 분석
+- 콘텐츠 분석
+- UX 분석
+- 결론
 
-The Resume Model does not duplicate content already captured elsewhere (e.g., project details); it references or summarizes rather than restates.
+---
 
-## 8. Skill Model
+## 7. 이력서 데이터 모델
 
-Represents the canonical catalog of skills referenced throughout the site.
+이력서는 다음 정보를 포함한다:
 
-Each entry defines:
+- 개인 정보
+- 경력 사항
+- 프로젝트 경험
+- 기술 스택
+- 교육 정보
+- 수상 및 기타 활동
 
-- `id` — a unique, stable identifier used by other models to reference the skill.
-- `name` — the display name of the skill.
-- `category` — the grouping the skill belongs to (e.g., System Design, Content Design, Tools & Technical, Analysis), aligned with the Target Positions in `docs/PROJECT.md`.
-- `description` — an optional short clarification of what the skill covers, used where the name alone may be ambiguous.
+---
 
-Skills are defined once and referenced by identifier from `projects.json`, `analysis.json`, and `resume.json`, ensuring consistent naming and enabling skill-based filtering across content types.
+## 8. 스킬 데이터 모델
 
-## 9. Company Model
+기술 스택은 다음 기준으로 분류된다:
 
-Represents the target companies identified in `docs/PROJECT.md` Section 5, used to keep content curated toward relevant audiences and to support any company-oriented views described in `docs/ARCHITECTURE.md`.
+- 시스템 기획 역량
+- 콘텐츠 기획 역량
+- 분석 역량
+- 도구 활용 능력
 
-Each entry defines:
+각 스킬은 숙련도와 함께 관리된다.
 
-- `id` — a unique, stable identifier used by other models to reference the company.
-- `name` — the company's display name.
-- `notes` — a short description of the company's focus or design philosophy, consistent with the notes captured in the charter.
-- `relevantTags` — an optional list of tags (genres, platforms, skills) that characterize what kind of content is most relevant to this company, supporting future filtering or curated views.
+---
 
-This model does not include recruiting, application, or contact-tracking data; it exists to inform content relevance, not to manage a hiring process.
+## 9. 회사 데이터 모델
 
-## 10. Navigation Model
+목표 회사 정보는 다음을 포함한다:
 
-Represents the structure of the site's global and footer navigation, consumed by the layout described in `docs/ARCHITECTURE.md`.
+- 회사 이름
+- 설명
+- 게임 장르
+- 디자인 특징
+- 지원 전략
 
-Each navigation entry defines:
+이 정보는 콘텐츠 큐레이션에 사용된다.
 
-- `id` — a unique identifier for the navigation item.
-- `label` — the display text shown to visitors.
-- `path` — the route or URL the item links to.
-- `group` — which navigation area the item belongs to (global or footer).
-- `order` — the position of the item within its group.
-- `external` — a boolean indicating whether the link leaves the site (e.g., a social profile), used to inform link presentation and behavior.
+---
 
-The Navigation Model is intentionally flat and simple: the site's information architecture is shallow by design, and navigation data should not need to express deep nesting.
+## 10. 네비게이션 데이터 모델
 
-## 11. Future Expansion
+사이트 구조는 데이터로 관리된다:
 
-New content types are added by introducing a new file under `data/` with its own model definition in this document, following the same Common Rules and naming conventions already established. Existing models are not modified to accommodate unrelated new content; a new content type earns its own file and schema.
+- 메뉴 항목
+- 경로 정보
+- 표시 순서
+- 활성 상태
 
-Where a new content type overlaps conceptually with an existing one (for example, a future content type that, like Analysis, needs structured body sections and media), it should reuse the same field names and structural patterns already defined here, so shared components can serve multiple content types without special-casing.
+---
 
-Extending an existing model (e.g., adding a new optional field to the Project Model) is preferred over introducing a parallel, near-duplicate model. Any such extension must be reflected in this document at the same time it is introduced.
+## 11. 확장 전략
 
-### Data Modeling Guidelines for Future Contributors
+새로운 데이터 타입은 기존 구조를 변경하지 않고 추가할 수 있어야 한다.
 
-- Never add a field to satisfy a single, one-off piece of content; if a field is truly one-off, it likely belongs in a more specific model or should be reconsidered.
-- Always update this document in the same change that introduces or modifies a model — this document is the schema's source of truth.
-- Reference shared entities (skills, companies) by identifier; never copy their data inline into another model.
-- Keep every model's field set explicit and self-describing; avoid overloading a single field to mean different things in different contexts.
-- Favor extending an existing model over creating a near-duplicate one, and favor a new model over overloading an existing one with unrelated content.
-- Do not introduce fields that encode presentation or layout decisions; those belong to components, not data.
+예:
+
+- 새로운 콘텐츠 타입 추가
+- 새로운 필터 구조 추가
+- 새로운 페이지 유형 추가
+
+---
+
+## 요약
+
+이 프로젝트의 모든 콘텐츠는 JSON 기반 데이터로 구성되며,
+UI는 이 데이터를 시각적으로 표현하는 역할만 수행한다.

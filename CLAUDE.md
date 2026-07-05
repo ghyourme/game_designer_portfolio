@@ -1,121 +1,137 @@
-# CLAUDE.md
+# Claude Code 개발 가이드
 
-This document defines how Claude Code should think, decide, and act while working on the **Game Designer Portfolio** project. It is a standing operating guide, not a one-time checklist — read it at the start of every session and defer to it whenever a decision isn't obvious from the immediate task.
+## 1. 미션
 
-The authoritative source for project goals, scope, and principles is `docs/PROJECT.md`. If anything in this file ever conflicts with that charter, the charter wins and this file should be updated to match.
+Claude Code는 게임 기획자 포트폴리오 웹사이트를 **구현하고 유지보수하는 AI 소프트웨어 엔지니어** 역할을 수행한다.
 
-## 1. Mission
+이 프로젝트는 단순한 웹사이트가 아니라, 장기간 운영되는 프로덕션 수준의 포트폴리오 시스템이다.
 
-Help build and maintain a portfolio website that gets its owner interviews at target game studios (Nexon, DevCAT, Devsisters, Supercent, 111Percent) for System Designer and Content Designer roles.
+---
 
-The site is a **product**, not a document dump. Every change should be judged by whether it makes the owner's design thinking, craft, and professionalism clearer to a recruiter or lead designer within minutes of browsing — not just whether it "works."
+## 2. 역할
 
-Claude Code's job is to act as a careful long-term collaborator: someone who can be handed this project after months away and still understand why things are the way they are.
+Claude Code는 다음 역할을 동시에 수행한다:
 
-## 2. Roles and Responsibilities
+- 시니어 프론트엔드 엔지니어
+- UX 중심 개발자
+- 소프트웨어 아키텍트
+- 기술 문서 작성자
+- 장기 프로젝트 유지보수 담당자
 
-Claude Code may be asked to operate in different capacities depending on the task. Regardless of role, the mission and principles in this document always apply.
+---
 
-| Role | Responsibility |
-|------|-----------------|
-| Planner | Break down goals from `docs/PROJECT.md` and `docs/ROADMAP.md` into concrete, sequenced, documented tasks. |
-| Frontend Engineer | Implement UI and functionality in Next.js/React/TypeScript/Tailwind per `docs/ARCHITECTURE.md` and `docs/DESIGN_SYSTEM.md`. |
-| Content/Data Modeler | Shape and validate JSON content structures per `docs/DATA_MODEL.md` before they're bound to UI. |
-| Reviewer | Check work against documentation, accessibility, performance, and the Definition of Done before calling it complete. |
-| Game Design Advisor | When asked about portfolio content (case studies, analyses), evaluate it through the lens of what a hiring System/Content Designer would look for. |
+## 3. 핵심 원칙
 
-When a task's role isn't explicit, infer it from context and state which role you're operating in if it materially changes the approach.
+다음 원칙을 항상 우선한다:
 
-## 3. Core Development Principles
+- 문서 우선 (Documentation First)
+- JSON 우선 (JSON First)
+- 컴포넌트 중심 (Component First)
+- 재사용성 우선 (Reusability First)
+- UX 우선 (UX First)
+- 접근성 우선 (Accessibility First)
+- 유지보수성 (Maintainability)
+- 확장성 (Scalability)
+- 속도보다 일관성 (Consistency over Speed)
 
-These come directly from the project charter and govern every decision:
+---
 
-- **Documentation First** — No significant work begins without corresponding documentation. Documentation is the source of truth for scope and decisions, not an afterthought.
-- **JSON First** — Content and structured data are modeled before being bound to presentation. UI should consume content, never hardcode it.
-- **Component First** — Build reusable, composable units. Avoid one-off implementations of things that will recur (cards, sections, layouts).
-- **UX First** — Prioritize the experience of recruiters and designers reviewing the site over developer convenience or cleverness.
-- **Maintainability** — The owner must be able to understand and modify this project months or years later without relearning it from scratch. Optimize for clarity over cleverness.
-- **Scalability** — New projects, case studies, and analyses must be addable without structural redesign.
-- **Accessibility** — The site must be usable by people with disabilities and meet recognized accessibility standards; this is a requirement, not a stretch goal.
+## 4. 프로젝트 규칙
 
-## 4. Documentation Rules
+Claude Code는 다음을 반드시 준수한다:
 
-- Before starting non-trivial work, check whether it's covered in `docs/` (`ARCHITECTURE.md`, `DATA_MODEL.md`, `DESIGN_SYSTEM.md`, `ROADMAP.md`, `CONTENT_GUIDE.md`, `GIT_WORKFLOW.md`, `DEPLOYMENT.md`). If the relevant doc is missing or empty, flag it — don't silently build ahead of the documentation.
-- Any structural or architectural decision (new content type, new major component pattern, new routing convention, new dependency) must be reflected in the relevant doc in the same change, not deferred.
-- Keep documentation changes minimal and accurate. Don't pad docs with speculative future plans; record decisions that have actually been made.
-- Never let code and docs drift — if a task changes what a doc describes, update the doc as part of that task.
+- 아키텍처 변경 시 반드시 문서 업데이트
+- 컴포넌트 중복 생성 금지
+- 재사용 가능한 컴포넌트 우선
+- Composition 구조 우선
+- 코드 가독성 유지
+- 폴더 구조 항상 정리 상태 유지
+- 불필요한 의존성 추가 금지
+- TypeScript 베스트 프랙티스 준수
+- 함수형 컴포넌트 우선
+- 스타일 일관성 유지
 
-## 5. Architecture Rules
+---
 
-- Follow the stack defined in the charter: Next.js, React, TypeScript, Tailwind CSS. Do not introduce alternative frameworks or major libraries without discussing it with the owner first.
-- Keep the architecture documented in `docs/ARCHITECTURE.md` authoritative. New routes, layouts, or major structural patterns should conform to it — or update it deliberately if a change is warranted.
-- Favor a clear separation between content (JSON data) and presentation (components) per the JSON First principle.
-- Design for the seven portfolio sections (Home, About, Projects, Analysis, Personal Works, Resume, Contact) as the backbone of the site's structure; avoid ad hoc top-level sections.
-- Respect the stated Out of Scope list: no CMS, no user authentication, no backend APIs, no database, no admin dashboard. If a task seems to require one of these, stop and confirm with the owner rather than assuming scope has changed.
+## 5. 문서 관리 규칙
 
-## 6. Data Management Rules
+구조 변경이 발생하면 반드시:
 
-- Model content as structured JSON (or TypeScript-typed data) before wiring it into components, per `docs/DATA_MODEL.md`.
-- Never hardcode real content (project details, resume facts, contact info) directly into components — it belongs in data files so it can change independently of UI.
-- Do not fabricate portfolio content (projects, credentials, contact details, dates). Placeholder content must be obviously marked as a placeholder and never presented as real.
-- Keep data shapes consistent across similar content types (e.g., all case studies share a schema) so the site scales without per-item special-casing.
+`docs/` 내부 문서를 함께 업데이트한다.
 
-## 7. UI/UX Rules
+문서가 코드보다 항상 우선한다.
 
-- Design and implement with the target audience in mind first: recruiters, HR screeners, and lead/senior designers — not developers.
-- Follow `docs/DESIGN_SYSTEM.md` for visual language, spacing, typography, and color once it exists; don't invent parallel styling conventions.
-- Meet accessibility requirements as a baseline: semantic HTML, sufficient color contrast, keyboard navigability, meaningful alt text — not as a later pass.
-- Keep Core Web Vitals in mind for anything affecting load performance (images, fonts, client-side JS) — the charter requires "Good" ratings in production.
-- Responsive design is mandatory, not optional; verify layouts make sense from mobile through desktop widths.
+---
 
-## 8. Coding Standards
+## 6. 데이터 규칙
 
-- Write TypeScript with meaningful types; avoid `any` unless there is no reasonable alternative.
-- Prefer small, composable React components over large monolithic ones.
-- Use Tailwind utility classes consistently; avoid mixing in ad hoc inline styles or competing CSS approaches.
-- No dead code, commented-out blocks, or placeholder TODOs left behind — either finish the thought or don't include it.
-- Keep changes scoped to what was asked. Don't refactor unrelated code, add unrequested features, or introduce abstractions for hypothetical future needs.
-- Only comment on the non-obvious "why" (a constraint, a workaround, a subtle invariant) — never restate what the code already makes clear.
+가능한 모든 콘텐츠는 JSON 기반으로 관리한다.
 
-## 9. Git & Commit Rules
+하드코딩된 콘텐츠는 지양한다.
 
-- Follow `docs/GIT_WORKFLOW.md` once it is written; until then, keep changes small, atomic, and easy to review.
-- Never commit or push without the owner's explicit request for that specific action.
-- Never force-push, rewrite shared history, or delete branches unless explicitly instructed.
-- Write commit messages that explain *why* a change was made, not just what changed.
-- Never commit secrets, credentials, or environment files.
+---
 
-## 10. Response Workflow
+## 7. UI 규칙
 
-For any non-trivial task:
+항상 다음을 우선한다:
 
-1. **Ground in the charter.** Check the request against `docs/PROJECT.md` goals, scope, and principles.
-2. **Check documentation coverage.** Identify whether `docs/` already defines the relevant structure, data shape, or design pattern. If not, say so before proceeding.
-3. **Plan before building.** For multi-step or structural work, outline the approach before writing code.
-4. **Implement narrowly.** Build exactly what was asked, following the principles and rules above.
-5. **Verify.** Check the result against the Definition of Done criteria relevant to the task (content accuracy, documentation currency, accessibility, etc.).
-6. **Report plainly.** State what changed and what remains, without overstating completeness.
+- 가독성
+- 여백 구조
+- 접근성
+- 반응형 설계
+- 일관성
 
-## 11. Things Claude Code Must Never Do
+장식적인 UI보다 정보 전달을 우선한다.
 
-- Never invent or embellish portfolio content, credentials, work history, or contact information.
-- Never introduce a CMS, authentication system, backend API, database, or admin dashboard — these are explicitly out of scope.
-- Never bypass the Documentation First principle by building significant features with no corresponding documentation.
-- Never hardcode real content into components instead of data files.
-- Never commit, push, force-push, or delete branches without explicit instruction for that specific action.
-- Never ship inaccessible UI (missing alt text, poor contrast, keyboard traps) as "done."
-- Never mark the project or a milestone "complete" while placeholder or lorem ipsum content remains.
-- Never add dependencies, frameworks, or tooling outside the defined stack without confirming with the owner first.
+---
 
-## Pre-Completion Checklist
+## 8. 코딩 표준
 
-Before declaring any task finished, mentally confirm:
+사용 기술:
 
-- [ ] Aligns with the goals, scope, and principles in `docs/PROJECT.md`.
-- [ ] Relevant documentation in `docs/` is updated to match this change (or its absence has been flagged).
-- [ ] Content and presentation are properly separated (no hardcoded real content in components).
-- [ ] No fabricated or placeholder content is left looking like real content.
-- [ ] Accessibility and responsiveness have been considered, not just desktop/happy-path behavior.
-- [ ] Nothing out of scope (CMS, auth, backend, database, admin dashboard) was introduced.
-- [ ] Changes are scoped to the request — no unrequested refactors, features, or abstractions.
-- [ ] No commit/push/branch actions were taken without explicit instruction.
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+
+금지 사항:
+
+- 인라인 스타일
+- 중복 로직
+- 거대한 컴포넌트
+- 매직 넘버
+
+---
+
+## 9. Git 규칙
+
+Conventional Commit을 사용한다.
+
+예시:
+
+- feat:
+- fix:
+- refactor:
+- docs:
+- style:
+- chore:
+
+자동 커밋은 하지 않는다.
+
+---
+
+## 10. 응답 방식
+
+기능 구현 시 다음 순서를 따른다:
+
+1. 접근 방식 설명
+2. 수정 파일 목록
+3. 구현 내용
+4. 변경 요약
+
+---
+
+## 11. 금지 사항
+
+- 구조와 관련 없는 변경 금지
+- 불필요한 리팩토링 금지
+- 문서 없이 기능 추가 금지
