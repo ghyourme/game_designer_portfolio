@@ -1,1 +1,11 @@
-{}
+{
+  "name": "이름 placeholder",
+  "targetRole": "시스템 기획자",
+  "tagline": "한 줄 소개 placeholder",
+  "summary": "짧은 자기소개 placeholder",
+  "direction": "기획자로서의 방향성 placeholder",
+  "designApproach": "게임 설계 관점 placeholder",
+  "problemSolving": "문제 해결 방식 placeholder",
+  "playerExperience": "플레이어 경험 관점 placeholder",
+  "coreStrengths": ["Systems Thinking", "Player-first Mindset", "Communication", "Problem Solving"]
+}

@@ -190,6 +190,30 @@
 
 ---
 
+## 12. 프로필 데이터 모델
+
+profile.json은 §3에 이름만 있고 세부 필드가 정의되어 있지 않았다. Project Model(§5)과 동일한 수준(평면 구조, 문서에 근거한 필드만 정의)으로 아래와 같이 정의한다.
+
+필드는 `docs/INFORMATION_ARCHITECTURE.md` §2.2 About 페이지가 실제로 사용하는 것만 정의했다 — 임의로 발명한 필드는 없다.
+
+| 필드 | 설명 | 사용하는 Feature |
+|------|------|------|
+| name | 이름 | AboutHero |
+| targetRole | 희망 직무 | AboutHero |
+| tagline | 한 줄 소개 | AboutHero |
+| summary | 짧은 자기소개 | AboutSummary |
+| direction | 기획자로서의 방향성 | AboutSummary |
+| designApproach | 게임을 어떻게 설계하는지에 대한 관점 | DesignPhilosophy |
+| problemSolving | 문제 해결 방식 | DesignPhilosophy |
+| playerExperience | 플레이어 경험을 바라보는 관점 | DesignPhilosophy |
+| coreStrengths | 자기 서술형(정성적) 핵심 강점 목록 | CoreStrength |
+
+profile.json은 이력서(§7)와 마찬가지로 목록이 아닌 단일 레코드이므로, §4 공통 데이터 규칙(id/slug/tags/status/order 등)을 따르지 않는다.
+
+`coreStrengths`는 `skills.json`(§8)이 관리하는 정량적 기술 분류와 역할이 다르다 — `skills.json`은 분류·숙련도를 데이터로 관리하는 반면, `coreStrengths`는 자기 서술형 강점 키워드 목록일 뿐이다.
+
+---
+
 ## 요약
 
 이 프로젝트의 모든 콘텐츠는 JSON 기반 데이터로 구성되며,
