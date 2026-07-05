@@ -1,7 +1,7 @@
+import { getProjects } from "@/lib/data";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
-import { Card } from "@/components/ui/Card";
-import { Badge } from "@/components/ui/Badge";
+import { ProjectGrid } from "@/features/projects/ProjectGrid";
 
 /**
  * FeaturedProjects
@@ -11,19 +11,20 @@ import { Badge } from "@/components/ui/Badge";
  * - docs/DESIGN_SYSTEM.md - 6. Component Library (Card, Badge)
  *
  * 책임:
- * - projects.json 중 featured가 true인 프로젝트만 선별해 보여주는 영역.
- * - 아직 데이터 연동 없이, 목록이 렌더링될 구조만 갖춘 placeholder다.
+ * - getProjects()로 projects.json을 읽고 featured가 true인 프로젝트만 선별해 보여준다.
+ * - 대표 프로젝트가 없으면(현재 data/projects.json이 비어 있어 항상 이 경로) Placeholder만 보여준다.
  */
 export function FeaturedProjects() {
+  const featuredProjects = getProjects().filter((project) => project.featured);
+
   return (
     <Section>
       <Container>
         <h2>Featured Projects</h2>
-        {/* TODO: projects.json에서 featured: true 항목을 map으로 렌더링 (현재는 구조 예시용 카드 1개) */}
-        <Card>
-          <Badge>Featured</Badge>
-          <p>대표 프로젝트 카드가 표시될 영역입니다.</p>
-        </Card>
+        <ProjectGrid
+          projects={featuredProjects}
+          emptyMessage="아직 대표 프로젝트가 없습니다."
+        />
       </Container>
     </Section>
   );
