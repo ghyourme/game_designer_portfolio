@@ -149,28 +149,39 @@
 
 이전 필드명은 `pdf`였다. 단일 PDF 한 개만 가리키는 이름이었지만, 실제로는 시스템 기획서·경제 기획서 등 여러 문서를 첨부할 수 있어야 하므로 복수형 `documents`로 이름을 바꾸고 배열로 정의한다.
 
+문서 형식이 PDF 하나로 고정되어 있지 않다 (PPT, DOCX, Markdown, Notion export 등도 첨부 대상이다). 형식마다 미리보기/다운로드 방식이 달라질 수 있어 `type`으로 구분한다.
+
 | 필드 | 타입 | 설명 |
 |------|------|------|
+| type | ProjectDocumentType | 문서 형식. `"pdf" \| "ppt" \| "docx" \| "markdown" \| "notion" \| "other"` |
 | title | string | 문서 제목 |
 | url | string | 문서 파일 경로 또는 링크 |
+
+`other`는 위 5가지로 분류되지 않는 문서 형식을 위한 예비 값이다. 특정 형식이 반복적으로 쓰이기 시작하면 그때 전용 값을 추가한다 — 당장 쓰이지 않는 형식을 미리 나열하지 않는다.
 
 #### 5.7 gallery 필드 구조 (ProjectGalleryImage)
 
 `docs/CONTENT_GUIDE.md` §7(이미지 사용 규칙)이 모든 이미지에 요구하는 설명·캡션·목적을 그대로 필드화했다. 이 규칙을 만족하지 않는 이미지는 데이터로 추가할 수 없다.
 
+와이어프레임, UML, ERD, 화면 캡처처럼 이미지 성격이 서로 달라 `type`으로 구분한다. GIF는 별도 타입이 아니라 `src`가 가리키는 파일 확장자로 표현한다 (정적 이미지와 렌더링 방식이 다르지 않다).
+
 | 필드 | 타입 | 설명 |
 |------|------|------|
-| src | string | 이미지 경로 |
+| type | ProjectGalleryImageType | 이미지 종류. `"screenshot" \| "wireframe" \| "uml" \| "erd" \| "concept" \| "other"` |
+| src | string | 이미지(또는 GIF) 경로 |
 | description | string | 설명 — 이미지가 무엇을 보여주는지 |
 | caption | string | 캡션 — 짧은 요약 문구 |
 | purpose | string | 목적 — 이 이미지를 넣은 이유 |
 
 #### 5.8 links 필드 구조 (ProjectLink)
 
-플레이 데모, 스토어 페이지, 발표 자료 등 프로젝트와 관련된 외부 링크를 나열한다. 어느 9단계 섹션에서 어떻게 노출할지는 `docs/INFORMATION_ARCHITECTURE.md`에 아직 정의되어 있지 않다 — IA가 위치를 확정하기 전까지 UI 구현은 하지 않는다.
+GitHub, Figma, Notion, YouTube, 배포 URL 등 프로젝트와 관련된 외부 링크를 나열한다. 어느 9단계 섹션에서 어떻게 노출할지는 `docs/INFORMATION_ARCHITECTURE.md`에 아직 정의되어 있지 않다 — IA가 위치를 확정하기 전까지 UI 구현은 하지 않는다.
+
+`label`은 자유 텍스트라 프로젝트마다 표기가 달라질 수 있다 ("깃허브" vs "GitHub" 등). UI가 플랫폼별 아이콘을 붙이거나 필터링할 수 있도록 `type`으로 플랫폼을 구분한다.
 
 | 필드 | 타입 | 설명 |
 |------|------|------|
+| type | ProjectLinkType | 링크 플랫폼. `"github" \| "figma" \| "notion" \| "youtube" \| "deployment" \| "other"` |
 | label | string | 링크 설명 (예: "플레이 데모", "스토어 페이지") |
 | url | string | 링크 주소 |
 
@@ -179,6 +190,8 @@
 > **변경 이력**: 이전에는 `solution`, `contents`라는 필드명을 썼다. `solution`은 "접근 과정" 섹션의 의미(문제를 해결한 결과물이 아니라 해결해 나간 과정/방법론)와 더 정확히 맞도록 `approach`로 이름을 바꿨고, `contents`는 "게임 콘텐츠"처럼 읽혀 "핵심 기능"이라는 섹션 의도와 어긋나 `features`로 이름을 바꿨다. `goal`, `retrospective`는 9단계 구조에 있던 "목표", "회고" 섹션에 대응하는 필드가 없어 새로 추가했다. `types/project.ts`와 `app/projects/[slug]/page.tsx`도 이 이름으로 동기화되었다 (`data/projects.json`은 현재 빈 배열이라 실제 데이터 마이그레이션은 해당 없음).
 >
 > **변경 이력 (feature/projects-schema)**: `systems`, `features`, `gallery`, `pdf`가 `unknown`으로 남아있던 것을 완성했다. `pdf`는 여러 문서를 담을 수 있도록 `documents`로 이름을 바꿨다. `systems`는 `docs/CONTENT_GUIDE.md` §4를, `gallery`는 같은 문서 §7을 그대로 필드화해 문서 간 중복 정의 없이 하나의 규칙만 참조하도록 했다. 이전에 없던 `links` 필드를 새로 추가했으며, 노출 위치는 IA 결정 전까지 미정 상태로 문서에 명시했다.
+>
+> **변경 이력 (feature/projects-content)**: 실제 콘텐츠 작성 전, "프로젝트를 언제든 추가할 수 있는 구조"인지 재검토했다. `documents`/`gallery`/`links`가 각각 `url`/`src`만으로는 형식·종류·플랫폼을 구분하지 못해, 향후 PDF/PPT/DOCX/Markdown/Notion 문서, 와이어프레임/UML/ERD/스크린샷 이미지, GitHub/Figma/Notion/YouTube/배포 URL 링크를 추가해도 UI가 구분 렌더링할 수 있도록 세 필드 모두에 `type` 판별 필드를 추가했다. 각 `type`은 `"other"` 예비값을 포함한 닫힌 집합(union)으로 정의해, 알려진 값은 타입 안전하게 검사하면서도 새로운 형식이 필요할 때는 `"other"`로 우선 수용할 수 있게 했다. 이 변경은 문서와 Type에만 적용되며, `data/projects.json`은 여전히 빈 배열이라 마이그레이션 대상이 없다.
 
 ---
 

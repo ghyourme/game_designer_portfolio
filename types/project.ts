@@ -26,22 +26,52 @@ export interface ProjectFeature {
   description: string;
 }
 
+/** docs/DATA_MODEL.md §5.6 — documents 항목의 문서 형식. "other"는 아래 5가지 외의 형식을 위한 예비값 */
+export type ProjectDocumentType =
+  | "pdf"
+  | "ppt"
+  | "docx"
+  | "markdown"
+  | "notion"
+  | "other";
+
 /** docs/DATA_MODEL.md §5.6 — "6. 시스템 설계" 섹션의 PDF Preview Card 항목 (구 pdf) */
 export interface ProjectDocument {
+  type: ProjectDocumentType;
   title: string;
   url: string;
 }
 
+/** docs/DATA_MODEL.md §5.7 — gallery 항목의 이미지 종류. "other"는 아래 5가지 외의 종류를 위한 예비값 */
+export type ProjectGalleryImageType =
+  | "screenshot"
+  | "wireframe"
+  | "uml"
+  | "erd"
+  | "concept"
+  | "other";
+
 /** docs/DATA_MODEL.md §5.7 — "7. 핵심 기능" 섹션의 갤러리 이미지 항목 */
 export interface ProjectGalleryImage {
+  type: ProjectGalleryImageType;
   src: string;
   description: string;
   caption: string;
   purpose: string;
 }
 
+/** docs/DATA_MODEL.md §5.8 — links 항목의 플랫폼. "other"는 아래 5가지 외의 플랫폼을 위한 예비값 */
+export type ProjectLinkType =
+  | "github"
+  | "figma"
+  | "notion"
+  | "youtube"
+  | "deployment"
+  | "other";
+
 /** docs/DATA_MODEL.md §5.8 — 노출 위치 미정, 프로젝트 관련 외부 링크 항목 */
 export interface ProjectLink {
+  type: ProjectLinkType;
   label: string;
   url: string;
 }
