@@ -72,45 +72,113 @@
 
 프로젝트는 다음 구조를 가진다. Project Detail의 공식 9단계 섹션 구조(`docs/CONTENT_GUIDE.md` §3, `docs/INFORMATION_ARCHITECTURE.md` §2.4와 동일)를 기준으로 필드명을 맞췄다.
 
-**헤더 메타 정보** (9개 섹션에는 포함되지 않는, 페이지 상단 요약 정보)
+**Required/Optional 원칙**: 모든 필드는 Required다 — 옵셔널 필드를 두지 않는다. 콘텐츠가 아직 없는 항목은 필드를 생략하는 대신 빈 문자열(`""`) 또는 빈 배열(`[]`)로 표현한다. 모든 프로젝트가 동일한 필드 집합을 가지므로, 프로젝트가 30개, 300개로 늘어나도 소비하는 쪽(Loader, 컴포넌트)이 `undefined` 분기를 따로 처리할 필요가 없다.
 
-- id
-- slug
-- title
-- subtitle
-- thumbnail
-- cover
-- role — 담당 역할의 짧은 요약 라벨 (예: "시스템 기획자"). 서술형 내용은 아래 contribution이 담당한다.
-- genre
-- platform
-- period
-- team
-- tags
-- featured
+### 5.1 헤더 메타 정보
 
-**9단계 섹션 본문** (`docs/CONTENT_GUIDE.md` §3 순서와 동일)
+9개 섹션에는 포함되지 않는, 페이지 상단 요약 정보다.
 
-| 순서 | 섹션명 | 필드명 |
-|------|--------|--------|
-| 1 | 프로젝트 개요 | overview |
-| 2 | 담당 역할 | contribution — role(짧은 라벨)을 서술형으로 풀어낸 내용 |
-| 3 | 목표 | goal |
-| 4 | 문제 정의 | problem |
-| 5 | 접근 과정 | approach |
-| 6 | 시스템 설계 | systems |
-| 7 | 핵심 기능 | features |
-| 8 | 결과 | result |
-| 9 | 회고 | retrospective |
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | string | 고유 식별자 |
+| slug | string | URL 경로 |
+| title | string | 제목 |
+| subtitle | string | 부제 |
+| thumbnail | string | 목록/카드에서 사용하는 썸네일 이미지 경로 |
+| cover | string | 상세 페이지 헤더에서 사용하는 커버 이미지 경로 |
+| role | string | 담당 역할의 짧은 요약 라벨 (예: "시스템 기획자"). 서술형 내용은 9단계 섹션의 contribution이 담당한다. |
+| genre | string | 장르 |
+| platform | string | 플랫폼 |
+| period | string | 진행 기간 |
+| team | string | 팀 규모 |
+| tags | string[] | 검색 및 분류용 태그 |
+| featured | boolean | 대표 프로젝트 여부 |
 
-**섹션 내부에서 사용하는 지원 필드** (독립 섹션이 아니라 위 섹션들 안에서 UI 요소로 쓰인다 — `docs/INFORMATION_ARCHITECTURE.md` §2.4 참고)
+### 5.2 9단계 섹션 본문
 
-- skills — "2. 담당 역할" 섹션 안에서 Tag 목록으로 함께 표시
-- pdf — "6. 시스템 설계" 섹션 안에서 PDF Preview Card로 표시
-- gallery — "7. 핵심 기능" 섹션 안에서 이미지 갤러리로 표시
+`docs/CONTENT_GUIDE.md` §3 순서와 동일하다.
+
+| 순서 | 섹션명 | 필드명 | 타입 | 설명 |
+|------|--------|--------|------|------|
+| 1 | 프로젝트 개요 | overview | string | 프로젝트 개요 서술 |
+| 2 | 담당 역할 | contribution | string | role(짧은 라벨)을 서술형으로 풀어낸 내용 |
+| 3 | 목표 | goal | string | 프로젝트 목표 |
+| 4 | 문제 정의 | problem | string | 해결하고자 한 문제 |
+| 5 | 접근 과정 | approach | string | 문제를 해결해 나간 과정/방법론 |
+| 6 | 시스템 설계 | systems | ProjectSystem[] | 시스템 설계 항목 목록. 구조는 §5.3 참고 |
+| 7 | 핵심 기능 | features | ProjectFeature[] | 핵심 기능 항목 목록. 구조는 §5.4 참고 |
+| 8 | 결과 | result | string | 결과 (수치 중심, `docs/CONTENT_GUIDE.md` §2) |
+| 9 | 회고 | retrospective | string | 회고 |
+
+#### 5.3 systems 필드 구조 (ProjectSystem)
+
+`docs/CONTENT_GUIDE.md` §4(시스템 기획 작성 규칙)가 정의한 7개 항목을 그대로 필드화했다. 한 프로젝트가 여러 시스템(예: 전투 시스템, 성장 시스템)을 다룰 수 있으므로, 배열의 각 항목을 구분하는 `name`만 추가했다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| name | string | 시스템 이름 (예: "전투 시스템") |
+| purpose | string | 목적 |
+| playerExperience | string | 플레이어 경험 |
+| structure | string | 시스템 구조 |
+| flow | string | 플로우 |
+| data | string | 데이터 |
+| exceptionHandling | string | 예외 처리 |
+| expectedEffect | string | 기대 효과 |
+
+#### 5.4 features 필드 구조 (ProjectFeature)
+
+"핵심 기능" 섹션에 나열되는 개별 기능 항목이다. `docs/CONTENT_GUIDE.md`에 이 항목의 세부 작성 규칙이 아직 없어, 기능을 식별하는 이름과 설명만 최소 구조로 정의한다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| name | string | 기능 이름 |
+| description | string | 기능 설명 |
+
+### 5.5 섹션 내부 지원 필드
+
+독립 섹션이 아니라 위 9개 섹션 안에서 UI 요소로 쓰인다 (`docs/INFORMATION_ARCHITECTURE.md` §2.4 참고).
+
+| 필드 | 타입 | 사용 위치 | 설명 |
+|------|------|-----------|------|
+| skills | string[] | "2. 담당 역할" | Tag 목록으로 함께 표시 |
+| documents | ProjectDocument[] | "6. 시스템 설계" | PDF Preview Card로 표시. 구조는 §5.6 참고 |
+| gallery | ProjectGalleryImage[] | "7. 핵심 기능" | 이미지 갤러리로 표시. 구조는 §5.7 참고 |
+| links | ProjectLink[] | 미정 | 프로젝트 관련 외부 참고 링크. 구조는 §5.8 참고 |
+
+#### 5.6 documents 필드 구조 (ProjectDocument)
+
+이전 필드명은 `pdf`였다. 단일 PDF 한 개만 가리키는 이름이었지만, 실제로는 시스템 기획서·경제 기획서 등 여러 문서를 첨부할 수 있어야 하므로 복수형 `documents`로 이름을 바꾸고 배열로 정의한다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| title | string | 문서 제목 |
+| url | string | 문서 파일 경로 또는 링크 |
+
+#### 5.7 gallery 필드 구조 (ProjectGalleryImage)
+
+`docs/CONTENT_GUIDE.md` §7(이미지 사용 규칙)이 모든 이미지에 요구하는 설명·캡션·목적을 그대로 필드화했다. 이 규칙을 만족하지 않는 이미지는 데이터로 추가할 수 없다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| src | string | 이미지 경로 |
+| description | string | 설명 — 이미지가 무엇을 보여주는지 |
+| caption | string | 캡션 — 짧은 요약 문구 |
+| purpose | string | 목적 — 이 이미지를 넣은 이유 |
+
+#### 5.8 links 필드 구조 (ProjectLink)
+
+플레이 데모, 스토어 페이지, 발표 자료 등 프로젝트와 관련된 외부 링크를 나열한다. 어느 9단계 섹션에서 어떻게 노출할지는 `docs/INFORMATION_ARCHITECTURE.md`에 아직 정의되어 있지 않다 — IA가 위치를 확정하기 전까지 UI 구현은 하지 않는다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| label | string | 링크 설명 (예: "플레이 데모", "스토어 페이지") |
+| url | string | 링크 주소 |
 
 이 구조는 모든 프로젝트에 동일하게 적용된다.
 
 > **변경 이력**: 이전에는 `solution`, `contents`라는 필드명을 썼다. `solution`은 "접근 과정" 섹션의 의미(문제를 해결한 결과물이 아니라 해결해 나간 과정/방법론)와 더 정확히 맞도록 `approach`로 이름을 바꿨고, `contents`는 "게임 콘텐츠"처럼 읽혀 "핵심 기능"이라는 섹션 의도와 어긋나 `features`로 이름을 바꿨다. `goal`, `retrospective`는 9단계 구조에 있던 "목표", "회고" 섹션에 대응하는 필드가 없어 새로 추가했다. `types/project.ts`와 `app/projects/[slug]/page.tsx`도 이 이름으로 동기화되었다 (`data/projects.json`은 현재 빈 배열이라 실제 데이터 마이그레이션은 해당 없음).
+>
+> **변경 이력 (feature/projects-schema)**: `systems`, `features`, `gallery`, `pdf`가 `unknown`으로 남아있던 것을 완성했다. `pdf`는 여러 문서를 담을 수 있도록 `documents`로 이름을 바꿨다. `systems`는 `docs/CONTENT_GUIDE.md` §4를, `gallery`는 같은 문서 §7을 그대로 필드화해 문서 간 중복 정의 없이 하나의 규칙만 참조하도록 했다. 이전에 없던 `links` 필드를 새로 추가했으며, 노출 위치는 IA 결정 전까지 미정 상태로 문서에 명시했다.
 
 ---
 
