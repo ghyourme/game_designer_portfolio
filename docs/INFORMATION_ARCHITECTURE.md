@@ -250,7 +250,7 @@ Project Detail의 Level 2(섹션 내부 요소: skills/documents/gallery)와 마
 시스템 분석 / 콘텐츠 분석 / UX 분석의 세부 필드는 공통 구조 `AnalysisDimension`(keyElement/strengths/weaknesses/improvements)으로 확정되었다 (`docs/DATA_MODEL.md` §6.2). 그럼에도 이를 렌더링할 전용 콘텐츠 렌더러(Projects의 SystemsSection/FeaturesSection에 해당하는 컴포넌트)는 아직 설계하지 않는다 — 이번 작업은 문서 간 의미 정렬만 수행하며 새 컴포넌트를 추가하지 않는다. 다음 컴포넌트 설계 브랜치는 (구조 미정 때문이 아니라) 순수하게 컴포넌트 설계 작업만 남는다.
 
 **주요 컴포넌트**
-- AnalysisHero, ProjectSection(재사용), Tag, Badge, Button
+- AnalysisHero, ProjectSection(재사용), AnalysisDimensionSection, AnalysisConclusion, ProjectInfo(재사용), Tag, Badge, Button (컴포넌트별 역할·props·데이터 소스는 `docs/DESIGN_SYSTEM.md` §6.2 참고)
 
 **예상 데이터 소스**
 - `analysis.json` (slug로 단일 항목 조회 — `docs/DATA_MODEL.md` §6.1에서 `id`/`slug`를 §4 공통 규칙에 따라 채워, 기존에 후속 결정이 필요하다고 남겨두었던 라우팅 방식을 확정했다: `/analysis/[slug]`)
