@@ -82,6 +82,20 @@ These components exist specifically to render `docs/DATA_MODEL.md` §5's Project
 | **Gallery** | Image list display | Arranges `gallery` items (thumbnail grid) and handles selection only; enlargement itself is delegated to the existing Modal component. | Project Detail only today; any future page with an image collection is a reuse candidate |
 | **ExternalLinks** | External link list display | Renders the `links` array as a labeled list, one Button per entry. Owns no link-specific visual treatment beyond composing the existing Button component. | Project Detail only today (`docs/DATA_MODEL.md` §5.8); Personal Works is a future reuse candidate once its data model is defined — not decided yet |
 
+### 6.2 Analysis Components
+
+These components render `docs/DATA_MODEL.md` §6's Analysis fields on the Analysis list (`docs/INFORMATION_ARCHITECTURE.md` §2.5) and Analysis Detail (`docs/INFORMATION_ARCHITECTURE.md` §2.6) pages, following the exact process used for Project Detail (Section 6.1): reuse a generic component wherever one already exists, and only name a new one where no existing component's responsibility fits.
+
+| Component | Purpose | Responsibility | Reuse Scope |
+|-----------|---------|-----------------|-------------|
+| **AnalysisCard** | Analysis list item summary | Displays one analysis's title, description, tags, and featured badge in list/grid form only. | Analysis list page only — the analysis-specific instance of the Card pattern, parallel to ProjectCard |
+| **AnalysisGrid** | Analysis list layout | Arranges an `Analysis[]` array into a grid and shows the Empty state only; does not know whether it's rendering the full list or a `featured`-filtered subset. | Analysis list page ↔ Home (FeaturedAnalysis) — parallel to how ProjectGrid is shared between Projects and FeaturedProjects |
+| **AnalysisHero** | Analysis Detail's top header block | Displays analysis metadata (title, description, tags, featured badge, target game, purpose) only. Owns no body-section content. | Analysis Detail only — the analysis-specific instance of the general Hero pattern (Section 6) |
+| **ProjectSection** *(reused, not renamed)* | Structural wrapper for each of the 4 Analysis body sections | Same responsibility as in Section 6.1 — title, spacing, width only, no content awareness. Analysis Detail reuses this component directly instead of introducing an `AnalysisSection`, because its existing responsibility already has zero Project-specific logic. | Now shared between Project Detail and Analysis Detail — see Section 8 |
+| **ProjectInfo** *(reused, not renamed)* | Label/value metadata pair | Same responsibility as in Section 6.1. AnalysisHero reuses it to display `targetGame`(분석 대상) and `purpose`(분석 목적) as label/value pairs. | Now shared between Project Detail and Analysis Detail — see Section 8 |
+
+`systemAnalysis`/`contentAnalysis`/`uxAnalysis`는 이제 공통 구조 `AnalysisDimension`(`keyElement`, `strengths`, `weaknesses`, `improvements`)으로 확정되었다 (`docs/DATA_MODEL.md` §6.2). 그럼에도 이 셋(그리고 `conclusion`)을 렌더링할 전용 콘텐츠 렌더러(Projects의 SystemsSection/FeaturesSection에 해당하는 컴포넌트, 예: `AnalysisDimensionSection`)는 아직 설계하지 않는다 — 이번 브랜치는 문서 간 의미 정렬만 수행하며 새 컴포넌트를 추가하지 않는다. 데이터 구조가 이미 확정되었으므로, 다음 컴포넌트 설계 브랜치에서는 (구조 미정 때문이 아니라) 순수하게 컴포넌트 설계 작업만 남는다.
+
 ## 7. Component Naming Convention
 
 Component names must stay traceable to `docs/DATA_MODEL.md` and must not become inaccurate as that data model grows. This section formalizes the rule that produced the Document Preview Card rename (`docs/DATA_MODEL.md` §5.6 changelog): a component name describes what role a component plays, never how today's data happens to be implemented.
@@ -109,6 +123,8 @@ Component names must stay traceable to `docs/DATA_MODEL.md` and must not become 
 
 `ProjectSection` and `SystemsSection`/`FeaturesSection` both end in `-Section` but are not the same kind of component: `ProjectSection` is the generic outer wrapper reused for all 9 sections, while `SystemsSection`/`FeaturesSection` are the specific content passed as its children for sections 6 and 7. See `docs/INFORMATION_ARCHITECTURE.md` §2.4 for how they compose.
 
+**Known naming debt**: `ProjectSection` and `ProjectInfo` (Section 6.1) are now reused by Analysis Detail (Section 6.2) despite carrying a `Project` prefix, the same shape of problem this convention exists to prevent (a name tied to one current consumer). They aren't renamed in this branch because renaming is a code change (`Component 수정`), which is out of scope here — see Section 8 and the Architecture Drift note in the branch report. A future UI branch should rename them to page-agnostic names (e.g., `DetailSection`, `MetaInfo`) once both consumers exist in code.
+
 ## 8. Shared Components
 
 A component is "shared" when more than one page renders it against its own data. Shared components must document their reuse scope, dependencies, and responsibility so a change made for one consumer doesn't silently break another.
@@ -117,13 +133,40 @@ A component is "shared" when more than one page renders it against its own data.
 |-----------|-----------|---------------|-----------------|
 | Section, Container, Card, Tag, Badge, Button | Every page | Design tokens only | Exactly the atomic responsibility defined in Section 6 above — no page-specific behavior |
 | **ProjectGrid** | Projects (list page) ↔ Home (FeaturedProjects) | ProjectCard | Arranges a `Project[]` array into a grid and shows the Empty state; does not know whether it's rendering the full list or a `featured`-filtered subset |
+| **AnalysisGrid** | Analysis (list page) ↔ Home (FeaturedAnalysis) | AnalysisCard | Same responsibility as ProjectGrid, for `Analysis[]` |
 | **Document Preview Card** | Project Detail ("6. 시스템 설계", `documents`) ↔ Resume (PDF 다운로드) | None — takes only a title, thumbnail, and url | Displays a single document's preview only; does not implement the file viewer or download behavior itself |
+| **ProjectSection** | Project Detail (9 sections) ↔ Analysis Detail (4 sections) | None — takes only a title and children | Structural wrapper only (title, spacing, width); has no knowledge of Project vs Analysis content |
+| **ProjectInfo** | Project Detail (ProjectHero) ↔ Analysis Detail (AnalysisHero) | None — takes only a label and value string | Displays one label/value metadata pair only |
 
-`ProjectGrid` was already documented as shared in its own file comment (`features/projects/ProjectGrid/ProjectGrid.tsx`) prior to this branch. `Document Preview Card` is newly confirmed as shared in this branch — `docs/INFORMATION_ARCHITECTURE.md` §2.4 and §2.8 both list it as a primary component.
+`ProjectGrid` was already documented as shared in its own file comment (`features/projects/ProjectGrid/ProjectGrid.tsx`) prior to this branch. `Document Preview Card` was confirmed shared in `feature/projects-detail-architecture`. `AnalysisGrid`, `ProjectSection`, and `ProjectInfo` are newly confirmed shared in this branch (`feature/analysis-architecture`) — the latter two carry naming debt from being shared under a `Project`-prefixed name (Section 7).
 
-`Gallery`, `ExternalLinks`, `SystemsSection`, `FeaturesSection`, `ProjectHero`, `ProjectSection`, and `ProjectInfo` are Project-only today and are not shared with any other page.
+`Gallery`, `ExternalLinks`, `SystemsSection`, `FeaturesSection`, `ProjectHero`, `AnalysisCard`, and `AnalysisHero` are page-specific today and are not shared with any other page.
 
-## 9. Interaction Principles
+## 9. Component Dependency Rule
+
+Every component may compose the components below it in this table; none may reference a component above it or beside it. This keeps dependencies one-directional and prevents two components from competing to render the same field.
+
+- **One direction only** — a parent composes children; a child never imports or knows about its parent (`docs/ARCHITECTURE.md` §7's Reusable Component → Feature → Section → Layout layering applies the same rule at the component level).
+- **No lateral dependencies** — sibling components at the same level do not reference each other (e.g., `SystemsSection` does not know `FeaturesSection` exists).
+- **One field, one owner** — each data field is rendered by exactly one component. No other component reads that field directly, even if it has access to the same object.
+
+| Component | May compose |
+|-----------|--------------|
+| ProjectDetailPage | ProjectHero, ProjectSection |
+| ProjectHero | ProjectInfo, ExternalLinks, Tag, Badge |
+| ProjectSection | (children supplied by the page: SystemsSection, FeaturesSection, or plain text — ProjectSection itself has no fixed child) |
+| SystemsSection | Document Preview Card |
+| FeaturesSection | Gallery |
+| Gallery | Modal |
+| AnalysisListPage | AnalysisGrid |
+| AnalysisGrid | AnalysisCard |
+| AnalysisCard | Tag, Badge, Button |
+| AnalysisDetailPage | AnalysisHero, ProjectSection |
+| AnalysisHero | ProjectInfo, Tag, Badge |
+
+**No overlapping dependencies**: `ProjectHero` and `AnalysisHero` both compose `ProjectInfo`, and `ProjectDetailPage`/`AnalysisDetailPage` both compose `ProjectSection` — this is intentional, permitted reuse of a shared atom (Section 8), not a responsibility conflict. Each Hero and each Detail page still owns a disjoint set of fields (`Project` vs `Analysis`); only the rendering primitive is shared.
+
+## 10. Interaction Principles
 
 - **Hover** — Provides clear, immediate feedback that an element is interactive, without altering layout or causing distracting motion.
 - **Focus** — Always visibly distinct from hover and from the unfocused state, ensuring keyboard users can track their position at all times.
@@ -132,7 +175,7 @@ A component is "shared" when more than one page renders it against its own data.
 - **Empty States** — When a list or section has no content to show, communicate that clearly and helpfully rather than showing a blank or broken-looking area.
 - **Error States** — When something fails to load or behave as expected, communicate the problem clearly and, where possible, offer a path forward, without exposing technical detail irrelevant to the visitor.
 
-## 10. Accessibility
+## 11. Accessibility
 
 - **Keyboard Navigation** — Every interactive element must be reachable and operable using only a keyboard, in a logical, predictable order.
 - **Color Contrast** — Text and meaningful UI elements must maintain sufficient contrast against their backgrounds to remain legible for visitors with low vision or color vision deficiencies.
@@ -142,17 +185,18 @@ A component is "shared" when more than one page renders it against its own data.
 
 Accessibility is a baseline requirement across every component and page, consistent with `docs/PROJECT.md` and `CLAUDE.md` — not a separate audit performed after the fact.
 
-## 11. Future Growth
+## 12. Future Growth
 
-New components should only be introduced when an existing component cannot reasonably be extended to meet the need. Before adding one, check whether an existing component in Section 6 can be reused or given a new variant. When a new component is genuinely needed:
+New components should only be introduced when an existing component cannot reasonably be extended to meet the need. Before adding one, check whether an existing component in Section 6 can be reused or given a new variant — this is what kept Analysis Detail from inventing an `AnalysisSection` (Section 6.2). When a new component is genuinely needed:
 
 - It must be built from the existing design tokens (Section 4), never introducing new one-off colors, spacing, or type styles.
 - It must be documented in this file, with its responsibility and intended usage stated as clearly as existing entries, and follow the Naming Convention (Section 7).
-- It must satisfy the same accessibility and interaction standards defined in Sections 9 and 10 as every other component.
+- It must declare its dependency edges per the Component Dependency Rule (Section 9).
+- It must satisfy the same accessibility and interaction standards defined in Sections 10 and 11 as every other component.
 
 This keeps the design system a living, complete reference rather than a document that drifts out of sync with the interface as the portfolio grows.
 
-## 12. Summary
+## 13. Summary
 
 The design system exists to make the portfolio feel like one deliberate product, not a series of independently built pages. Every design decision should be traceable to a principle in Section 2, serve the recruiter-first UX goals in Section 3, and draw from the shared tokens and components defined here rather than inventing new patterns in isolation.
 

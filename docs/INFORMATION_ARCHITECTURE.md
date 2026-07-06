@@ -178,8 +178,16 @@ Project Detail의 콘텐츠는 세 계층으로 나뉜다. 계층 순서와 각 
 3. 분석 목록 (그리드/리스트)
 4. 결과 없음 상태
 
+**Component Architecture** — `docs/ARCHITECTURE.md` §7(Projects의 ProjectCard/ProjectGrid)과 동일한 패턴을 그대로 따른다.
+
+| 컴포넌트 | 책임 | Projects의 대응 |
+|---|---|---|
+| AnalysisCard | 분석 항목 1건을 목록에서 요약(title, description, tags, featured 배지)만 담당 | ProjectCard |
+| AnalysisGrid | `Analysis[]`를 그리드로 배치하고 Empty 상태를 표시만 담당 | ProjectGrid (Projects 목록 ↔ Home FeaturedProjects 간 공유 패턴과 동일하게, AnalysisGrid도 Analysis 목록 페이지 ↔ Home FeaturedAnalysis 양쪽에서 재사용된다) |
+| Search Bar, Filter | 태그 기준 검색/필터만 담당 | Projects 목록(§2.3)과 동일한 컴포넌트를 공유 — 아직 미구현 |
+
 **주요 컴포넌트**
-- Section, Search Bar, Filter, Card, Tag
+- Section, Search Bar, Filter, AnalysisGrid, AnalysisCard, Tag, Badge
 
 **예상 데이터 소스**
 - `analysis.json` (전체 목록)
@@ -195,19 +203,57 @@ Project Detail의 콘텐츠는 세 계층으로 나뉜다. 계층 순서와 각 
 | 사용자 목표 | 후보자가 기존 게임을 어떤 관점과 기준으로 분석하는지 확인한다. |
 | CTA | "다른 분석 보기" |
 
-**구성 섹션 (상단 → 하단, `docs/DATA_MODEL.md` §6 분석 데이터 모델 순서 기반)**
-1. 헤더 — title, description, tags, 분석 대상 게임(targetGame)
-2. 시스템 분석 (systemAnalysis)
-3. 콘텐츠 분석 (contentAnalysis)
-4. UX 분석 (uxAnalysis)
-5. 결론 (conclusion)
-6. 다른 분석으로 이동하는 내비게이션
+**정보 위계 (Information Hierarchy)** — Project Detail(§2.4)과 동일한 3계층 모델을 적용한다.
+
+| 계층 | 구성 요소 | 순서 변경 가능 여부 |
+|------|-----------|---------------------|
+| Level 0 — 페이지 프레임 | 헤더(맨 위), 다른 분석으로 이동하는 내비게이션(맨 아래) | 본문 섹션 앞/뒤에 고정 |
+| Level 1 — 본문 섹션 | 시스템 분석 → 콘텐츠 분석 → UX 분석 → 결론 | 고정 순서 (`docs/DATA_MODEL.md` §6.2) |
+| Level 2 — 섹션 내부 요소 | 시스템/콘텐츠/UX 분석 3개 섹션 각각의 keyElement/strengths/weaknesses/improvements (`AnalysisDimension`, `docs/DATA_MODEL.md` §6.2) | 3개 섹션에 동일하게 반복되는 고정 구조. `결론`(conclusion)은 단일 서술이라 이 계층에 해당하지 않는다 |
+
+Project Detail의 Level 2(섹션 내부 요소: skills/documents/gallery)와 마찬가지로, Analysis Detail도 이제 구조화된 Level 2를 갖는다. 다만 이를 렌더링할 전용 컴포넌트는 아직 없다 (`docs/DESIGN_SYSTEM.md` §6.2 참고) — 이번 문서 동기화 작업은 정보 구조만 반영하며 새 컴포넌트를 설계하지 않는다.
+
+**표시 순서 (상단 → 하단, `docs/DATA_MODEL.md` §6 분석 데이터 모델 기반)**
+
+1. **헤더** — title, description, tags, featured 배지, 분석 대상 게임(targetGame), 분석 목적(purpose)
+2. **시스템 분석** (systemAnalysis)
+3. **콘텐츠 분석** (contentAnalysis)
+4. **UX 분석** (uxAnalysis)
+5. **결론** (conclusion)
+6. **다른 분석으로 이동하는 내비게이션**
+
+**Section 책임 (Section Responsibility)**
+
+| 섹션 | 책임 |
+|------|------|
+| 헤더 | 분석 대상을 식별하는 메타데이터(제목/설명/태그/대표 여부/분석 대상 게임/분석 목적)만 노출한다 |
+| 시스템 분석 / 콘텐츠 분석 / UX 분석 | 각 관점마다 동일한 4개 하위 요소(keyElement/strengths/weaknesses/improvements)로 구성된 서술만 담당한다 (`AnalysisDimension`, `docs/DATA_MODEL.md` §6.2) |
+| 결론 | 세 관점을 종합한 결론 서술(배운 점 포함)만 담당한다 |
+| 마무리 내비게이션 | 다른 분석으로 이동하는 경로만 제공한다 |
+
+**사용자 흐름 (User Flow)** — Project Detail(§2.4)과 동일하게 두 가지 흐름을 지원한다.
+
+| 유형 | 흐름 |
+|------|------|
+| 빠른 스크리닝 | 헤더에서 분석 대상 게임과 태그만 확인 → 결론만 훑고 다음 분석으로 이동 |
+| 심층 검토 | 헤더 → 4개 섹션을 순서대로 완독(시스템 → 콘텐츠 → UX → 결론 순으로 분석 관점을 따라간다) → 다른 분석으로 이동 |
+
+**Component Architecture** (`docs/DESIGN_SYSTEM.md` §6.2 Analysis Components 참고)
+
+| 컴포넌트 | 상태 | Projects의 대응 |
+|---|---|---|
+| AnalysisHero | 신규 정의 | ProjectHero — 데이터 형태가 달라(title/description/targetGame/purpose vs title/subtitle/role 등) 코드를 공유하진 않지만 동일한 Hero 패턴의 인스턴스다 |
+| ProjectSection **(재사용, 이름 변경 없음)** | 기존 컴포넌트 재사용 | 4개 섹션 모두 `ProjectSection`을 그대로 감싸 쓴다 — title/children만 받는 완전히 범용적인 레이아웃 래퍼라 Project 전용 로직이 전혀 없다. 새 `AnalysisSection`을 만들지 않는다 |
+| ProjectInfo **(재사용, 이름 변경 없음)** | 기존 컴포넌트 재사용 | label/value 쌍을 표시하는 범용 원자 컴포넌트. AnalysisHero가 분석 대상(targetGame)과 분석 목적(purpose)을 표시하는 데 재사용한다 |
+| Accordion | 예정, 미배치 | 시스템/콘텐츠/UX 분석 섹션의 하위 내용이 길어질 경우를 대비해 이미 후보로 언급되어 있다. `AnalysisDimension` 확정으로 데이터상 블로커는 없어졌지만, 배치 결정은 새 컴포넌트를 도입하지 않는 이번 문서 동기화 범위 밖이라 미배치 상태를 유지한다 |
+
+시스템 분석 / 콘텐츠 분석 / UX 분석의 세부 필드는 공통 구조 `AnalysisDimension`(keyElement/strengths/weaknesses/improvements)으로 확정되었다 (`docs/DATA_MODEL.md` §6.2). 그럼에도 이를 렌더링할 전용 콘텐츠 렌더러(Projects의 SystemsSection/FeaturesSection에 해당하는 컴포넌트)는 아직 설계하지 않는다 — 이번 작업은 문서 간 의미 정렬만 수행하며 새 컴포넌트를 추가하지 않는다. 다음 컴포넌트 설계 브랜치는 (구조 미정 때문이 아니라) 순수하게 컴포넌트 설계 작업만 남는다.
 
 **주요 컴포넌트**
-- Section, Tag, Accordion (긴 하위 섹션의 점진적 공개)
+- AnalysisHero, ProjectSection(재사용), Tag, Badge, Button
 
 **예상 데이터 소스**
-- `analysis.json` (slug 또는 식별자로 단일 항목 조회 — 현재 Analysis 모델에는 식별자 필드가 문서상 명시되어 있지 않아, 라우팅 방식은 후속 결정이 필요하다. `types/analysis.ts`에도 동일한 TODO가 남아있다.)
+- `analysis.json` (slug로 단일 항목 조회 — `docs/DATA_MODEL.md` §6.1에서 `id`/`slug`를 §4 공통 규칙에 따라 채워, 기존에 후속 결정이 필요하다고 남겨두었던 라우팅 방식을 확정했다: `/analysis/[slug]`)
 
 ---
 

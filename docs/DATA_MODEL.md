@@ -199,14 +199,48 @@ GitHub, Figma, Notion, YouTube, 배포 URL 등 프로젝트와 관련된 외부 
 
 ## 6. 분석 데이터 모델
 
-게임 분석 콘텐츠는 다음 구조를 따른다:
+게임 분석 콘텐츠는 다음 구조를 따른다. `docs/CONTENT_GUIDE.md` §5(게임 분석 작성 규칙)를 그대로 필드화했다 — CONTENT_GUIDE §5의 "분석 대상/분석 목적"은 헤더 메타 정보로, "핵심 요소/장점/문제점/개선안" 4항목 템플릿은 3개 분석 관점(시스템/콘텐츠/UX)에 반복 적용되는 공통 하위 구조로, "배운 점"은 결론에 포함되는 내용으로 대응한다.
 
-- 기본 정보 (제목, 설명, 태그)
-- 분석 대상 게임
-- 시스템 분석
-- 콘텐츠 분석
-- UX 분석
-- 결론
+**Required/Optional 원칙**: Project Model(§5)과 동일하다 — 모든 필드는 Required이며, 콘텐츠가 없는 항목은 빈 문자열/빈 배열로 표현한다.
+
+### 6.1 헤더 메타 정보
+
+Analysis는 목록형 콘텐츠이므로 §4 공통 데이터 규칙을 Project Model(§5.1)과 동일한 방식으로 적용한다 (`docs/INFORMATION_ARCHITECTURE.md` §2.1의 featured 필터, §2.6의 라우팅 전제와 일치).
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | string | 고유 식별자 |
+| slug | string | URL 경로 (`/analysis/[slug]`) |
+| title | string | 제목 |
+| description | string | 설명 |
+| tags | string[] | 검색 및 분류용 태그 |
+| featured | boolean | 대표 분석 여부. Home의 featured 필터(§2.1)가 참조 |
+| targetGame | string | 분석 대상 게임 (`docs/CONTENT_GUIDE.md` §5 "분석 대상") |
+| purpose | string | 분석 목적 (`docs/CONTENT_GUIDE.md` §5 "분석 목적") |
+
+### 6.2 본문 섹션 (AnalysisDimension)
+
+시스템 분석(systemAnalysis) / 콘텐츠 분석(contentAnalysis) / UX 분석(uxAnalysis)은 서로 다른 대상을 다루지만 내부 구조는 동일하다 — `docs/CONTENT_GUIDE.md` §5의 4항목 템플릿을 공통 구조 `AnalysisDimension`으로 필드화했다.
+
+**AnalysisDimension**
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| keyElement | string | 핵심 요소 (시스템 분석 = "핵심 시스템", 콘텐츠 분석 = "핵심 콘텐츠", UX 분석 = "핵심 경험") |
+| strengths | string | 장점 |
+| weaknesses | string | 문제점 |
+| improvements | string | 개선안 |
+
+**본문 섹션 순서**
+
+| 순서 | 섹션명 | 필드명 | 타입 | 설명 |
+|------|--------|--------|------|------|
+| 1 | 시스템 분석 | systemAnalysis | AnalysisDimension | 시스템 관점 분석 |
+| 2 | 콘텐츠 분석 | contentAnalysis | AnalysisDimension | 콘텐츠 관점 분석 |
+| 3 | UX 분석 | uxAnalysis | AnalysisDimension | UX 관점 분석 |
+| 4 | 결론 | conclusion | string | 세 관점을 종합한 결론. `docs/CONTENT_GUIDE.md` §5 "배운 점"을 포함한다 |
+
+> **Architecture Decision (feature/analysis-alignment)**: `docs/CONTENT_GUIDE.md` §5(7항목 평면 목록), 이 절(4-섹션 구조), `types/analysis.ts`(all-`unknown`) 세 구조를 비교한 결과, 서로 다른 개념을 표현하고 있던 것이 아니라 CONTENT_GUIDE §5가 **두 추상화 수준을 하나의 목록으로 섞어 표현**하고 있었음을 확인했다 — ①분석 전체의 도입 정보(분석 대상/분석 목적)와 ②세 분석 관점 각각에 반복 적용되는 4항목 템플릿(핵심 요소/장점/문제점/개선안)이 구분 없이 나열되어 있었다. "콘텐츠 분석"/"UX 분석"이라는 관점 구분 자체는 CONTENT_GUIDE에 없었지만, `docs/PROJECT.md` §4(시스템 기획자·콘텐츠 기획자 이중 목표 직무)를 반영한 타당한 확장으로 판단해 유지했다. 실제 drift로 확인된 것은 두 가지뿐이다: (1) "분석 목적"이 DATA_MODEL/Type 어디에도 필드로 없었다 → `purpose` 필드 추가, (2) "핵심 시스템"이라는 표현이 콘텐츠·UX 관점에는 그대로 쓸 수 없었다 → `keyElement`로 일반화. 7개 항목을 4개로 줄이거나 4개를 7개로 늘리지 않고, 계층 관계(헤더 2개 + 반복 템플릿 4개 + 결론 1개 = 7개 그대로)만 세 문서에 동일하게 반영했다. `targetGame`도 CONTENT_GUIDE가 세부 구조를 요구하지 않는 단일 개념이라 `unknown` 대신 `string`으로 확정했다.
 
 ---
 
