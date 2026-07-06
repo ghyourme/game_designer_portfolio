@@ -108,31 +108,55 @@
 | 사용자 목표 | 이 프로젝트에서 후보자가 실제로 무엇을 맡았고 어떻게 사고했는지 이해한다. |
 | CTA | "PDF 다운로드", "다른 프로젝트 보기" |
 
-**구성 섹션 (상단 → 하단)**
+**정보 위계 (Information Hierarchy)**
 
-헤더 — title, subtitle, cover, role, genre, platform, period, team, tags (9개 공식 섹션에는 포함되지 않는, 페이지 최상단의 메타 정보 블록)
+Project Detail의 콘텐츠는 세 계층으로 나뉜다. 계층 순서와 각 계층 내부 순서는 모두 고정이며, 임의로 바꾸지 않는다.
 
-이후 `docs/CONTENT_GUIDE.md` §3과 동일한 순서·명칭의 9개 공식 섹션이 이어진다 (`docs/DATA_MODEL.md` §5 프로젝트 데이터 모델 필드와의 대응은 괄호로 표기):
+| 계층 | 구성 요소 | 순서 변경 가능 여부 |
+|------|-----------|---------------------|
+| Level 0 — 페이지 프레임 | 헤더(맨 위), 다른 프로젝트로 이동하는 내비게이션(맨 아래) | 9개 섹션 앞/뒤에 고정 — 9단계 구조에는 포함되지 않는다 |
+| Level 1 — 공식 콘텐츠 | 9개 공식 섹션 | 고정. `docs/CONTENT_GUIDE.md` §3 "순서를 임의로 바꾸지 않는다"를 그대로 따른다 |
+| Level 2 — 섹션 내부 요소 | skills(섹션 2), documents(섹션 6), gallery(섹션 7) | 각자 종속된 상위 섹션 안에서만 존재하며, 독립적으로 순서를 갖지 않는다 |
 
-1. 프로젝트 개요 (overview)
-2. 담당 역할 (contribution)
-3. 목표 (goal)
-4. 문제 정의 (problem)
-5. 접근 과정 (approach)
-6. 시스템 설계 (systems)
-7. 핵심 기능 (features)
-8. 결과 (result)
-9. 회고 (retrospective)
+**표시 순서 (상단 → 하단)**
 
-마지막으로 다른 프로젝트로 이동하는 내비게이션이 온다.
+1. **헤더** — title, subtitle, cover, role, genre, platform, period, team, tags, **links**(ExternalLinks로 표시)
+2. **1. 프로젝트 개요** (overview)
+3. **2. 담당 역할** (contribution) + skills(Tag 목록)
+4. **3. 목표** (goal)
+5. **4. 문제 정의** (problem)
+6. **5. 접근 과정** (approach)
+7. **6. 시스템 설계** (systems) + documents(Document Preview Card 목록)
+8. **7. 핵심 기능** (features) + gallery(이미지 갤러리)
+9. **8. 결과** (result)
+10. **9. 회고** (retrospective)
+11. **다른 프로젝트로 이동하는 내비게이션**
 
-Gallery, 관련 PDF, 사용 역량(skills)은 더 이상 독립된 섹션이 아니라, 위 9개 섹션 내부에서 사용하는 **UI 요소**로 정의한다:
-- **사용 역량(skills)** — "2. 담당 역할" 섹션 안에서 Tag 목록으로 함께 표시한다.
-- **관련 문서(documents)** — "6. 시스템 설계" 섹션 안에서 Document Preview Card로 다운로드/미리보기를 제공한다 (`docs/DATA_MODEL.md` §5.6, 구 필드명 pdf. PDF 외 PPT/DOCX/Markdown/Notion export도 포함하므로 컴포넌트명은 특정 포맷에 종속되지 않는다).
-- **갤러리(gallery)** — "7. 핵심 기능" 섹션 안에서 이미지 갤러리(Modal로 확대)로 함께 표시한다.
+**Section 책임 (Section Responsibility)**
 
-**주요 컴포넌트**
-- Section, Badge, Tag, Modal(갤러리 확대), Document Preview Card, Button
+| 섹션 | 책임 |
+|------|------|
+| 헤더 | 프로젝트를 식별하는 메타데이터와 외부 참고 링크(links)만 노출한다. 서술형 콘텐츠는 담당하지 않는다 |
+| 1~5, 8, 9 (개요/담당 역할/목표/문제 정의/접근 과정/결과/회고) | 단일 문단 서술만 담당한다. 구조화된 하위 항목을 갖지 않는다 |
+| 6. 시스템 설계 | `systems` 배열(시스템별 목적/플레이어 경험/구조/플로우/데이터/예외 처리/기대 효과)과, 그 근거가 되는 `documents`(관련 설계 문서)만 담당한다 |
+| 7. 핵심 기능 | `features` 배열(기능명/설명)과, 그 시각 자료인 `gallery`만 담당한다 |
+| 마무리 내비게이션 | 다른 프로젝트로 이동하는 경로만 제공한다 |
+
+`links`가 왜 헤더에 있는지: 9개 공식 섹션은 각각 하나의 서술 주제를 갖지만(§ 표 참고), `links`(GitHub/Figma/Notion/YouTube/배포 URL)는 특정 섹션의 서술 내용이 아니라 프로젝트 전체에 대한 외부 참고 자료다. 9개 섹션 중 어디에도 종속되지 않으므로 9단계 구조 밖의 헤더에 둔다 (`docs/DATA_MODEL.md` §5.8).
+
+**사용자 흐름 (User Flow)**
+
+`docs/DESIGN_SYSTEM.md` §3(Progressive Disclosure, 2분 스크리닝 원칙)에 따라 두 가지 흐름을 모두 지원해야 한다.
+
+| 유형 | 흐름 |
+|------|------|
+| 빠른 스크리닝 (채용 담당자) | 헤더에서 역할/장르/기간을 확인 → 필요하면 링크(links)로 바로 데모/저장소 이동 → 1. 개요, 8. 결과만 훑고 다음 프로젝트로 이동 |
+| 심층 검토 (시니어/리드 기획자) | 헤더 → 9개 섹션을 순서대로 완독(문제 정의 → 접근 → 시스템 설계 → 결과 → 회고 순으로 사고 과정을 따라간다) → 다른 프로젝트로 이동 |
+
+빠른 스크리닝 흐름이 9개 섹션을 다 읽지 않고도 성립하려면 헤더가 이미 핵심 식별 정보(역할, 링크)를 모두 노출하고 있어야 한다 — 헤더의 책임 범위를 "메타데이터 + 링크"로 한정한 이유다.
+
+**주요 컴포넌트** (`docs/DESIGN_SYSTEM.md` §6.1 Project Detail Components 참고)
+- ProjectHero, ProjectSection, SystemsSection, FeaturesSection, Document Preview Card, Gallery, ExternalLinks, Tag, Badge, Modal, Button
 
 **예상 데이터 소스**
 - `projects.json` (slug로 단일 항목 조회)

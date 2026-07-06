@@ -136,14 +136,14 @@
 
 ### 5.5 섹션 내부 지원 필드
 
-독립 섹션이 아니라 위 9개 섹션 안에서 UI 요소로 쓰인다 (`docs/INFORMATION_ARCHITECTURE.md` §2.4 참고).
+독립 섹션이 아니라 헤더 또는 위 9개 섹션 안에서 UI 요소로 쓰인다 (`docs/INFORMATION_ARCHITECTURE.md` §2.4 참고).
 
 | 필드 | 타입 | 사용 위치 | 설명 |
 |------|------|-----------|------|
 | skills | string[] | "2. 담당 역할" | Tag 목록으로 함께 표시 |
 | documents | ProjectDocument[] | "6. 시스템 설계" | Document Preview Card로 표시. 구조는 §5.6 참고 |
 | gallery | ProjectGalleryImage[] | "7. 핵심 기능" | 이미지 갤러리로 표시. 구조는 §5.7 참고 |
-| links | ProjectLink[] | 미정 | 프로젝트 관련 외부 참고 링크. 구조는 §5.8 참고 |
+| links | ProjectLink[] | 헤더 메타 정보 (§5.1) | ExternalLinks로 표시. 구조는 §5.8 참고 |
 
 #### 5.6 documents 필드 구조 (ProjectDocument)
 
@@ -175,7 +175,7 @@
 
 #### 5.8 links 필드 구조 (ProjectLink)
 
-GitHub, Figma, Notion, YouTube, 배포 URL 등 프로젝트와 관련된 외부 링크를 나열한다. 어느 9단계 섹션에서 어떻게 노출할지는 `docs/INFORMATION_ARCHITECTURE.md`에 아직 정의되어 있지 않다 — IA가 위치를 확정하기 전까지 UI 구현은 하지 않는다.
+GitHub, Figma, Notion, YouTube, 배포 URL 등 프로젝트와 관련된 외부 링크를 나열한다. 9개 공식 섹션 중 어디에도 속하지 않아(어느 한 섹션의 서술 내용이 아니라 프로젝트 전체에 대한 참고 자료다), 헤더 메타 정보 영역에서 ExternalLinks 컴포넌트로 노출한다 (`docs/INFORMATION_ARCHITECTURE.md` §2.4). 채용 담당자가 9개 섹션을 읽기 전에 라이브 데모·저장소로 바로 이동할 수 있어야 한다는 `docs/DESIGN_SYSTEM.md` §3(2분 스크리닝 원칙)의 요구와도 맞다.
 
 `label`은 자유 텍스트라 프로젝트마다 표기가 달라질 수 있다 ("깃허브" vs "GitHub" 등). UI가 플랫폼별 아이콘을 붙이거나 필터링할 수 있도록 `type`으로 플랫폼을 구분한다.
 
@@ -192,6 +192,8 @@ GitHub, Figma, Notion, YouTube, 배포 URL 등 프로젝트와 관련된 외부 
 > **변경 이력 (feature/projects-schema)**: `systems`, `features`, `gallery`, `pdf`가 `unknown`으로 남아있던 것을 완성했다. `pdf`는 여러 문서를 담을 수 있도록 `documents`로 이름을 바꿨다. `systems`는 `docs/CONTENT_GUIDE.md` §4를, `gallery`는 같은 문서 §7을 그대로 필드화해 문서 간 중복 정의 없이 하나의 규칙만 참조하도록 했다. 이전에 없던 `links` 필드를 새로 추가했으며, 노출 위치는 IA 결정 전까지 미정 상태로 문서에 명시했다.
 >
 > **변경 이력 (feature/projects-content)**: 실제 콘텐츠 작성 전, "프로젝트를 언제든 추가할 수 있는 구조"인지 재검토했다. `documents`/`gallery`/`links`가 각각 `url`/`src`만으로는 형식·종류·플랫폼을 구분하지 못해, 향후 PDF/PPT/DOCX/Markdown/Notion 문서, 와이어프레임/UML/ERD/스크린샷 이미지, GitHub/Figma/Notion/YouTube/배포 URL 링크를 추가해도 UI가 구분 렌더링할 수 있도록 세 필드 모두에 `type` 판별 필드를 추가했다. 각 `type`은 `"other"` 예비값을 포함한 닫힌 집합(union)으로 정의해, 알려진 값은 타입 안전하게 검사하면서도 새로운 형식이 필요할 때는 `"other"`로 우선 수용할 수 있게 했다. 이 변경은 문서와 Type에만 적용되며, `data/projects.json`은 여전히 빈 배열이라 마이그레이션 대상이 없다.
+>
+> **변경 이력 (feature/projects-detail-architecture)**: Project Detail의 정보 구조를 문서 수준에서 확정하면서, 그동안 미정이던 `links`의 노출 위치를 헤더 메타 정보로 확정했다 (9개 공식 섹션 중 어디에도 속하지 않는 프로젝트 전체 참고 자료이기 때문). `docs/INFORMATION_ARCHITECTURE.md` §2.4, `docs/DESIGN_SYSTEM.md`의 Component Architecture/Naming Convention/Shared Components 절과 함께 갱신했다. 데이터 구조(필드/타입) 자체는 변경하지 않았다.
 
 ---
 

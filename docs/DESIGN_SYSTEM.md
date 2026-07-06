@@ -69,7 +69,61 @@ Each entry below defines a component's responsibility and intended usage, consis
 - **Filter** — Allows visitors to narrow visible content by attributes such as skill, role, or tag, consistent with the tagging structure defined in `docs/DATA_MODEL.md`.
 - **Document Preview Card** — Represents a linked document (e.g., a design document, a resume; PDF, PPT, DOCX, Markdown, or a Notion export, per `docs/DATA_MODEL.md` §5.6 `ProjectDocumentType`) with enough visual context (title, thumbnail) to set expectations before opening it, supporting the PDF Viewer feature described in `docs/ROADMAP.md` §7.
 
-## 7. Interaction Principles
+### 6.1 Project Detail Components
+
+These components exist specifically to render `docs/DATA_MODEL.md` §5's Project fields on the Project Detail page (`docs/INFORMATION_ARCHITECTURE.md` §2.4). Each has exactly one responsibility, so no two components compete to render the same data.
+
+| Component | Purpose | Responsibility | Reuse Scope |
+|-----------|---------|-----------------|-------------|
+| **ProjectHero** | Project Detail's top header block | Displays project metadata (title, subtitle, role, genre, platform, period, team, tags, featured badge) and external links (via ExternalLinks) only. Owns no body-section content. | Project Detail only — the project-specific instance of the general Hero pattern above |
+| **ProjectSection** | Structural wrapper for each of the 9 official sections | Provides title, spacing, and width only. Holds no knowledge of what content it wraps — content is passed in as children. Reused 9 times per page. | Project Detail only |
+| **SystemsSection** | Content renderer for "6. 시스템 설계" | Renders the `systems` array (name, purpose, playerExperience, structure, flow, data, exceptionHandling, expectedEffect) and delegates each `documents` entry to Document Preview Card. Does not implement its own layout chrome (that's ProjectSection's job) or document preview rendering (that's Document Preview Card's job). | Project Detail only |
+| **FeaturesSection** | Content renderer for "7. 핵심 기능" | Renders the `features` array (name, description) and delegates `gallery` to Gallery. Does not implement image display or enlargement itself. | Project Detail only |
+| **Gallery** | Image list display | Arranges `gallery` items (thumbnail grid) and handles selection only; enlargement itself is delegated to the existing Modal component. | Project Detail only today; any future page with an image collection is a reuse candidate |
+| **ExternalLinks** | External link list display | Renders the `links` array as a labeled list, one Button per entry. Owns no link-specific visual treatment beyond composing the existing Button component. | Project Detail only today (`docs/DATA_MODEL.md` §5.8); Personal Works is a future reuse candidate once its data model is defined — not decided yet |
+
+## 7. Component Naming Convention
+
+Component names must stay traceable to `docs/DATA_MODEL.md` and must not become inaccurate as that data model grows. This section formalizes the rule that produced the Document Preview Card rename (`docs/DATA_MODEL.md` §5.6 changelog): a component name describes what role a component plays, never how today's data happens to be implemented.
+
+- **Ground names in `docs/DATA_MODEL.md`.** A component name should reference the field or section it renders (e.g., `SystemsSection` renders `systems`), not an invented term unrelated to the data model.
+- **Never encode a specific file format or platform in a name.** A component that previews any of several document types is `DocumentPreviewCard`, never `PDFPreviewCard`. A component that lists external links across platforms is `ExternalLinks`, never `GithubCard`. A component that displays images regardless of file extension is `Gallery`, never `PNGGallery`.
+- **Prefer names that survive data model growth.** If `ProjectDocumentType` gains a 6th format, or `ProjectLinkType` gains a 6th platform, no component should need renaming. Format- or platform-specific names break this guarantee; role-based names don't.
+- **A component name expresses role, not implementation.** Name a component for what it is responsible for (a preview, a list, a section), never for the rendering technique or file type behind it.
+
+  | Good | Bad | Why |
+  |------|-----|-----|
+  | `DocumentPreviewCard` | `PDFPreviewCard` | Previews any document type, not only PDF |
+  | `ExternalLinks` | `GithubCard` | Lists any link platform, not only GitHub |
+  | `Gallery` | `PNGGallery` | Displays any image format, not only PNG |
+
+**Suffix vocabulary** — the existing component set already follows a consistent suffix-to-role mapping; new components should follow the same one rather than inventing new suffixes:
+
+| Suffix | Role | Examples |
+|--------|------|----------|
+| `-Card` | Summarizes a single content item | `ProjectCard`, `DocumentPreviewCard` |
+| `-Grid` | Arranges multiple Cards | `ProjectGrid` |
+| `-Section` | A structural wrapper for one page content block, or the content renderer that fills it | `ProjectSection` (wrapper), `SystemsSection` / `FeaturesSection` (content renderers passed into a `ProjectSection`) |
+| `-Info` | A label/value metadata pair | `ProjectInfo` |
+| `-Hero` | A page's top introductory block | `Hero`, `ProjectHero` |
+
+`ProjectSection` and `SystemsSection`/`FeaturesSection` both end in `-Section` but are not the same kind of component: `ProjectSection` is the generic outer wrapper reused for all 9 sections, while `SystemsSection`/`FeaturesSection` are the specific content passed as its children for sections 6 and 7. See `docs/INFORMATION_ARCHITECTURE.md` §2.4 for how they compose.
+
+## 8. Shared Components
+
+A component is "shared" when more than one page renders it against its own data. Shared components must document their reuse scope, dependencies, and responsibility so a change made for one consumer doesn't silently break another.
+
+| Component | Reused By | Dependencies | Responsibility |
+|-----------|-----------|---------------|-----------------|
+| Section, Container, Card, Tag, Badge, Button | Every page | Design tokens only | Exactly the atomic responsibility defined in Section 6 above — no page-specific behavior |
+| **ProjectGrid** | Projects (list page) ↔ Home (FeaturedProjects) | ProjectCard | Arranges a `Project[]` array into a grid and shows the Empty state; does not know whether it's rendering the full list or a `featured`-filtered subset |
+| **Document Preview Card** | Project Detail ("6. 시스템 설계", `documents`) ↔ Resume (PDF 다운로드) | None — takes only a title, thumbnail, and url | Displays a single document's preview only; does not implement the file viewer or download behavior itself |
+
+`ProjectGrid` was already documented as shared in its own file comment (`features/projects/ProjectGrid/ProjectGrid.tsx`) prior to this branch. `Document Preview Card` is newly confirmed as shared in this branch — `docs/INFORMATION_ARCHITECTURE.md` §2.4 and §2.8 both list it as a primary component.
+
+`Gallery`, `ExternalLinks`, `SystemsSection`, `FeaturesSection`, `ProjectHero`, `ProjectSection`, and `ProjectInfo` are Project-only today and are not shared with any other page.
+
+## 9. Interaction Principles
 
 - **Hover** — Provides clear, immediate feedback that an element is interactive, without altering layout or causing distracting motion.
 - **Focus** — Always visibly distinct from hover and from the unfocused state, ensuring keyboard users can track their position at all times.
@@ -78,7 +132,7 @@ Each entry below defines a component's responsibility and intended usage, consis
 - **Empty States** — When a list or section has no content to show, communicate that clearly and helpfully rather than showing a blank or broken-looking area.
 - **Error States** — When something fails to load or behave as expected, communicate the problem clearly and, where possible, offer a path forward, without exposing technical detail irrelevant to the visitor.
 
-## 8. Accessibility
+## 10. Accessibility
 
 - **Keyboard Navigation** — Every interactive element must be reachable and operable using only a keyboard, in a logical, predictable order.
 - **Color Contrast** — Text and meaningful UI elements must maintain sufficient contrast against their backgrounds to remain legible for visitors with low vision or color vision deficiencies.
@@ -88,17 +142,17 @@ Each entry below defines a component's responsibility and intended usage, consis
 
 Accessibility is a baseline requirement across every component and page, consistent with `docs/PROJECT.md` and `CLAUDE.md` — not a separate audit performed after the fact.
 
-## 9. Future Growth
+## 11. Future Growth
 
 New components should only be introduced when an existing component cannot reasonably be extended to meet the need. Before adding one, check whether an existing component in Section 6 can be reused or given a new variant. When a new component is genuinely needed:
 
 - It must be built from the existing design tokens (Section 4), never introducing new one-off colors, spacing, or type styles.
-- It must be documented in this file, with its responsibility and intended usage stated as clearly as existing entries.
-- It must satisfy the same accessibility and interaction standards defined in Sections 7 and 8 as every other component.
+- It must be documented in this file, with its responsibility and intended usage stated as clearly as existing entries, and follow the Naming Convention (Section 7).
+- It must satisfy the same accessibility and interaction standards defined in Sections 9 and 10 as every other component.
 
 This keeps the design system a living, complete reference rather than a document that drifts out of sync with the interface as the portfolio grows.
 
-## 10. Summary
+## 12. Summary
 
 The design system exists to make the portfolio feel like one deliberate product, not a series of independently built pages. Every design decision should be traceable to a principle in Section 2, serve the recruiter-first UX goals in Section 3, and draw from the shared tokens and components defined here rather than inventing new patterns in isolation.
 
