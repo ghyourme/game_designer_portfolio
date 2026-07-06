@@ -8,6 +8,7 @@
  * 필드는 TODO로 표시했다.
  */
 export interface Project {
+  // 헤더 메타 정보
   id: string;
   slug: string;
   title: string;
@@ -19,21 +20,25 @@ export interface Project {
   platform: string;
   period: string;
   team: string;
-  contribution: string;
+  tags: string[];
+  featured: boolean;
+
+  // 9단계 섹션 본문
   overview: string;
+  contribution: string;
   goal: string;
   problem: string;
   approach: string;
-  result: string;
-  retrospective: string;
   /** TODO: systems 항목의 세부 구조는 문서에 정의되어 있지 않음 */
   systems: unknown[];
   /** TODO: features 항목의 세부 구조는 문서에 정의되어 있지 않음 */
   features: unknown[];
+  result: string;
+  retrospective: string;
+
+  // 섹션 내부 지원 필드
   skills: string[];
-  tags: string[];
-  gallery: string[];
   /** TODO: pdf 항목의 세부 구조(단일 파일 여부, 필드 구성 등)는 문서에 정의되어 있지 않음 */
   pdf: unknown;
-  featured: boolean;
+  gallery: string[];
 }
