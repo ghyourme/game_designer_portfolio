@@ -128,11 +128,11 @@
 
 Gallery, 관련 PDF, 사용 역량(skills)은 더 이상 독립된 섹션이 아니라, 위 9개 섹션 내부에서 사용하는 **UI 요소**로 정의한다:
 - **사용 역량(skills)** — "2. 담당 역할" 섹션 안에서 Tag 목록으로 함께 표시한다.
-- **관련 문서(documents)** — "6. 시스템 설계" 섹션 안에서 PDF Preview Card로 다운로드/미리보기를 제공한다 (`docs/DATA_MODEL.md` §5.6, 구 필드명 pdf).
+- **관련 문서(documents)** — "6. 시스템 설계" 섹션 안에서 Document Preview Card로 다운로드/미리보기를 제공한다 (`docs/DATA_MODEL.md` §5.6, 구 필드명 pdf. PDF 외 PPT/DOCX/Markdown/Notion export도 포함하므로 컴포넌트명은 특정 포맷에 종속되지 않는다).
 - **갤러리(gallery)** — "7. 핵심 기능" 섹션 안에서 이미지 갤러리(Modal로 확대)로 함께 표시한다.
 
 **주요 컴포넌트**
-- Section, Badge, Tag, Modal(갤러리 확대), PDF Preview Card, Button
+- Section, Badge, Tag, Modal(갤러리 확대), Document Preview Card, Button
 
 **예상 데이터 소스**
 - `projects.json` (slug로 단일 항목 조회)
@@ -230,7 +230,7 @@ Gallery, 관련 PDF, 사용 역량(skills)은 더 이상 독립된 섹션이 아
 7. PDF 다운로드 CTA
 
 **주요 컴포넌트**
-- Section, Timeline, Tag, PDF Preview Card, Button
+- Section, Timeline, Tag, Document Preview Card, Button
 
 **예상 데이터 소스**
 - `resume.json`

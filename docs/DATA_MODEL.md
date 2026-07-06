@@ -141,7 +141,7 @@
 | 필드 | 타입 | 사용 위치 | 설명 |
 |------|------|-----------|------|
 | skills | string[] | "2. 담당 역할" | Tag 목록으로 함께 표시 |
-| documents | ProjectDocument[] | "6. 시스템 설계" | PDF Preview Card로 표시. 구조는 §5.6 참고 |
+| documents | ProjectDocument[] | "6. 시스템 설계" | Document Preview Card로 표시. 구조는 §5.6 참고 |
 | gallery | ProjectGalleryImage[] | "7. 핵심 기능" | 이미지 갤러리로 표시. 구조는 §5.7 참고 |
 | links | ProjectLink[] | 미정 | 프로젝트 관련 외부 참고 링크. 구조는 §5.8 참고 |
 

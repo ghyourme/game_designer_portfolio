@@ -67,7 +67,7 @@ Each entry below defines a component's responsibility and intended usage, consis
 - **Modal** — Presents focused, temporary content (e.g., an enlarged gallery image) above the page without navigating away from it.
 - **Search Bar** — Allows visitors to locate content directly by keyword across projects and analyses.
 - **Filter** — Allows visitors to narrow visible content by attributes such as skill, role, or tag, consistent with the tagging structure defined in `docs/DATA_MODEL.md`.
-- **PDF Preview Card** — Represents a linked PDF document (e.g., a design document, a resume) with enough visual context (title, thumbnail) to set expectations before opening it, supporting the PDF Viewer feature described in `docs/ARCHITECTURE.md`.
+- **Document Preview Card** — Represents a linked document (e.g., a design document, a resume; PDF, PPT, DOCX, Markdown, or a Notion export, per `docs/DATA_MODEL.md` §5.6 `ProjectDocumentType`) with enough visual context (title, thumbnail) to set expectations before opening it, supporting the PDF Viewer feature described in `docs/ROADMAP.md` §7.
 
 ## 7. Interaction Principles
 
