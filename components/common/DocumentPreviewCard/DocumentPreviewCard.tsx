@@ -35,7 +35,7 @@ export interface DocumentPreviewCardProps {
 export function DocumentPreviewCard({ document: doc }: DocumentPreviewCardProps) {
   return (
     <Card>
-      <p>{doc.title}</p>
+      <h4>{doc.title}</h4>
       <Tag>{TYPE_LABEL[doc.type]}</Tag>
       <Button
         href={doc.url}

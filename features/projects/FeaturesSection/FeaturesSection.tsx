@@ -25,7 +25,7 @@ export function FeaturesSection({ features, gallery }: FeaturesSectionProps) {
   if (features.length === 0) return null;
 
   return (
-    <div>
+    <div className="space-y-8">
       {features.map((feature) => (
         <article key={feature.name}>
           <h3>{feature.name}</h3>

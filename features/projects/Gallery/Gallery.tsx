@@ -40,7 +40,7 @@ export function Gallery({ images }: GalleryProps) {
             <button
               type="button"
               onClick={() => setSelectedIndex(index)}
-              className="block w-full text-left"
+              className="block w-full text-left transition-opacity duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)]"
             >
               <img
                 src={image.src}

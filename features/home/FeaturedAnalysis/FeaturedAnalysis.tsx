@@ -1,29 +1,34 @@
+import { getAnalysis } from "@/lib/data";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
-import { Card } from "@/components/ui/Card";
-import { Tag } from "@/components/ui/Tag";
+import { AnalysisGrid } from "@/features/analysis/AnalysisGrid";
 
 /**
  * FeaturedAnalysis
  *
  * 참고 문서:
  * - docs/INFORMATION_ARCHITECTURE.md - 2.1 Home (구성 섹션 4. Featured Analysis)
- * - docs/DESIGN_SYSTEM.md - 6. Component Library (Card, Tag)
+ * - docs/DESIGN_SYSTEM.md - 8. Shared Components (AnalysisGrid)
  *
  * 책임:
- * - analysis.json 중 대표 분석 콘텐츠 1~2개를 선별해 보여주는 선택적 영역.
- * - 아직 데이터 연동 없이, 목록이 렌더링될 구조만 갖춘 placeholder다.
+ * - getAnalysis()로 analysis.json을 읽고 featured가 true인 분석만 선별해 보여준다.
+ * - 대표 분석이 없으면(현재 data/analysis.json이 비어 있어 항상 이 경로) AnalysisGrid가
+ *   자체적으로 Empty 상태를 보여준다.
+ *
+ * FeaturedProjects와 동일한 패턴이다 — AnalysisGrid를 그대로 재사용해 Projects/Analysis
+ * 양쪽에서 "대표 콘텐츠 선별" 표현 방식을 동일하게 유지한다(UI Consistency Rule).
  */
 export function FeaturedAnalysis() {
+  const featuredAnalyses = getAnalysis().filter((analysis) => analysis.featured);
+
   return (
     <Section>
       <Container>
         <h2>Featured Analysis</h2>
-        {/* TODO: analysis.json에서 대표 분석 1~2개를 map으로 렌더링 (현재는 구조 예시용 카드 1개) */}
-        <Card>
-          <Tag>분석 태그</Tag>
-          <p>대표 분석 카드가 표시될 영역입니다.</p>
-        </Card>
+        <AnalysisGrid
+          analyses={featuredAnalyses}
+          emptyMessage="아직 대표 분석이 없습니다."
+        />
       </Container>
     </Section>
   );

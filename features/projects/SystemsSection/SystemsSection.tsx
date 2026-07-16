@@ -28,7 +28,7 @@ export function SystemsSection({ systems, documents }: SystemsSectionProps) {
   if (systems.length === 0) return null;
 
   return (
-    <div>
+    <div className="space-y-8">
       {systems.map((system) => (
         <article key={system.name}>
           <h3>{system.name}</h3>
@@ -44,7 +44,7 @@ export function SystemsSection({ systems, documents }: SystemsSectionProps) {
         </article>
       ))}
       {documents.length > 0 && (
-        <div>
+        <div className="grid gap-4 sm:grid-cols-2">
           {documents.map((doc) => (
             <DocumentPreviewCard key={doc.url} document={doc} />
           ))}

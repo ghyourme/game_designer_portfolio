@@ -34,9 +34,9 @@ export function ExternalLinks({ links }: ExternalLinksProps) {
   if (links.length === 0) return null;
 
   return (
-    <ul>
+    <ul className="flex flex-wrap gap-4">
       {links.map((link) => (
-        <li key={link.url}>
+        <li key={link.url} className="flex items-center gap-2">
           <Button
             href={link.url}
             target="_blank"
