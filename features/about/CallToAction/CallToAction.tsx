@@ -11,18 +11,22 @@ import { Button } from "@/components/ui/Button";
  *
  * 책임:
  * - About 마지막에서 "프로젝트 보기", "이력서 보기", "연락하기"로 이어지는
- *   행동 유도 영역을 제공한다. Home의 CallToAction과 동일한 목적을 갖는다.
- * - 아직 실제 라우팅 연결 없이 구조만 갖춘 placeholder다.
+ *   행동 유도 영역을 제공한다. Home의 CallToAction과 동일한 목적·강조 순서를 갖는다.
  */
 export function CallToAction() {
   return (
     <Section>
       <Container>
         <p>프로젝트, 이력서, 연락처로 이어지는 CTA 영역입니다.</p>
-        <Button>프로젝트 보기</Button>
-        <Button>이력서 보기</Button>
-        <Button>연락하기</Button>
-        {/* TODO: 각 버튼을 /projects, /resume, /contact로 연결 예정 */}
+        <Button href="/projects" variant="primary">
+          프로젝트 보기
+        </Button>
+        <Button href="/resume" variant="secondary">
+          이력서 보기
+        </Button>
+        <Button href="/contact" variant="tertiary">
+          연락하기
+        </Button>
       </Container>
     </Section>
   );

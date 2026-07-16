@@ -1,27 +1,46 @@
+import { getProfile, getSkills } from "@/lib/data";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { Tag } from "@/components/ui/Tag";
+import { Button } from "@/components/ui/Button";
+import { flattenSkills } from "@/utils/skills";
 
 /**
  * Introduction
  *
  * 참고 문서:
  * - docs/INFORMATION_ARCHITECTURE.md - 2.1 Home (구성 섹션 2. 핵심 역량 요약, 5. About 미리보기)
- * - docs/DESIGN_SYSTEM.md - 6. Component Library (Section, Tag)
+ * - docs/DESIGN_SYSTEM.md - 6. Component Library (Section, Tag, Button)
  *
  * 책임:
- * - Hero 다음에 이어지는 짧은 소개와 핵심 역량 요약을 전달한다.
- * - About 페이지로 이어지는 미리보기 역할도 함께 담당한다.
- * - 아직 profile.json, skills.json 연동 없이 구조만 갖춘 placeholder다.
+ * - Hero 다음에 핵심 역량 요약(skills.json)과 About 페이지 미리보기(profile.json
+ *   summary + 이동 링크)를 전달한다.
+ * - 역량 요약은 About의 SkillOverview/Resume의 SkillSummary와 동일한 데이터·나열
+ *   로직(utils/skills.ts의 flattenSkills)을 공유한다 — 세 곳의 스킬 정보가 서로
+ *   어긋나지 않게 한다.
+ * - 등록된 스킬이 하나도 없으면 Empty State를 보여준다(SkillOverview/SkillSummary와
+ *   동일한 문구).
  */
 export function Introduction() {
+  const profile = getProfile();
+  const allSkills = flattenSkills(getSkills());
+
   return (
     <Section>
       <Container>
-        <p>짧은 소개 문구가 표시될 영역입니다.</p>
-        {/* TODO: skills.json 기반 역량 카테고리(시스템 기획 / 콘텐츠 기획 / 분석 / 도구 활용) 요약 — 현재는 구조 예시용 태그 1개 */}
-        <Tag>핵심 역량 태그</Tag>
-        {/* TODO: About 페이지 미리보기 문구 및 링크 */}
+        {allSkills.length === 0 ? (
+          <p>등록된 기술 정보가 없습니다.</p>
+        ) : (
+          <div>
+            {allSkills.map((skill) => (
+              <Tag key={skill.name}>{skill.name}</Tag>
+            ))}
+          </div>
+        )}
+        <p>{profile.summary}</p>
+        <Button href="/about" variant="tertiary">
+          자세히 보기
+        </Button>
       </Container>
     </Section>
   );

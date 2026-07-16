@@ -1,3 +1,4 @@
+import { getProfile } from "@/lib/data";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 
@@ -9,16 +10,21 @@ import { Container } from "@/components/ui/Container";
  * - docs/DESIGN_SYSTEM.md - 6. Component Library (Hero)
  *
  * 책임:
- * - Home 최상단에서 이름/정체성, 지향 역할, 한 줄 소개를 전달하는 첫인상 영역.
- * - 아직 profile.json 연동 없이 구조만 갖춘 placeholder다.
+ * - Home 최상단에서 profile.json의 이름/정체성, 지향 역할, 한 줄 소개를 전달하는
+ *   첫인상 영역.
+ * - About의 AboutHero와 동일한 필드(name/targetRole/tagline)를 동일한 방식으로
+ *   보여준다 — 두 Hero는 서로 다른 페이지의 인스턴스일 뿐, 데이터 소스와 표현
+ *   방식은 동일해야 한다(UI Consistency Rule).
  */
 export function Hero() {
+  const profile = getProfile();
+
   return (
     <Section>
       <Container>
-        <h1>Game Designer Portfolio</h1>
-        <p>이름, 지향 역할, 한 줄 소개가 표시될 영역입니다.</p>
-        {/* TODO: profile.json 연동 — 이름/정체성, 지향 역할(시스템 기획자 / 콘텐츠 기획자), 한 줄 소개 */}
+        <h1>{profile.name}</h1>
+        <p>{profile.targetRole}</p>
+        <p>{profile.tagline}</p>
       </Container>
     </Section>
   );
