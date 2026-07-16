@@ -2,7 +2,7 @@ import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { Tag } from "@/components/ui/Tag";
 import { Badge } from "@/components/ui/Badge";
-import { ProjectInfo } from "@/features/projects/ProjectInfo";
+import { MetaInfo } from "@/components/common/MetaInfo";
 import type { Project } from "@/types/project";
 
 /**
@@ -27,11 +27,11 @@ export function ProjectHero({ project }: ProjectHeroProps) {
         <h1>{project.title}</h1>
         <p>{project.subtitle}</p>
         <dl>
-          <ProjectInfo label="담당 역할" value={project.role} />
-          <ProjectInfo label="장르" value={project.genre} />
-          <ProjectInfo label="플랫폼" value={project.platform} />
-          <ProjectInfo label="기간" value={project.period} />
-          <ProjectInfo label="팀 규모" value={project.team} />
+          <MetaInfo label="담당 역할" value={project.role} />
+          <MetaInfo label="장르" value={project.genre} />
+          <MetaInfo label="플랫폼" value={project.platform} />
+          <MetaInfo label="기간" value={project.period} />
+          <MetaInfo label="팀 규모" value={project.team} />
         </dl>
         {project.tags.length > 0 && (
           <div>

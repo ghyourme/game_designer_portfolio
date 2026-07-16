@@ -2,7 +2,7 @@ import { getProjects } from "@/lib/data";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { ProjectHero } from "@/features/projects/ProjectHero";
-import { ProjectSection } from "@/features/projects/ProjectSection";
+import { DetailSection } from "@/components/common/DetailSection";
 
 interface ProjectDetailPageProps {
   params: Promise<{ slug: string }>;
@@ -54,7 +54,7 @@ export default async function ProjectDetailPage({
     <>
       <ProjectHero project={project} />
       {DETAIL_SECTION_TITLES.map((title) => (
-        <ProjectSection key={title} title={title} />
+        <DetailSection key={title} title={title} />
       ))}
     </>
   );

@@ -69,32 +69,49 @@ Each entry below defines a component's responsibility and intended usage, consis
 - **Filter** — Allows visitors to narrow visible content by attributes such as skill, role, or tag, consistent with the tagging structure defined in `docs/DATA_MODEL.md`.
 - **Document Preview Card** — Represents a linked document (e.g., a design document, a resume; PDF, PPT, DOCX, Markdown, or a Notion export, per `docs/DATA_MODEL.md` §5.6 `ProjectDocumentType`) with enough visual context (title, thumbnail) to set expectations before opening it, supporting the PDF Viewer feature described in `docs/ROADMAP.md` §7.
 
-### 6.1 Project Detail Components
+### 6.1 Shared Detail Components
 
-These components exist specifically to render `docs/DATA_MODEL.md` §5's Project fields on the Project Detail page (`docs/INFORMATION_ARCHITECTURE.md` §2.4). Each has exactly one responsibility, so no two components compete to render the same data.
+Project Detail and Analysis Detail are built from the same Detail page skeleton (`docs/INFORMATION_ARCHITECTURE.md` §2.4, §2.6: header → N official sections → closing navigation). The two components below implement that skeleton and belong to neither page's feature — they live in `components/common/`, not inside `features/projects/` or `features/analysis/`, because no single feature owns them.
 
 | Component | Purpose | Responsibility | Reuse Scope |
 |-----------|---------|-----------------|-------------|
-| **ProjectHero** | Project Detail's top header block | Displays project metadata (title, subtitle, role, genre, platform, period, team, tags, featured badge) and external links (via ExternalLinks) only. Owns no body-section content. | Project Detail only — the project-specific instance of the general Hero pattern above |
-| **ProjectSection** | Structural wrapper for each of the 9 official sections | Provides title, spacing, and width only. Holds no knowledge of what content it wraps — content is passed in as children. Reused 9 times per page. | Project Detail only |
-| **SystemsSection** | Content renderer for "6. 시스템 설계" | Renders the `systems` array (name, purpose, playerExperience, structure, flow, data, exceptionHandling, expectedEffect) and delegates each `documents` entry to Document Preview Card. Does not implement its own layout chrome (that's ProjectSection's job) or document preview rendering (that's Document Preview Card's job). | Project Detail only |
+| **DetailSection** | Structural wrapper for one official section on any Detail page | Provides title, spacing, and width only. Holds no knowledge of what content it wraps — content is passed in as children. Reused 9 times on Project Detail, 4 times on Analysis Detail. | Project Detail ↔ Analysis Detail — see Shared Components (Section 8) |
+| **MetaInfo** | Label/value metadata pair | Displays one label/value pair (`dt`/`dd`) only. Renders both even when the value is empty (Component Contract Rule, Section 11). | Project Detail (ProjectHero) ↔ Analysis Detail (AnalysisHero) — see Shared Components (Section 8) |
+
+**Props**
+
+| Component | Props |
+|-----------|-------|
+| DetailSection | `{ title: string, children?: ReactNode }` |
+| MetaInfo | `{ label: string, value: string }` |
+
+> **변경 이력 (feature/detail-ui-foundation)**: 이전 이름은 `ProjectSection`/`ProjectInfo`였고 `features/projects/` 아래 있었다. Analysis Detail도 동일 컴포넌트를 그대로 재사용하면서 `Project` 접두사가 실제 소유 범위(두 Feature 모두)보다 좁아졌다 — Section 7이 금지하는 "특정 소비자에 종속된 이름"과 같은 문제였다. `DetailSection`/`MetaInfo`로 이름을 바꾸고 `components/common/`으로 옮겨 코드와 문서를 동기화했다.
+
+### 6.2 Project Detail Components
+
+These components exist specifically to render `docs/DATA_MODEL.md` §5's Project fields on the Project Detail page (`docs/INFORMATION_ARCHITECTURE.md` §2.4), on top of the shared Detail skeleton (Section 6.1). Each has exactly one responsibility, so no two components compete to render the same data.
+
+| Component | Purpose | Responsibility | Reuse Scope |
+|-----------|---------|-----------------|-------------|
+| **ProjectHero** | Project Detail's top header block | Displays project metadata (title, subtitle, role, genre, platform, period, team, tags, featured badge) and external links (via ExternalLinks) only. Owns no body-section content. | Project Detail only — the project-specific instance of the general Hero pattern (Section 6) |
+| **SystemsSection** | Content renderer for "6. 시스템 설계" | Renders the `systems` array (name, purpose, playerExperience, structure, flow, data, exceptionHandling, expectedEffect) and delegates each `documents` entry to Document Preview Card. Does not implement its own layout chrome (that's the owning `DetailSection`'s job) or document preview rendering (that's Document Preview Card's job). | Project Detail only |
 | **FeaturesSection** | Content renderer for "7. 핵심 기능" | Renders the `features` array (name, description) and delegates `gallery` to Gallery. Does not implement image display or enlargement itself. | Project Detail only |
 | **Gallery** | Image list display | Arranges `gallery` items (thumbnail grid) and handles selection only; enlargement itself is delegated to the existing Modal component. | Project Detail only today; any future page with an image collection is a reuse candidate |
 | **ExternalLinks** | External link list display | Renders the `links` array as a labeled list, one Button per entry. Owns no link-specific visual treatment beyond composing the existing Button component. | Project Detail only today (`docs/DATA_MODEL.md` §5.8); Personal Works is a future reuse candidate once its data model is defined — not decided yet |
 
-### 6.2 Analysis Components
+### 6.3 Analysis Detail Components
 
-These components render `docs/DATA_MODEL.md` §6's Analysis fields on the Analysis list (`docs/INFORMATION_ARCHITECTURE.md` §2.5) and Analysis Detail (`docs/INFORMATION_ARCHITECTURE.md` §2.6) pages, following the exact process used for Project Detail (Section 6.1): reuse a generic component wherever one already exists, and only name a new one where no existing component's responsibility fits. This section is now complete — every Analysis field defined in `docs/DATA_MODEL.md` §6 has exactly one component responsible for rendering it, so React implementation can begin directly from this table.
+These components render `docs/DATA_MODEL.md` §6's Analysis fields on the Analysis list (`docs/INFORMATION_ARCHITECTURE.md` §2.5) and Analysis Detail (`docs/INFORMATION_ARCHITECTURE.md` §2.6) pages, on top of the shared Detail skeleton (Section 6.1), following the exact process used for Project Detail (Section 6.2): reuse a generic component wherever one already exists, and only name a new one where no existing component's responsibility fits.
 
 | Component | Purpose | Responsibility | Reuse Scope |
 |-----------|---------|-----------------|-------------|
 | **AnalysisCard** | Analysis list item summary | Displays one analysis's title, description, tags, and featured badge in list/grid form only. | Analysis list page only — the analysis-specific instance of the Card pattern, parallel to ProjectCard |
 | **AnalysisGrid** | Analysis list layout | Arranges an `Analysis[]` array into a grid and shows the Empty state only; does not know whether it's rendering the full list or a `featured`-filtered subset. | Analysis list page ↔ Home (FeaturedAnalysis) — parallel to how ProjectGrid is shared between Projects and FeaturedProjects |
 | **AnalysisHero** | Analysis Detail's top header block | Displays analysis metadata (title, description, tags, featured badge, target game, purpose) only. Owns no body-section content. | Analysis Detail only — the analysis-specific instance of the general Hero pattern (Section 6) |
-| **AnalysisDimensionSection** | Content renderer for "시스템 분석" / "콘텐츠 분석" / "UX 분석" | Renders one `AnalysisDimension` (`keyElement`, `strengths`, `weaknesses`, `improvements`) only. Does not implement its own layout chrome (that's the owning `ProjectSection`'s job) — the direct Analysis Detail counterpart to `SystemsSection`/`FeaturesSection` (Section 6.1). | Analysis Detail only, instantiated 3 times (once per dimension) — see Ownership Rule (Section 10) |
+| **AnalysisDimensionSection** | Content renderer for "시스템 분석" / "콘텐츠 분석" / "UX 분석" | Renders one `AnalysisDimension` (`keyElement`, `strengths`, `weaknesses`, `improvements`) only. Does not implement its own layout chrome (that's the owning `DetailSection`'s job) — the direct Analysis Detail counterpart to `SystemsSection`/`FeaturesSection` (Section 6.2). | Analysis Detail only, instantiated 3 times (once per dimension) — see Ownership Rule (Section 10) |
 | **AnalysisConclusion** | Content renderer for "결론" | Renders the `conclusion` string only, with the visual emphasis appropriate to its role as the fast-skim anchor for recruiters (`docs/INFORMATION_ARCHITECTURE.md` §2.6 User Flow: "결론만 훑고 다음 분석으로 이동"). Unlike Project's plain-text `result`/`retrospective`, this gets a dedicated component because it is the one section a skimming visitor is guaranteed to read — it must be visually distinguishable from the three dimension sections above it. | Analysis Detail only |
-| **ProjectSection** *(reused, not renamed)* | Structural wrapper for each of the 4 Analysis body sections | Same responsibility as in Section 6.1 — title, spacing, width only, no content awareness. Analysis Detail reuses this component directly instead of introducing an `AnalysisSection`, because its existing responsibility already has zero Project-specific logic. | Now shared between Project Detail and Analysis Detail — see Section 8 |
-| **ProjectInfo** *(reused, not renamed)* | Label/value metadata pair | Same responsibility as in Section 6.1. AnalysisHero reuses it to display `targetGame`(분석 대상) and `purpose`(분석 목적) as label/value pairs. | Now shared between Project Detail and Analysis Detail — see Section 8 |
+
+`DetailSection`과 `MetaInfo`는 여기 다시 나열하지 않는다 — Section 6.1 참고.
 
 **Component Interface** — props and data source for each component above, so implementation can start without inventing an interface.
 
@@ -105,8 +122,6 @@ These components render `docs/DATA_MODEL.md` §6's Analysis fields on the Analys
 | AnalysisHero | `{ analysis: Analysis }` | One item from `getAnalysis().find(slug)` |
 | AnalysisDimensionSection | `{ dimension: AnalysisDimension, keyElementLabel: string }` | One of `analysis.systemAnalysis` / `analysis.contentAnalysis` / `analysis.uxAnalysis`. `keyElementLabel` is supplied by the calling page per instance ("핵심 시스템" / "핵심 콘텐츠" / "핵심 경험", `docs/DATA_MODEL.md` §6.2) since the field name `keyElement` is dimension-neutral but its display label isn't |
 | AnalysisConclusion | `{ conclusion: string }` | `analysis.conclusion` |
-| ProjectSection *(reused)* | `{ title: string, children?: ReactNode }` | None — purely structural, unchanged from Section 6.1 |
-| ProjectInfo *(reused)* | `{ label: string, value: string }` | None — purely structural, unchanged from Section 6.1 |
 
 ## 7. Component Naming Convention
 
@@ -127,17 +142,15 @@ Component names must stay traceable to `docs/DATA_MODEL.md` and must not become 
 
 | Suffix | Role | Examples |
 |--------|------|----------|
-| `-Card` | Summarizes a single content item | `ProjectCard`, `DocumentPreviewCard` |
-| `-Grid` | Arranges multiple Cards | `ProjectGrid` |
-| `-Section` | A structural wrapper for one page content block, or the content renderer that fills it | `ProjectSection` (wrapper), `SystemsSection` / `FeaturesSection` (content renderers passed into a `ProjectSection`) |
-| `-Info` | A label/value metadata pair | `ProjectInfo` |
-| `-Hero` | A page's top introductory block | `Hero`, `ProjectHero` |
+| `-Card` | Summarizes a single content item | `ProjectCard`, `AnalysisCard`, `DocumentPreviewCard` |
+| `-Grid` | Arranges multiple Cards | `ProjectGrid`, `AnalysisGrid` |
+| `-Section` | A structural wrapper for one page content block, or the content renderer that fills it | `DetailSection` (wrapper), `SystemsSection` / `FeaturesSection` / `AnalysisDimensionSection` (content renderers passed into a `DetailSection`) |
+| `-Info` | A label/value metadata pair | `MetaInfo` |
+| `-Hero` | A page's top introductory block | `Hero`, `ProjectHero`, `AnalysisHero` |
 
-`ProjectSection` and `SystemsSection`/`FeaturesSection` both end in `-Section` but are not the same kind of component: `ProjectSection` is the generic outer wrapper reused for all 9 sections, while `SystemsSection`/`FeaturesSection` are the specific content passed as its children for sections 6 and 7. See `docs/INFORMATION_ARCHITECTURE.md` §2.4 for how they compose.
+`DetailSection` and `SystemsSection`/`FeaturesSection`/`AnalysisDimensionSection` both end in `-Section` but are not the same kind of component: `DetailSection` is the generic outer wrapper reused for all official sections on either Detail page, while `SystemsSection`/`FeaturesSection`/`AnalysisDimensionSection` are the specific content passed as its children. See `docs/INFORMATION_ARCHITECTURE.md` §2.4/§2.6 for how they compose.
 
-**Known naming debt**: `ProjectSection` and `ProjectInfo` (Section 6.1) are now reused by Analysis Detail (Section 6.2) despite carrying a `Project` prefix, the same shape of problem this convention exists to prevent (a name tied to one current consumer). They are not renamed now because renaming is a code change (`Component 수정`), which is out of scope for a documentation/design branch.
-
-**When to rename**: at the start of the React implementation branch, before either `ProjectHero` or `AnalysisHero` is written against these components — not after. Right now, zero code references either name, so renaming costs nothing but a documentation edit. Once implementation begins, `ProjectSection`/`ProjectInfo` will be imported from both Project Detail and Analysis Detail code, and the rename cost grows with every additional usage. Recommended target names: `DetailSection` (for `ProjectSection`) and `MetaInfo` (for `ProjectInfo`) — both already role-based per this section's rules, not tied to either consumer.
+**Resolved naming debt**: `ProjectSection`/`ProjectInfo` used to carry a `Project` prefix despite being reused by Analysis Detail — flagged as debt in `feature/analysis-architecture` and `feature/analysis-components`, with the rename deferred to "before either Hero component is written against them in code." This branch (`feature/detail-ui-foundation`) is that trigger point: they are renamed to `DetailSection`/`MetaInfo` and relocated to `components/common/` (Section 6.1). No naming debt remains for these two components.
 
 ## 8. Shared Components
 
@@ -149,16 +162,16 @@ A component is "shared" when more than one page renders it against its own data.
 | **ProjectGrid** | Projects (list page) ↔ Home (FeaturedProjects) | ProjectCard | Arranges a `Project[]` array into a grid and shows the Empty state; does not know whether it's rendering the full list or a `featured`-filtered subset |
 | **AnalysisGrid** | Analysis (list page) ↔ Home (FeaturedAnalysis) | AnalysisCard | Same responsibility as ProjectGrid, for `Analysis[]` |
 | **Document Preview Card** | Project Detail ("6. 시스템 설계", `documents`) ↔ Resume (PDF 다운로드) | None — takes only a title, thumbnail, and url | Displays a single document's preview only; does not implement the file viewer or download behavior itself |
-| **ProjectSection** | Project Detail (9 sections) ↔ Analysis Detail (4 sections) | None — takes only a title and children | Structural wrapper only (title, spacing, width); has no knowledge of Project vs Analysis content |
-| **ProjectInfo** | Project Detail (ProjectHero) ↔ Analysis Detail (AnalysisHero) | None — takes only a label and value string | Displays one label/value metadata pair only |
+| **DetailSection** | Project Detail (9 sections) ↔ Analysis Detail (4 sections) | None — takes only a title and children | Structural wrapper only (title, spacing, width); has no knowledge of Project vs Analysis content |
+| **MetaInfo** | Project Detail (ProjectHero) ↔ Analysis Detail (AnalysisHero) | None — takes only a label and value string | Displays one label/value metadata pair only |
 
-`ProjectGrid` was already documented as shared in its own file comment (`features/projects/ProjectGrid/ProjectGrid.tsx`) prior to this branch. `Document Preview Card` was confirmed shared in `feature/projects-detail-architecture`. `AnalysisGrid`, `ProjectSection`, and `ProjectInfo` are newly confirmed shared in this branch (`feature/analysis-architecture`) — the latter two carry naming debt from being shared under a `Project`-prefixed name (Section 7).
+`ProjectGrid` was already documented as shared in its own file comment (`features/projects/ProjectGrid/ProjectGrid.tsx`) prior to this branch. `Document Preview Card` was confirmed shared in `feature/projects-detail-architecture`. `AnalysisGrid` was confirmed shared in `feature/analysis-architecture`. `DetailSection`/`MetaInfo` (renamed from `ProjectSection`/`ProjectInfo` in this branch, `feature/detail-ui-foundation`) were already known to be shared but carried naming debt until this branch resolved it — see Section 7.
 
-`Gallery`, `ExternalLinks`, `SystemsSection`, `FeaturesSection`, `ProjectHero`, `AnalysisCard`, and `AnalysisHero` are page-specific today and are not shared with any other page.
-
-**Newly reviewed in this branch**: `AnalysisDimensionSection` and `AnalysisConclusion` are Analysis-only, not shared with Project Detail, even though `AnalysisDimensionSection` is structurally parallel to `SystemsSection`/`FeaturesSection`.
-- `AnalysisDimensionSection` renders `AnalysisDimension`, a shape with no `Project`-side equivalent — `SystemsSection`/`FeaturesSection` are already tightly coupled to `ProjectSystem`/`ProjectFeature` specifically. The parallel is in *pattern* (a per-dimension content renderer owned by a `ProjectSection`), not in shared code or a shared data shape, so merging them would force an artificial common type neither side needs.
+**Re-verified in this branch**, now that both Detail pages exist in code: no components beyond `DetailSection`/`MetaInfo` are actually shared between Project Detail and Analysis Detail. `SystemsSection`/`FeaturesSection` remain Project-only and `AnalysisDimensionSection`/`AnalysisConclusion` remain Analysis-only:
+- `AnalysisDimensionSection` renders `AnalysisDimension`, a shape with no `Project`-side equivalent — `SystemsSection`/`FeaturesSection` are already tightly coupled to `ProjectSystem`/`ProjectFeature` specifically. The parallel is in *pattern* (a per-dimension content renderer owned by a `DetailSection`), not in shared code or a shared data shape, so merging them would force an artificial common type neither side needs.
 - `AnalysisConclusion` has no Project Detail counterpart at all — Project's `result`/`retrospective` are plain text with no dedicated component, so there is nothing to share it with.
+
+`Gallery`, `ExternalLinks`, `SystemsSection`, `FeaturesSection`, `ProjectHero`, `AnalysisCard`, `AnalysisHero`, `AnalysisDimensionSection`, and `AnalysisConclusion` are page-specific today and are not shared with any other page.
 
 ## 9. Component Dependency Rule
 
@@ -170,22 +183,21 @@ Every component may compose the components below it in this table; none may refe
 
 | Component | May compose |
 |-----------|--------------|
-| ProjectDetailPage | ProjectHero, ProjectSection |
-| ProjectHero | ProjectInfo, ExternalLinks, Tag, Badge |
-| ProjectSection | (children supplied by the page: SystemsSection, FeaturesSection, or plain text — ProjectSection itself has no fixed child) |
+| ProjectDetailPage | ProjectHero, DetailSection |
+| ProjectHero | MetaInfo, ExternalLinks, Tag, Badge |
+| DetailSection | (children supplied by the page: SystemsSection, FeaturesSection, AnalysisDimensionSection, AnalysisConclusion, or plain text — DetailSection itself has no fixed child) |
 | SystemsSection | Document Preview Card |
 | FeaturesSection | Gallery |
 | Gallery | Modal |
 | AnalysisListPage | AnalysisGrid |
 | AnalysisGrid | AnalysisCard |
 | AnalysisCard | Tag, Badge, Button |
-| AnalysisDetailPage | AnalysisHero, ProjectSection |
-| AnalysisHero | ProjectInfo, Tag, Badge |
-| ProjectSection (Analysis Detail context) | AnalysisDimensionSection, AnalysisConclusion |
-| AnalysisDimensionSection | Accordion *(향후, 미배치 — Section 6.2)* |
+| AnalysisDetailPage | AnalysisHero, DetailSection |
+| AnalysisHero | MetaInfo, Tag, Badge |
+| AnalysisDimensionSection | Accordion *(향후, 미배치 — Section 6.3)* |
 | AnalysisConclusion | *(no children today)* |
 
-**No overlapping dependencies**: `ProjectHero` and `AnalysisHero` both compose `ProjectInfo`, and `ProjectDetailPage`/`AnalysisDetailPage` both compose `ProjectSection` — this is intentional, permitted reuse of a shared atom (Section 8), not a responsibility conflict. Each Hero and each Detail page still owns a disjoint set of fields (`Project` vs `Analysis`); only the rendering primitive is shared. `ProjectSection`'s allowed children differ by page (`SystemsSection`/`FeaturesSection`/plain text on Project Detail; `AnalysisDimensionSection`/`AnalysisConclusion` on Analysis Detail) — the Ownership Rule (Section 10) fixes which specific children each page's `ProjectSection` instances actually use, so this table's breadth doesn't translate into any instance rendering both pages' content.
+**No overlapping dependencies**: `ProjectHero` and `AnalysisHero` both compose `MetaInfo`, and `ProjectDetailPage`/`AnalysisDetailPage` both compose `DetailSection` — this is intentional, permitted reuse of a shared atom (Section 8), not a responsibility conflict. Each Hero and each Detail page still owns a disjoint set of fields (`Project` vs `Analysis`); only the rendering primitive is shared. `DetailSection`'s allowed children differ by page (`SystemsSection`/`FeaturesSection`/plain text on Project Detail; `AnalysisDimensionSection`/`AnalysisConclusion` on Analysis Detail) — the Ownership Rule (Section 10) fixes which specific children each page's `DetailSection` instances actually use, so this table's breadth doesn't translate into any instance rendering both pages' content.
 
 ## 10. Component Ownership Rule
 
@@ -196,29 +208,87 @@ The Dependency Rule (Section 9) is a capability graph — it says which componen
 **Ownership tree**
 
 ```
+ProjectListPage
+└── ProjectGrid
+    └── ProjectCard (×N, one per project)
+
+ProjectDetailPage
+├── ProjectHero
+│   ├── MetaInfo (×5 — role, genre, platform, period, team)
+│   ├── Tag (×N — tags)
+│   └── ExternalLinks *(설계됨, 미구현 — links)*
+├── DetailSection ("1. 프로젝트 개요") — plain text (overview)
+├── DetailSection ("2. 담당 역할") — plain text (contribution) + Tag (×N — skills)
+├── DetailSection ("3. 목표") — plain text (goal)
+├── DetailSection ("4. 문제 정의") — plain text (problem)
+├── DetailSection ("5. 접근 과정") — plain text (approach)
+├── DetailSection ("6. 시스템 설계")
+│   └── SystemsSection *(설계됨, 미구현)*
+│       └── Document Preview Card *(설계됨, 미구현)* (×N — documents)
+├── DetailSection ("7. 핵심 기능")
+│   └── FeaturesSection *(설계됨, 미구현)*
+│       └── Gallery *(설계됨, 미구현)*
+│           └── Modal
+├── DetailSection ("8. 결과") — plain text (result)
+└── DetailSection ("9. 회고") — plain text (retrospective)
+
 AnalysisListPage
 └── AnalysisGrid
     └── AnalysisCard (×N, one per analysis)
 
 AnalysisDetailPage
 ├── AnalysisHero
-│   └── ProjectInfo (×2 — targetGame, purpose)
-├── ProjectSection ("시스템 분석")
-│   └── AnalysisDimensionSection
+│   ├── MetaInfo (×2 — targetGame, purpose)
+│   └── Tag (×N — tags)
+├── DetailSection ("시스템 분석")
+│   └── AnalysisDimensionSection *(설계됨, 미구현)*
 │       └── (향후 Accordion — 미배치, 후보만)
-├── ProjectSection ("콘텐츠 분석")
-│   └── AnalysisDimensionSection
+├── DetailSection ("콘텐츠 분석")
+│   └── AnalysisDimensionSection *(설계됨, 미구현)*
 │       └── (향후 Accordion — 미배치, 후보만)
-├── ProjectSection ("UX 분석")
-│   └── AnalysisDimensionSection
+├── DetailSection ("UX 분석")
+│   └── AnalysisDimensionSection *(설계됨, 미구현)*
 │       └── (향후 Accordion — 미배치, 후보만)
-└── ProjectSection ("결론")
-    └── AnalysisConclusion
+└── DetailSection ("결론")
+    └── AnalysisConclusion *(설계됨, 미구현)*
 ```
 
-**Circular reference check**: every edge points strictly downward (page → section → content renderer → atom); no component is both an ancestor and a descendant of itself. `ProjectSection` and `ProjectInfo` are each owned by exactly one parent type per page (Project Detail's `ProjectHero`/9 sections vs Analysis Detail's `AnalysisHero`/4 sections) — sharing across pages doesn't create a cycle, because Project Detail and Analysis Detail never render each other or reference each other's tree.
+`*(설계됨, 미구현)*`는 Contract(Section 11)까지 확정되었지만 React 코드는 아직 없는 컴포넌트를 뜻한다. 이번 브랜치(`feature/detail-ui-foundation`)가 실제로 구현하는 것은 Foundation 수준뿐이다: `ProjectHero`/`AnalysisHero`는 헤더 필드를 실제로 렌더링하고, 9개(Project)·4개(Analysis) `DetailSection`은 코드에 배치되어 제목을 렌더링한다. 위 트리에서 "plain text (overview)"처럼 `*(설계됨, 미구현)*` 표시가 없는 항목도, 실제로는 아직 제목만 렌더링되고 해당 `children`(overview 등 실제 텍스트)은 이번 브랜치에서 연결하지 않는다 — Out of Scope의 "실제 Project/Analysis 콘텐츠 구현"에 해당하기 때문이다. 이 트리는 코드가 아니라 **완성된 설계**를 보여주며, 각 항목의 현재 구현 여부는 "다음 브랜치 추천"(브랜치 보고서)에 정리한다.
 
-## 11. Interaction Principles
+**Circular reference check**: every edge points strictly downward (page → section → content renderer → atom); no component is both an ancestor and a descendant of itself. `DetailSection` and `MetaInfo` are each owned by exactly one parent type per page (Project Detail's `ProjectHero`/9 sections vs Analysis Detail's `AnalysisHero`/4 sections) — sharing across pages doesn't create a cycle, because Project Detail and Analysis Detail never render each other or reference each other's tree.
+
+## 11. Component Contract Rule
+
+A Contract fixes exactly what a component receives, what it renders and in what order, and how it behaves when a field has no content — derived directly from `docs/DATA_MODEL.md`, never from a UI judgment made in this document or in code. Two components rendering the same field must render it in the same order and treat emptiness the same way.
+
+**General Empty State principle** (applies unless a component's row below overrides it):
+- **Fixed-shape fields** — a field that always exists on every record, per `docs/DATA_MODEL.md`'s Required/Optional principle — render even when their value is an empty string. The label always appears; only the value is blank. Hiding a fixed field would make the component's shape unpredictable from one record to the next.
+- **Variable-length collections** (arrays: `tags`, `skills`, `systems`, `features`, `gallery`, `documents`, `links`) render nothing when empty — the wrapping UI block is omitted entirely rather than shown empty. This matches the convention already in code (`{project.tags.length > 0 && (...)}`).
+
+| Component | Input Contract | Output Contract (render order) | Empty State Contract |
+|-----------|------------------|----------------------------------|------------------------|
+| **DetailSection** | `{ title, children }` | `title` as heading, then `children`, in that order | `children` is optional — renders the heading alone when absent (the current state of every section on both Detail pages, per Out of Scope of this branch) |
+| **MetaInfo** | `{ label, value }` | `label` (`dt`), then `value` (`dd`) | Fixed-shape — always renders both, even if `value` is `""` |
+| **ProjectHero** | `Project` | Featured badge (if `featured`) → `title` → `subtitle` → `role`/`genre`/`platform`/`period`/`team` via `MetaInfo`, in `docs/DATA_MODEL.md` §5.1 field order → `tags` | `featured=false` → no badge. `tags=[]` → no tag block. `role`/`genre`/`platform`/`period`/`team` are fixed-shape — always rendered via `MetaInfo` even if `""` |
+| **AnalysisHero** | `Analysis` | Featured badge (if `featured`) → `title` → `description` → `targetGame`/`purpose` via `MetaInfo`, in `docs/DATA_MODEL.md` §6.1 field order → `tags` | Same rules as ProjectHero |
+| **SystemsSection** *(설계됨, 미구현)* | `ProjectSystem[]` | Each system in array order: `name` → `purpose` → `playerExperience` → `structure` → `flow` → `data` → `exceptionHandling` → `expectedEffect`, matching `docs/DATA_MODEL.md` §5.3 field order, then its `documents` via Document Preview Card | `systems=[]` → renders nothing (variable-length collection) |
+| **FeaturesSection** *(설계됨, 미구현)* | `ProjectFeature[]` | Each feature in array order: `name` → `description`, then `gallery` via Gallery | `features=[]` → renders nothing |
+| **AnalysisDimensionSection** *(설계됨, 미구현)* | `{ dimension: AnalysisDimension, keyElementLabel }` | `keyElementLabel` → `dimension.keyElement` → `strengths` → `weaknesses` → `improvements`, matching `docs/DATA_MODEL.md` §6.2 `AnalysisDimension` field order | Fixed-shape — all 4 fields always render, even if any is `""` (an analysis with an empty `weaknesses` still shows the label; hiding it would make the three dimension sections inconsistent with each other) |
+| **AnalysisConclusion** *(설계됨, 미구현)* | `{ conclusion: string }` | `conclusion` only | Fixed-shape single field — always renders, even if `""` |
+| **Gallery** *(설계됨, 미구현)* | `ProjectGalleryImage[]` | Each image in array order: `src` → `description`/`caption` as visible text; `purpose` is used for alt text, not rendered visibly (`docs/CONTENT_GUIDE.md` §7) | `gallery=[]` → renders nothing |
+| **Document Preview Card** *(설계됨, 미구현)* | `ProjectDocument` | `title` → `type` (as an icon/label) → `url` (as the open/download action) | Rendered once per `documents` array item; the array itself follows `documents=[]` → renders nothing at the SystemsSection level |
+| **ExternalLinks** *(설계됨, 미구현)* | `ProjectLink[]` | Each link in array order: `label` → `type` (as an icon) → `url` (as the Button target) | `links=[]` → renders nothing |
+
+이 표는 아직 구현되지 않은 컴포넌트에도 Contract를 미리 확정해 둔다 — "다음 브랜치에서 구현한다"는 것이 "다음 브랜치에서 설계한다"는 뜻은 아니다. 구현 시점에는 이 표를 그대로 옮기면 된다.
+
+**세 규칙의 충돌 검토 (Dependency / Ownership / Contract)**: 세 규칙은 서로 다른 단위에서 동작해 충돌하지 않는다.
+- Dependency Rule(Section 9) — 컴포넌트 **타입**이 어떤 타입을 쓸 수 있는지 (허용 그래프)
+- Ownership Rule(Section 10) — 실제 트리에서 어떤 **인스턴스**가 그 자식을 실제로 소유하는지
+- Contract Rule(이 절) — 그 인스턴스에 실제로 어떤 **데이터**가 어떤 순서로 들어오고 나가는지
+
+세 규칙은 타입 → 인스턴스 → 데이터 순으로 점점 좁혀지는 계층이라 서로 다른 질문에 답하며 겹치지 않는다. 예를 들어 `ProjectHero`가 `MetaInfo`를 쓸 수 있다는 것(Dependency), `ProjectHero`가 그 `MetaInfo` 5개를 직접 소유한다는 것(Ownership), 그 5개가 role→genre→platform→period→team 순서로 렌더링된다는 것(Contract)은 서로 다른 층위의 사실이며, 하나가 바뀐다고 다른 하나가 깨지지 않는다.
+
+## 12. Interaction Principles
 
 - **Hover** — Provides clear, immediate feedback that an element is interactive, without altering layout or causing distracting motion.
 - **Focus** — Always visibly distinct from hover and from the unfocused state, ensuring keyboard users can track their position at all times.
@@ -227,7 +297,7 @@ AnalysisDetailPage
 - **Empty States** — When a list or section has no content to show, communicate that clearly and helpfully rather than showing a blank or broken-looking area.
 - **Error States** — When something fails to load or behave as expected, communicate the problem clearly and, where possible, offer a path forward, without exposing technical detail irrelevant to the visitor.
 
-## 12. Accessibility
+## 13. Accessibility
 
 - **Keyboard Navigation** — Every interactive element must be reachable and operable using only a keyboard, in a logical, predictable order.
 - **Color Contrast** — Text and meaningful UI elements must maintain sufficient contrast against their backgrounds to remain legible for visitors with low vision or color vision deficiencies.
@@ -237,18 +307,18 @@ AnalysisDetailPage
 
 Accessibility is a baseline requirement across every component and page, consistent with `docs/PROJECT.md` and `CLAUDE.md` — not a separate audit performed after the fact.
 
-## 13. Future Growth
+## 14. Future Growth
 
-New components should only be introduced when an existing component cannot reasonably be extended to meet the need. Before adding one, check whether an existing component in Section 6 can be reused or given a new variant — this is what kept Analysis Detail from inventing an `AnalysisSection` (Section 6.2), and what limited it to exactly two new components (`AnalysisDimensionSection`, `AnalysisConclusion`) instead of a bespoke component per body section. When a new component is genuinely needed:
+New components should only be introduced when an existing component cannot reasonably be extended to meet the need. Before adding one, check whether an existing component in Section 6 can be reused or given a new variant — this is what kept Analysis Detail from inventing an `AnalysisSection` (Section 6.3), and what limited it to exactly two new components (`AnalysisDimensionSection`, `AnalysisConclusion`) instead of a bespoke component per body section. When a new component is genuinely needed:
 
 - It must be built from the existing design tokens (Section 4), never introducing new one-off colors, spacing, or type styles.
 - It must be documented in this file, with its responsibility and intended usage stated as clearly as existing entries, and follow the Naming Convention (Section 7).
-- It must declare its dependency edges per the Component Dependency Rule (Section 9) and its owner per the Component Ownership Rule (Section 10).
-- It must satisfy the same accessibility and interaction standards defined in Sections 11 and 12 as every other component.
+- It must declare its dependency edges per the Component Dependency Rule (Section 9), its owner per the Component Ownership Rule (Section 10), and its data contract per the Component Contract Rule (Section 11).
+- It must satisfy the same accessibility and interaction standards defined in Sections 12 and 13 as every other component.
 
 This keeps the design system a living, complete reference rather than a document that drifts out of sync with the interface as the portfolio grows.
 
-## 14. Summary
+## 15. Summary
 
 The design system exists to make the portfolio feel like one deliberate product, not a series of independently built pages. Every design decision should be traceable to a principle in Section 2, serve the recruiter-first UX goals in Section 3, and draw from the shared tokens and components defined here rather than inventing new patterns in isolation.
 
