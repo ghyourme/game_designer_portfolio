@@ -13,10 +13,15 @@ import Link from "next/link";
  *
  * 네이티브 button 속성(onClick, disabled, type 등)을 그대로 확장해 별도로 재정의하지 않는다.
  * href가 있을 때는 앵커에 의미가 없는 button 전용 속성(disabled, type 등)을 전달하지 않는다.
+ * 대신 앵커 전용 속성(target, rel)은 별도 named prop으로 받아 Link에 그대로 전달한다 —
+ * 외부 링크(ExternalLinks, DocumentPreviewCard)가 target="_blank"와 새 창임을 알리는
+ * aria-label을 붙일 수 있어야 하기 때문이다 (docs/DESIGN_SYSTEM.md 13. Accessibility).
  */
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "tertiary";
   href?: string;
+  target?: string;
+  rel?: string;
 }
 
 const VARIANT_CLASSES: Record<Required<ButtonProps>["variant"], string> = {
@@ -33,6 +38,8 @@ export function Button({
   variant = "primary",
   type = "button",
   href,
+  target,
+  rel,
   className,
   children,
   ...rest
@@ -41,7 +48,13 @@ export function Button({
 
   if (href) {
     return (
-      <Link href={href} className={classes}>
+      <Link
+        href={href}
+        target={target}
+        rel={rel}
+        className={classes}
+        aria-label={rest["aria-label"]}
+      >
         {children}
       </Link>
     );

@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/Container";
 import { Tag } from "@/components/ui/Tag";
 import { Badge } from "@/components/ui/Badge";
 import { MetaInfo } from "@/components/common/MetaInfo";
+import { ExternalLinks } from "@/features/projects/ExternalLinks";
 import type { Project } from "@/types/project";
 
 /**
@@ -11,8 +12,9 @@ import type { Project } from "@/types/project";
  * 참고 문서: docs/INFORMATION_ARCHITECTURE.md - 2.4 Project Detail (구성 섹션 1. 헤더)
  *
  * 책임:
- * - Project Detail 최상단에서 title, subtitle, role/genre/platform/period/team, tags를
- *   보여주는 헤더 블록. (cover, gallery는 이번 범위에 포함하지 않음 — 아래 self-review 참고)
+ * - Project Detail 최상단에서 title, subtitle, role/genre/platform/period/team, tags,
+ *   links(ExternalLinks)를 보여주는 헤더 블록. (cover는 이번 범위에 포함하지 않음 —
+ *   아래 self-review 참고)
  * - Home의 Hero와 동일하게 자체적으로 Section/Container를 감싸는 "페이지 블록" 컴포넌트다.
  */
 export interface ProjectHeroProps {
@@ -40,6 +42,7 @@ export function ProjectHero({ project }: ProjectHeroProps) {
             ))}
           </div>
         )}
+        <ExternalLinks links={project.links} />
       </Container>
     </Section>
   );

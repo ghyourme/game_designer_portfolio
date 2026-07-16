@@ -211,7 +211,7 @@ Project Detail의 콘텐츠는 세 계층으로 나뉜다. 계층 순서와 각 
 | Level 1 — 본문 섹션 | 시스템 분석 → 콘텐츠 분석 → UX 분석 → 결론 | 고정 순서 (`docs/DATA_MODEL.md` §6.2) |
 | Level 2 — 섹션 내부 요소 | 시스템/콘텐츠/UX 분석 3개 섹션 각각의 keyElement/strengths/weaknesses/improvements (`AnalysisDimension`, `docs/DATA_MODEL.md` §6.2) | 3개 섹션에 동일하게 반복되는 고정 구조. `결론`(conclusion)은 단일 서술이라 이 계층에 해당하지 않는다 |
 
-Project Detail의 Level 2(섹션 내부 요소: skills/documents/gallery)와 마찬가지로, Analysis Detail도 이제 구조화된 Level 2를 갖는다. 다만 이를 렌더링할 전용 컴포넌트는 아직 없다 (`docs/DESIGN_SYSTEM.md` §6.2 참고) — 이번 문서 동기화 작업은 정보 구조만 반영하며 새 컴포넌트를 설계하지 않는다.
+Project Detail의 Level 2(섹션 내부 요소: skills/documents/gallery)와 마찬가지로, Analysis Detail도 구조화된 Level 2를 갖는다. 이를 렌더링하는 전용 컴포넌트(AnalysisDimensionSection)는 `feature/detail-content-components`에서 구현이 완료됐다 (`docs/DESIGN_SYSTEM.md` §6.3, §11 Component Contract Rule 참고).
 
 **표시 순서 (상단 → 하단, `docs/DATA_MODEL.md` §6 분석 데이터 모델 기반)**
 
@@ -242,12 +242,14 @@ Project Detail의 Level 2(섹션 내부 요소: skills/documents/gallery)와 마
 
 | 컴포넌트 | 상태 | Projects의 대응 |
 |---|---|---|
-| AnalysisHero | 신규 정의 | ProjectHero — 데이터 형태가 달라(title/description/targetGame/purpose vs title/subtitle/role 등) 코드를 공유하진 않지만 동일한 Hero 패턴의 인스턴스다 |
-| DetailSection **(공용, `components/common/`)** | Project Detail과 공유하는 컴포넌트 | 4개 섹션 모두 `DetailSection`을 그대로 감싸 쓴다 — title/children만 받는 완전히 범용적인 레이아웃 래퍼라 Project 전용 로직이 전혀 없다. 새 `AnalysisSection`을 만들지 않는다. 구 이름 `ProjectSection` (`feature/detail-ui-foundation`에서 리네이밍) |
-| MetaInfo **(공용, `components/common/`)** | Project Detail과 공유하는 컴포넌트 | label/value 쌍을 표시하는 범용 원자 컴포넌트. AnalysisHero가 분석 대상(targetGame)과 분석 목적(purpose)을 표시하는 데 재사용한다. 구 이름 `ProjectInfo` (`feature/detail-ui-foundation`에서 리네이밍) |
-| Accordion | 예정, 미배치 | 시스템/콘텐츠/UX 분석 섹션의 하위 내용이 길어질 경우를 대비해 이미 후보로 언급되어 있다. `AnalysisDimension` 확정으로 데이터상 블로커는 없어졌지만, 배치 결정은 새 컴포넌트를 도입하지 않는 이번 문서 동기화 범위 밖이라 미배치 상태를 유지한다 |
+| AnalysisHero | 구현 완료 | ProjectHero — 데이터 형태가 달라(title/description/targetGame/purpose vs title/subtitle/role 등) 코드를 공유하진 않지만 동일한 Hero 패턴의 인스턴스다 |
+| DetailSection **(공용, `components/common/`)** | Project Detail과 공유하는 컴포넌트, 구현 완료 | 4개 섹션 모두 `DetailSection`을 그대로 감싸 쓴다 — title/children만 받는 완전히 범용적인 레이아웃 래퍼라 Project 전용 로직이 전혀 없다. 새 `AnalysisSection`을 만들지 않는다. 구 이름 `ProjectSection` (`feature/detail-ui-foundation`에서 리네이밍) |
+| MetaInfo **(공용, `components/common/`)** | Project Detail과 공유하는 컴포넌트, 구현 완료 | label/value 쌍을 표시하는 범용 원자 컴포넌트. AnalysisHero와 AnalysisDimensionSection이 재사용한다(분석 대상/분석 목적, keyElement/strengths/weaknesses/improvements). 구 이름 `ProjectInfo` (`feature/detail-ui-foundation`에서 리네이밍) |
+| AnalysisDimensionSection | 구현 완료 (`feature/detail-content-components`) | SystemsSection — `AnalysisDimension`(keyElement/strengths/weaknesses/improvements)을 렌더링하며, 4개 필드 모두 `MetaInfo`로 표현하는 Fixed-shape 구조다 |
+| AnalysisConclusion | 구현 완료 (`feature/detail-content-components`) | Project의 `result`/`retrospective`(단순 텍스트)에는 없는 전용 컴포넌트 — 결론은 빠른 스크리닝 시 반드시 읽히는 구간이라 Card로 시각적으로 구분한다 |
+| Accordion | 예정, 미배치 | 시스템/콘텐츠/UX 분석 섹션의 하위 내용이 길어질 경우를 대비해 이미 후보로 언급되어 있다. `AnalysisDimension` 확정으로 데이터상 블로커는 없어졌지만, 배치 결정은 실제로 내용이 길어지는 경우가 생기기 전까지 미배치 상태를 유지한다 |
 
-시스템 분석 / 콘텐츠 분석 / UX 분석의 세부 필드는 공통 구조 `AnalysisDimension`(keyElement/strengths/weaknesses/improvements)으로 확정되었다 (`docs/DATA_MODEL.md` §6.2). 그럼에도 이를 렌더링할 전용 콘텐츠 렌더러(Projects의 SystemsSection/FeaturesSection에 해당하는 컴포넌트)는 아직 설계하지 않는다 — 이번 작업은 문서 간 의미 정렬만 수행하며 새 컴포넌트를 추가하지 않는다. 다음 컴포넌트 설계 브랜치는 (구조 미정 때문이 아니라) 순수하게 컴포넌트 설계 작업만 남는다.
+시스템 분석 / 콘텐츠 분석 / UX 분석의 세부 필드는 공통 구조 `AnalysisDimension`(keyElement/strengths/weaknesses/improvements)으로 확정되었다 (`docs/DATA_MODEL.md` §6.2). 이를 렌더링하는 전용 콘텐츠 렌더러 `AnalysisDimensionSection`(Projects의 SystemsSection/FeaturesSection에 해당)은 `feature/detail-content-components`에서 구현이 완료됐다.
 
 **주요 컴포넌트**
 - AnalysisHero, DetailSection(공용), AnalysisDimensionSection, AnalysisConclusion, MetaInfo(공용), Tag, Badge, Button (컴포넌트별 역할·props·데이터 소스는 `docs/DESIGN_SYSTEM.md` §6.3 참고)

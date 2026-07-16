@@ -7,8 +7,8 @@
  *
  * 책임:
  * - Project Detail·Analysis Detail 공용 label/value 메타 정보 한 쌍을 표현한다.
- * - dt/dd만 반환하므로, 반드시 부모(ProjectHero/AnalysisHero)의 dl 안에서 사용해야
- *   유효한 HTML이 된다.
+ * - dt/dd만 반환하므로, 반드시 부모(ProjectHero/AnalysisHero/SystemsSection/
+ *   AnalysisDimensionSection 등)의 dl 안에서 사용해야 유효한 HTML이 된다.
  * - value가 빈 문자열이어도 dt/dd 자리를 그대로 렌더링한다 — 고정된 헤더 필드이므로
  *   조건부로 숨기지 않는다 (Empty State Contract).
  *

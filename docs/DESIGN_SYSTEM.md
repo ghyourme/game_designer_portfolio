@@ -64,10 +64,10 @@ Each entry below defines a component's responsibility and intended usage, consis
 - **Hero** — The introductory block at the top of a page (most prominently Home), responsible for immediate first-impression communication of identity and focus.
 - **Timeline** — Presents chronological information (e.g., experience history, a project's design process) in a structured, sequential visual form.
 - **Accordion** — Progressively discloses supplementary detail (e.g., extended explanation within a case study) without consuming space until the visitor chooses to expand it.
-- **Modal** — Presents focused, temporary content (e.g., an enlarged gallery image) above the page without navigating away from it.
+- **Modal** — Presents focused, temporary content (e.g., an enlarged gallery image) above the page without navigating away from it. Implemented as a shared component (`components/common/Modal`, not `components/ui/`) since it owns an open/close interaction contract rather than being a bare visual atom — see Section 8.
 - **Search Bar** — Allows visitors to locate content directly by keyword across projects and analyses.
 - **Filter** — Allows visitors to narrow visible content by attributes such as skill, role, or tag, consistent with the tagging structure defined in `docs/DATA_MODEL.md`.
-- **Document Preview Card** — Represents a linked document (e.g., a design document, a resume; PDF, PPT, DOCX, Markdown, or a Notion export, per `docs/DATA_MODEL.md` §5.6 `ProjectDocumentType`) with enough visual context (title, thumbnail) to set expectations before opening it, supporting the PDF Viewer feature described in `docs/ROADMAP.md` §7.
+- **Document Preview Card** — Represents a linked document (e.g., a design document, a resume; PDF, PPT, DOCX, Markdown, or a Notion export, per `docs/DATA_MODEL.md` §5.6 `ProjectDocumentType`) with enough visual context (title, thumbnail) to set expectations before opening it, supporting the PDF Viewer feature described in `docs/ROADMAP.md` §7. `thumbnail` is aspirational — `ProjectDocument` (§5.6) has no such field today, so the current implementation shows `title`/`type`/`url` only (Section 11 Contract).
 
 ### 6.1 Shared Detail Components
 
@@ -161,11 +161,12 @@ A component is "shared" when more than one page renders it against its own data.
 | Section, Container, Card, Tag, Badge, Button | Every page | Design tokens only | Exactly the atomic responsibility defined in Section 6 above — no page-specific behavior |
 | **ProjectGrid** | Projects (list page) ↔ Home (FeaturedProjects) | ProjectCard | Arranges a `Project[]` array into a grid and shows the Empty state; does not know whether it's rendering the full list or a `featured`-filtered subset |
 | **AnalysisGrid** | Analysis (list page) ↔ Home (FeaturedAnalysis) | AnalysisCard | Same responsibility as ProjectGrid, for `Analysis[]` |
-| **Document Preview Card** | Project Detail ("6. 시스템 설계", `documents`) ↔ Resume (PDF 다운로드) | None — takes only a title, thumbnail, and url | Displays a single document's preview only; does not implement the file viewer or download behavior itself |
+| **Document Preview Card** | Project Detail ("6. 시스템 설계", `documents`) ↔ Resume (PDF 다운로드) | None — takes only a `document` (`ProjectDocument`: title, type, url; no `thumbnail` field exists in `docs/DATA_MODEL.md` §5.6 today, so §6's "title, thumbnail" description is aspirational, not the current Contract) | Displays a single document's preview only; does not implement the file viewer or download behavior itself |
 | **DetailSection** | Project Detail (9 sections) ↔ Analysis Detail (4 sections) | None — takes only a title and children | Structural wrapper only (title, spacing, width); has no knowledge of Project vs Analysis content |
-| **MetaInfo** | Project Detail (ProjectHero) ↔ Analysis Detail (AnalysisHero) | None — takes only a label and value string | Displays one label/value metadata pair only |
+| **MetaInfo** | Project Detail (ProjectHero, SystemsSection) ↔ Analysis Detail (AnalysisHero, AnalysisDimensionSection) | None — takes only a label and value string | Displays one label/value metadata pair only |
+| **Modal** (`components/common/Modal`) | Gallery (Project Detail) today; any future page needing focused overlay content (e.g. Personal Works, Analysis) is a reuse candidate | None — takes only `isOpen`, `onClose`, and `children`; knows nothing about what it displays | Focused overlay only (open/close, Escape-to-close, initial focus, backdrop click); owns no enlargement-specific logic — the caller decides what renders inside |
 
-`ProjectGrid` was already documented as shared in its own file comment (`features/projects/ProjectGrid/ProjectGrid.tsx`) prior to this branch. `Document Preview Card` was confirmed shared in `feature/projects-detail-architecture`. `AnalysisGrid` was confirmed shared in `feature/analysis-architecture`. `DetailSection`/`MetaInfo` (renamed from `ProjectSection`/`ProjectInfo` in this branch, `feature/detail-ui-foundation`) were already known to be shared but carried naming debt until this branch resolved it — see Section 7.
+`ProjectGrid` was already documented as shared in its own file comment (`features/projects/ProjectGrid/ProjectGrid.tsx`) prior to this branch. `Document Preview Card` was confirmed shared in `feature/projects-detail-architecture`. `AnalysisGrid` was confirmed shared in `feature/analysis-architecture`. `DetailSection`/`MetaInfo` (renamed from `ProjectSection`/`ProjectInfo` in this branch, `feature/detail-ui-foundation`) were already known to be shared but carried naming debt until this branch resolved it — see Section 7. `MetaInfo`'s reuse scope widened in `feature/detail-content-components`: `SystemsSection` and `AnalysisDimensionSection` both reuse it for their own fixed-shape label/value fields, not just the two Hero components. `Modal` is new in `feature/detail-content-components`, built as a common component (not `components/ui/`) specifically because Gallery's Contract (Section 11) requires an enlargement surface, and because it composes no other component beyond design tokens yet is not a bare visual atom like Button/Tag — it owns open/close interaction state contracts (isOpen/onClose), which is why it sits alongside DetailSection/MetaInfo rather than in Section 6's plain atom list.
 
 **Re-verified in this branch**, now that both Detail pages exist in code: no components beyond `DetailSection`/`MetaInfo` are actually shared between Project Detail and Analysis Detail. `SystemsSection`/`FeaturesSection` remain Project-only and `AnalysisDimensionSection`/`AnalysisConclusion` remain Analysis-only:
 - `AnalysisDimensionSection` renders `AnalysisDimension`, a shape with no `Project`-side equivalent — `SystemsSection`/`FeaturesSection` are already tightly coupled to `ProjectSystem`/`ProjectFeature` specifically. The parallel is in *pattern* (a per-dimension content renderer owned by a `DetailSection`), not in shared code or a shared data shape, so merging them would force an artificial common type neither side needs.
@@ -186,16 +187,18 @@ Every component may compose the components below it in this table; none may refe
 | ProjectDetailPage | ProjectHero, DetailSection |
 | ProjectHero | MetaInfo, ExternalLinks, Tag, Badge |
 | DetailSection | (children supplied by the page: SystemsSection, FeaturesSection, AnalysisDimensionSection, AnalysisConclusion, or plain text — DetailSection itself has no fixed child) |
-| SystemsSection | Document Preview Card |
+| SystemsSection | MetaInfo, Document Preview Card |
 | FeaturesSection | Gallery |
 | Gallery | Modal |
+| ExternalLinks | Button, Tag |
+| Document Preview Card | Card, Tag, Button |
 | AnalysisListPage | AnalysisGrid |
 | AnalysisGrid | AnalysisCard |
 | AnalysisCard | Tag, Badge, Button |
 | AnalysisDetailPage | AnalysisHero, DetailSection |
 | AnalysisHero | MetaInfo, Tag, Badge |
-| AnalysisDimensionSection | Accordion *(향후, 미배치 — Section 6.3)* |
-| AnalysisConclusion | *(no children today)* |
+| AnalysisDimensionSection | MetaInfo, Accordion *(향후, 미배치 — Section 6.3)* |
+| AnalysisConclusion | Card |
 
 **No overlapping dependencies**: `ProjectHero` and `AnalysisHero` both compose `MetaInfo`, and `ProjectDetailPage`/`AnalysisDetailPage` both compose `DetailSection` — this is intentional, permitted reuse of a shared atom (Section 8), not a responsibility conflict. Each Hero and each Detail page still owns a disjoint set of fields (`Project` vs `Analysis`); only the rendering primitive is shared. `DetailSection`'s allowed children differ by page (`SystemsSection`/`FeaturesSection`/plain text on Project Detail; `AnalysisDimensionSection`/`AnalysisConclusion` on Analysis Detail) — the Ownership Rule (Section 10) fixes which specific children each page's `DetailSection` instances actually use, so this table's breadth doesn't translate into any instance rendering both pages' content.
 
@@ -216,19 +219,24 @@ ProjectDetailPage
 ├── ProjectHero
 │   ├── MetaInfo (×5 — role, genre, platform, period, team)
 │   ├── Tag (×N — tags)
-│   └── ExternalLinks *(설계됨, 미구현 — links)*
+│   └── ExternalLinks (links)
+│       ├── Button (×N — url)
+│       └── Tag (×N — type label)
 ├── DetailSection ("1. 프로젝트 개요") — plain text (overview)
 ├── DetailSection ("2. 담당 역할") — plain text (contribution) + Tag (×N — skills)
 ├── DetailSection ("3. 목표") — plain text (goal)
 ├── DetailSection ("4. 문제 정의") — plain text (problem)
 ├── DetailSection ("5. 접근 과정") — plain text (approach)
 ├── DetailSection ("6. 시스템 설계")
-│   └── SystemsSection *(설계됨, 미구현)*
-│       └── Document Preview Card *(설계됨, 미구현)* (×N — documents)
+│   └── SystemsSection (systems, documents)
+│       ├── MetaInfo (×7 per system — purpose, playerExperience, structure, flow, data, exceptionHandling, expectedEffect)
+│       └── Document Preview Card (×N — documents)
+│           ├── Card, Tag (type label)
+│           └── Button (url)
 ├── DetailSection ("7. 핵심 기능")
-│   └── FeaturesSection *(설계됨, 미구현)*
-│       └── Gallery *(설계됨, 미구현)*
-│           └── Modal
+│   └── FeaturesSection (features, gallery)
+│       └── Gallery (gallery)
+│           └── Modal (선택된 이미지 확대 시)
 ├── DetailSection ("8. 결과") — plain text (result)
 └── DetailSection ("9. 회고") — plain text (retrospective)
 
@@ -241,19 +249,20 @@ AnalysisDetailPage
 │   ├── MetaInfo (×2 — targetGame, purpose)
 │   └── Tag (×N — tags)
 ├── DetailSection ("시스템 분석")
-│   └── AnalysisDimensionSection *(설계됨, 미구현)*
-│       └── (향후 Accordion — 미배치, 후보만)
+│   └── AnalysisDimensionSection (keyElementLabel="핵심 시스템")
+│       └── MetaInfo (×4 — keyElement, strengths, weaknesses, improvements)
 ├── DetailSection ("콘텐츠 분석")
-│   └── AnalysisDimensionSection *(설계됨, 미구현)*
-│       └── (향후 Accordion — 미배치, 후보만)
+│   └── AnalysisDimensionSection (keyElementLabel="핵심 콘텐츠")
+│       └── MetaInfo (×4)
 ├── DetailSection ("UX 분석")
-│   └── AnalysisDimensionSection *(설계됨, 미구현)*
-│       └── (향후 Accordion — 미배치, 후보만)
+│   └── AnalysisDimensionSection (keyElementLabel="핵심 경험")
+│       └── MetaInfo (×4)
 └── DetailSection ("결론")
-    └── AnalysisConclusion *(설계됨, 미구현)*
+    └── AnalysisConclusion
+        └── Card
 ```
 
-`*(설계됨, 미구현)*`는 Contract(Section 11)까지 확정되었지만 React 코드는 아직 없는 컴포넌트를 뜻한다. 이번 브랜치(`feature/detail-ui-foundation`)가 실제로 구현하는 것은 Foundation 수준뿐이다: `ProjectHero`/`AnalysisHero`는 헤더 필드를 실제로 렌더링하고, 9개(Project)·4개(Analysis) `DetailSection`은 코드에 배치되어 제목을 렌더링한다. 위 트리에서 "plain text (overview)"처럼 `*(설계됨, 미구현)*` 표시가 없는 항목도, 실제로는 아직 제목만 렌더링되고 해당 `children`(overview 등 실제 텍스트)은 이번 브랜치에서 연결하지 않는다 — Out of Scope의 "실제 Project/Analysis 콘텐츠 구현"에 해당하기 때문이다. 이 트리는 코드가 아니라 **완성된 설계**를 보여주며, 각 항목의 현재 구현 여부는 "다음 브랜치 추천"(브랜치 보고서)에 정리한다.
+**구현 상태 (`feature/detail-content-components`)**: 위 트리의 모든 컴포넌트가 실제 React 코드로 구현되어 있다 — 이전 브랜치(`feature/detail-ui-foundation`)까지 남아있던 `*(설계됨, 미구현)*` 표시는 이번 브랜치에서 모두 해소됐다. `data/projects.json`·`data/analysis.json`이 여전히 빈 배열이라(Out of Scope: 실제 콘텐츠 작성) 방문 시 화면에 보이는 내용은 없지만, 실제 데이터가 채워지는 즉시 위 트리 그대로 렌더링된다. `Modal`은 `Gallery`가 이미지를 선택했을 때만 열리는 조건부 자식이라 "선택된 이미지 확대 시"로 표기했다.
 
 **Circular reference check**: every edge points strictly downward (page → section → content renderer → atom); no component is both an ancestor and a descendant of itself. `DetailSection` and `MetaInfo` are each owned by exactly one parent type per page (Project Detail's `ProjectHero`/9 sections vs Analysis Detail's `AnalysisHero`/4 sections) — sharing across pages doesn't create a cycle, because Project Detail and Analysis Detail never render each other or reference each other's tree.
 
@@ -269,17 +278,18 @@ A Contract fixes exactly what a component receives, what it renders and in what 
 |-----------|------------------|----------------------------------|------------------------|
 | **DetailSection** | `{ title, children }` | `title` as heading, then `children`, in that order | `children` is optional — renders the heading alone when absent (the current state of every section on both Detail pages, per Out of Scope of this branch) |
 | **MetaInfo** | `{ label, value }` | `label` (`dt`), then `value` (`dd`) | Fixed-shape — always renders both, even if `value` is `""` |
-| **ProjectHero** | `Project` | Featured badge (if `featured`) → `title` → `subtitle` → `role`/`genre`/`platform`/`period`/`team` via `MetaInfo`, in `docs/DATA_MODEL.md` §5.1 field order → `tags` | `featured=false` → no badge. `tags=[]` → no tag block. `role`/`genre`/`platform`/`period`/`team` are fixed-shape — always rendered via `MetaInfo` even if `""` |
+| **ProjectHero** | `Project` | Featured badge (if `featured`) → `title` → `subtitle` → `role`/`genre`/`platform`/`period`/`team` via `MetaInfo`, in `docs/DATA_MODEL.md` §5.1 field order → `tags` → `links` via ExternalLinks | `featured=false` → no badge. `tags=[]` → no tag block. `links=[]` → ExternalLinks renders nothing. `role`/`genre`/`platform`/`period`/`team` are fixed-shape — always rendered via `MetaInfo` even if `""` |
 | **AnalysisHero** | `Analysis` | Featured badge (if `featured`) → `title` → `description` → `targetGame`/`purpose` via `MetaInfo`, in `docs/DATA_MODEL.md` §6.1 field order → `tags` | Same rules as ProjectHero |
-| **SystemsSection** *(설계됨, 미구현)* | `ProjectSystem[]` | Each system in array order: `name` → `purpose` → `playerExperience` → `structure` → `flow` → `data` → `exceptionHandling` → `expectedEffect`, matching `docs/DATA_MODEL.md` §5.3 field order, then its `documents` via Document Preview Card | `systems=[]` → renders nothing (variable-length collection) |
-| **FeaturesSection** *(설계됨, 미구현)* | `ProjectFeature[]` | Each feature in array order: `name` → `description`, then `gallery` via Gallery | `features=[]` → renders nothing |
-| **AnalysisDimensionSection** *(설계됨, 미구현)* | `{ dimension: AnalysisDimension, keyElementLabel }` | `keyElementLabel` → `dimension.keyElement` → `strengths` → `weaknesses` → `improvements`, matching `docs/DATA_MODEL.md` §6.2 `AnalysisDimension` field order | Fixed-shape — all 4 fields always render, even if any is `""` (an analysis with an empty `weaknesses` still shows the label; hiding it would make the three dimension sections inconsistent with each other) |
-| **AnalysisConclusion** *(설계됨, 미구현)* | `{ conclusion: string }` | `conclusion` only | Fixed-shape single field — always renders, even if `""` |
-| **Gallery** *(설계됨, 미구현)* | `ProjectGalleryImage[]` | Each image in array order: `src` → `description`/`caption` as visible text; `purpose` is used for alt text, not rendered visibly (`docs/CONTENT_GUIDE.md` §7) | `gallery=[]` → renders nothing |
-| **Document Preview Card** *(설계됨, 미구현)* | `ProjectDocument` | `title` → `type` (as an icon/label) → `url` (as the open/download action) | Rendered once per `documents` array item; the array itself follows `documents=[]` → renders nothing at the SystemsSection level |
-| **ExternalLinks** *(설계됨, 미구현)* | `ProjectLink[]` | Each link in array order: `label` → `type` (as an icon) → `url` (as the Button target) | `links=[]` → renders nothing |
+| **SystemsSection** | `{ systems: ProjectSystem[], documents: ProjectDocument[] }` | Each system in array order: `name` (heading) → `purpose` → `playerExperience` → `structure` → `flow` → `data` → `exceptionHandling` → `expectedEffect` via `MetaInfo`, matching `docs/DATA_MODEL.md` §5.3 field order, then `documents` via Document Preview Card | `systems=[]` → renders nothing (variable-length collection); `documents` belongs to the section, not to each system, so it still renders even if drawn from a `systems`-having project. `purpose`/`playerExperience`/.../`expectedEffect` are fixed-shape per system — always rendered even if `""`. `documents=[]` → no Document Preview Card block |
+| **FeaturesSection** | `{ features: ProjectFeature[], gallery: ProjectGalleryImage[] }` | Each feature in array order: `name` (heading) → `description`, then `gallery` via Gallery | `features=[]` → renders nothing (variable-length collection). `gallery=[]` → Gallery renders nothing, independent of whether `features` rendered |
+| **AnalysisDimensionSection** | `{ dimension: AnalysisDimension, keyElementLabel: string }` | `keyElementLabel` → `dimension.keyElement` → `strengths` → `weaknesses` → `improvements`, matching `docs/DATA_MODEL.md` §6.2 `AnalysisDimension` field order, each rendered via `MetaInfo` | Fixed-shape — all 4 fields always render, even if any is `""` (an analysis with an empty `weaknesses` still shows the label; hiding it would make the three dimension sections inconsistent with each other) |
+| **AnalysisConclusion** | `{ conclusion: string }` | `conclusion` only | Fixed-shape single field — always renders, even if `""` |
+| **Gallery** | `{ images: ProjectGalleryImage[] }` | Each image in array order: `src` (as thumbnail, then enlarged in Modal) → `caption` (visible under the thumbnail) → `description` (visible inside the Modal); `purpose` is used for alt text on both, never rendered visibly (`docs/CONTENT_GUIDE.md` §7). `type` is not part of this Output Contract — nothing branches on it visibly today | `images=[]` → renders nothing |
+| **Document Preview Card** | `{ document: ProjectDocument }` | `title` → `type` (as a Tag label — no icon system exists yet, `docs/DESIGN_SYSTEM.md` §4 Iconography is still conceptual) → `url` (as the open action, opens in a new tab) | Rendered once per `documents` array item; the array itself follows `documents=[]` → renders nothing at the SystemsSection level |
+| **ExternalLinks** | `{ links: ProjectLink[] }` | Each link in array order: `label` (as the Button's visible text) → `url` (as the Button's `href`, opens in a new tab) → `type` (as a Tag label placed after the Button — no icon system exists yet) | `links=[]` → renders nothing |
+| **Modal** | `{ isOpen: boolean, onClose: () => void, children }` | `children` only, inside a `role="dialog"` overlay | `isOpen=false` → renders nothing. Not a Contract row derived from `docs/DATA_MODEL.md` (Modal renders no data field directly) — listed here because Gallery's Contract depends on it |
 
-이 표는 아직 구현되지 않은 컴포넌트에도 Contract를 미리 확정해 둔다 — "다음 브랜치에서 구현한다"는 것이 "다음 브랜치에서 설계한다"는 뜻은 아니다. 구현 시점에는 이 표를 그대로 옮기면 된다.
+**구현 상태 (`feature/detail-content-components`)**: 위 표의 모든 행이 실제로 구현되었다 — 이전에 `*(설계됨, 미구현)*`으로 표시됐던 `SystemsSection`/`FeaturesSection`/`AnalysisDimensionSection`/`AnalysisConclusion`/`Gallery`/`Document Preview Card`/`ExternalLinks`는 모두 이번 브랜치에서 이 표와 동일한 Contract로 코드화됐다. `SystemsSection`/`FeaturesSection`의 Input Contract는 구현 과정에서 정밀화됐다 — `documents`/`gallery`가 각 시스템/기능 항목이 아니라 섹션 전체에 속하는 별도 배열임이 드러나 `ProjectSystem[]`/`ProjectFeature[]` 단일 타입에서 위와 같은 2-필드 객체로 바뀌었다(§10 Ownership tree와 일치). "Contract를 미리 확정하고 구현 시점에 그대로 옮긴다"는 이전 브랜치의 원칙은 앞으로 추가되는 컴포넌트(예: Accordion)에도 동일하게 적용된다.
 
 **세 규칙의 충돌 검토 (Dependency / Ownership / Contract)**: 세 규칙은 서로 다른 단위에서 동작해 충돌하지 않는다.
 - Dependency Rule(Section 9) — 컴포넌트 **타입**이 어떤 타입을 쓸 수 있는지 (허용 그래프)
