@@ -6,6 +6,13 @@ import { CareerTimeline } from "@/features/about/CareerTimeline";
 import { SkillOverview } from "@/features/about/SkillOverview";
 import { WorkingProcess } from "@/features/about/WorkingProcess";
 import { CallToAction } from "@/features/about/CallToAction";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata = buildMetadata({
+  title: "About",
+  description: "게임 기획자로서의 자기소개와 설계 철학을 소개하는 페이지입니다.",
+  path: "/about",
+});
 
 /**
  * About

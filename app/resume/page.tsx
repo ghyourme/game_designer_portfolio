@@ -5,6 +5,13 @@ import { ProjectExperience } from "@/features/resume/ProjectExperience";
 import { SkillSummary } from "@/features/resume/SkillSummary";
 import { Education } from "@/features/resume/Education";
 import { ResumeDownload } from "@/features/resume/ResumeDownload";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata = buildMetadata({
+  title: "Resume",
+  description: "이력, 경력, 프로젝트 경험, 보유 기술을 확인할 수 있는 페이지입니다.",
+  path: "/resume",
+});
 
 /**
  * Resume

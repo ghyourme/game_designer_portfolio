@@ -1,5 +1,7 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProjects, findBySlug } from "@/lib/data";
+import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
@@ -11,6 +13,33 @@ import { FeaturesSection } from "@/features/projects/FeaturesSection";
 
 interface ProjectDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+/**
+ * generateMetadata
+ *
+ * page 본문과 동일하게 findBySlug로 조회하고, 찾지 못하면 동일하게 notFound()로
+ * 위임한다(Next.js가 generateMetadata 안의 notFound() 호출을 지원한다) — 메타데이터와
+ * 실제 렌더링이 서로 다른 판단을 내리지 않도록 같은 조회 로직을 그대로 재사용한다.
+ * description은 overview를, 대표 이미지는 실제로 값이 있을 때만 cover를 사용한다.
+ */
+export async function generateMetadata({
+  params,
+}: ProjectDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const project = findBySlug(getProjects(), slug);
+
+  if (!project) {
+    notFound();
+  }
+
+  return buildMetadata({
+    title: project.title,
+    description: project.overview || project.subtitle,
+    path: `/projects/${project.slug}`,
+    image: project.cover || undefined,
+    type: "article",
+  });
 }
 
 /**

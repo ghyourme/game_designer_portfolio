@@ -175,15 +175,15 @@ Architecture → Implementation → Real Contents → Content Review
 
 | Feature | JSON 렌더링 | Empty State | Loading/Error | SEO/Metadata | Performance | 비고 |
 |---|---|---|---|---|---|---|
-| Projects | ✅ | ✅ (목록), ✅ (상세 `notFound()`+전용 not-found.tsx) | ✅ (Error Boundary만 사용, Loading 제거 — 아래 참고) | ❌ | ❌ (`<img>` 사용) | `feature/platform-routing`에서 Loading/Error·Record Not Found 해소 |
-| Analysis | ✅ | ✅ (목록), ✅ (상세 `notFound()`+전용 not-found.tsx) | ✅ (동일) | ❌ | ⬜ | 동일 |
-| Home | ✅ | ✅ (Introduction/FeaturedProjects/FeaturedAnalysis 확인됨) | ✅ (Loading 제거, Error Boundary만) | ❌ | ⬜ | |
-| About | ✅ | ✅ (CareerTimeline/SkillOverview 확인됨) | ✅ (동일) | ❌ | ⬜ | |
-| Resume | ✅ | ✅ (SkillSummary/ExperienceTimeline/Education/ProjectExperience 확인됨) | ✅ (동일) | ❌ | ⬜ | |
-| Personal Works | ⬜ | ⬜ | ✅ (동일) | ❌ | ⬜ | Architecture 자체가 미확정(위 §11 표 참고) |
-| Contact | ⬜ | ⬜ | ✅ (동일) | ❌ | ⬜ | Architecture Decision 필요(위 §11 표 참고) |
+| Projects | ✅ | ✅ (목록), ✅ (상세 `notFound()`+전용 not-found.tsx) | ✅ (Error Boundary만 사용, Loading 제거 — 아래 참고) | ✅ (`generateMetadata` + OG + canonical) | ❌ (`<img>` 사용) | `feature/platform-routing`에서 Loading/Error·Record Not Found, `feature/platform-seo`에서 SEO 해소 |
+| Analysis | ✅ | ✅ (목록), ✅ (상세 `notFound()`+전용 not-found.tsx) | ✅ (동일) | ✅ (동일) | ⬜ | 동일 |
+| Home | ✅ | ✅ (Introduction/FeaturedProjects/FeaturedAnalysis 확인됨) | ✅ (Loading 제거, Error Boundary만) | ✅ (`suffixTitle: false`로 중복 방지) | ⬜ | |
+| About | ✅ | ✅ (CareerTimeline/SkillOverview 확인됨) | ✅ (동일) | ✅ | ⬜ | |
+| Resume | ✅ | ✅ (SkillSummary/ExperienceTimeline/Education/ProjectExperience 확인됨) | ✅ (동일) | ✅ | ⬜ | |
+| Personal Works | ⬜ | ⬜ | ✅ (동일) | ✅ | ⬜ | Architecture 자체가 미확정(위 §11 표 참고)이지만 메타데이터는 이미 갖춤 |
+| Contact | ⬜ | ⬜ | ✅ (동일) | ✅ | ⬜ | Architecture Decision 필요(위 §11 표 참고)이지만 메타데이터는 이미 갖춤 |
 
-`⬜ 미확인` 항목은 다음 구현 브랜치에서 실제로 코드를 열어 확인한 뒤 갱신한다. **Navigation은 Feature별이 아니라 전역이라 표에 별도 컬럼을 두지 않는다** — `Header`의 Active Navigation과 `Footer`는 `feature/platform-routing`에서 7개 Feature 전체에 동일하게 해소되었다(아래 §12.1 참고).
+`⬜ 미확인` 항목은 다음 구현 브랜치에서 실제로 코드를 열어 확인한 뒤 갱신한다. **Navigation은 Feature별이 아니라 전역이라 표에 별도 컬럼을 두지 않는다** — `Header`의 Active Navigation과 `Footer`는 `feature/platform-routing`에서 7개 Feature 전체에 동일하게 해소되었다(아래 §12.1 참고). **robots.txt/sitemap.xml은 Feature 단위가 아니라 사이트 전체 라우트를 다루므로 이 표에 별도 행을 두지 않는다** — `docs/ARCHITECTURE.md` §14.1 참고.
 
 **Loading State 전역 제거**: `app/loading.tsx`가 있으면 Next.js가 하위 비동기 컴포넌트를 Suspense로 감싸 스트리밍하는데, 이 상태에서는 `notFound()`가 평가되기 전에 HTTP 200이 이미 커밋되어버려 잘못된 slug도 200으로 응답했다(`curl`로 재현 확인). 실사용 빈도가 낮다고 이미 문서화되어 있던 파일이라 제거했다 — `docs/ARCHITECTURE.md` §13.2에 근거를 기록했다.
 
@@ -213,10 +213,10 @@ Architecture → Implementation → Real Contents → Content Review
 
 | 항목 | 상태 | 설명 |
 |------|------|------|
-| 페이지별 Metadata 없음 | 잔존 | `app/layout.tsx`에만 정적 `metadata`가 있고, 그 외 모든 `page.tsx`는 `metadata`/`generateMetadata`가 없다 |
-| OpenGraph 없음 | 잔존 | 위와 동일 지점 — OG 필드 자체가 아직 없다 |
-| sitemap/robots 없음 | 잔존 | `app/sitemap.ts`, `app/robots.ts` 모두 없음 |
-| canonical 없음 | 잔존 | 상세 페이지(`[slug]`)의 `metadata.alternates.canonical` 없음 |
+| 페이지별 Metadata 없음 | 해결됨 (`feature/platform-seo`) | 9개 `page.tsx` 전부 `lib/seo/buildMetadata`로 title/description을 갖췄다. 상세 페이지는 `generateMetadata` |
+| OpenGraph 없음 | 해결됨 (`feature/platform-seo`) | `buildMetadata`가 title/description/url/siteName/type을 채우고, 실제 이미지가 있을 때만(Project Detail `cover`) image를 추가한다 |
+| sitemap/robots 없음 | 해결됨 (`feature/platform-seo`) | `app/robots.ts`(전체 allow) + `app/sitemap.ts`(정적 7개 + 실제 slug만) 추가 |
+| canonical 없음 | 해결됨 (`feature/platform-seo`) | `buildMetadata`가 모든 페이지에 자기 자신을 가리키는 canonical을 설정 |
 
 **Low**
 

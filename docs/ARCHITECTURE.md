@@ -323,12 +323,14 @@ Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력�
 
 | 항목 | 요구 사항 | 현재 상태 |
 |------|-----------|-------------|
-| Metadata | 모든 `page.tsx`는 `metadata` 또는 `generateMetadata`를 통해 페이지별 제목/설명을 노출해야 한다. 목록형 페이지는 정적 `metadata`로, 상세 페이지(`[slug]`)는 `generateMetadata`로 실제 데이터(title/overview 등)를 반영한다 | `app/layout.tsx`에만 정적 `metadata` 존재. 그 외 모든 `page.tsx`는 없음 — **미비 — Technical Debt** |
-| OpenGraph | 위 metadata에 OpenGraph 필드(title/description/image)를 포함한다 | 없음 — **미비 — Technical Debt** |
-| robots | `app/robots.ts`(Next.js 컨벤션)으로 크롤링 정책을 정의한다 | 없음 — **미비 — Technical Debt** |
-| sitemap | `app/sitemap.ts`(Next.js 컨벤션)으로 전체 라우트를 노출한다 | 없음 — **미비 — Technical Debt** |
-| canonical | 상세 페이지(`[slug]`)의 `metadata.alternates.canonical`을 설정한다 | 없음 — **미비 — Technical Debt** |
+| Metadata | 모든 `page.tsx`는 `metadata` 또는 `generateMetadata`를 통해 페이지별 제목/설명을 노출해야 한다. 목록형 페이지는 정적 `metadata`로, 상세 페이지(`[slug]`)는 `generateMetadata`로 실제 데이터(title/overview 등)를 반영한다 | 이미 구현됨(`feature/platform-seo`) — 9개 `page.tsx` 전부 `lib/seo/buildMetadata`로 구성. 상세 페이지는 `generateMetadata`가 `findBySlug` 조회 실패 시 페이지 본문과 동일하게 `notFound()`로 위임한다 |
+| OpenGraph | 위 metadata에 OpenGraph 필드(title/description/image)를 포함한다 | 이미 구현됨 — `buildMetadata`가 title/description/url/siteName/type을 항상 채우고, 실제 이미지가 있는 페이지(Project Detail의 `cover`)만 image를 추가한다. 이미지가 없는 페이지에 억지로 만들지 않는다 |
+| robots | `app/robots.ts`(Next.js 컨벤션)으로 크롤링 정책을 정의한다 | 이미 구현됨 — 전체 allow 하나. `data/*.json`에 반영된 콘텐츠는 이미 Quality Gate(`docs/PROJECT.md` §10)를 통과했으므로 noindex 대상이 없다 |
+| sitemap | `app/sitemap.ts`(Next.js 컨벤션)으로 전체 라우트를 노출한다 | 이미 구현됨 — 정적 라우트 7개 + `getProjects()`/`getAnalysis()`가 실제로 반환하는 slug만 반영(현재는 둘 다 `[]`이라 정적 라우트만 노출) |
+| canonical | 상세 페이지(`[slug]`)의 `metadata.alternates.canonical`을 설정한다 | 이미 구현됨 — `buildMetadata`가 모든 페이지에 자기 자신을 가리키는 canonical을 설정한다(목록/상세 공통) |
 | favicon | `app/favicon.ico` | 이미 존재 |
+
+**Shared SEO Utility**: `lib/seo/buildMetadata.ts`가 위 5개 항목을 한 곳에서 조립한다 — 페이지는 `title`/`description`/`path`(+선택적 `image`)만 넘긴다. `SITE_URL`(`lib/seo/siteUrl.ts`)은 `NEXT_PUBLIC_SITE_URL` 환경 변수를 유일한 출처로 삼으며, 커스텀 도메인이 미정인 지금은 로컬 기본값으로 대체한다(`docs/DEPLOYMENT.md` §2). Home은 그 자체가 `SITE_NAME`이라 `suffixTitle: false`로 중복("Game Designer Portfolio | Game Designer Portfolio")을 막는다.
 
 ### 14.2 Performance
 

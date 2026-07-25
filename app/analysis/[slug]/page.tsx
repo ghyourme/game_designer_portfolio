@@ -1,5 +1,7 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getAnalysis, findBySlug } from "@/lib/data";
+import { buildMetadata } from "@/lib/seo";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
@@ -10,6 +12,31 @@ import { AnalysisConclusion } from "@/features/analysis/AnalysisConclusion";
 
 interface AnalysisDetailPageProps {
   params: Promise<{ slug: string }>;
+}
+
+/**
+ * generateMetadata
+ *
+ * page 본문과 동일한 findBySlug 조회·notFound() 위임 패턴이다(app/projects/[slug]/page.tsx
+ * 참고). Analysis에는 이미지 필드가 없어(docs/DATA_MODEL.md §6.1) image는 넘기지 않는다 —
+ * 없는 이미지를 억지로 만들지 않는다.
+ */
+export async function generateMetadata({
+  params,
+}: AnalysisDetailPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const analysis = findBySlug(getAnalysis(), slug);
+
+  if (!analysis) {
+    notFound();
+  }
+
+  return buildMetadata({
+    title: analysis.title,
+    description: analysis.description,
+    path: `/analysis/${analysis.slug}`,
+    type: "article",
+  });
 }
 
 /**

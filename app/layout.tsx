@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { MainLayout } from "@/components/layout/MainLayout";
+import { SITE_URL, SITE_NAME } from "@/lib/seo";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -13,8 +14,17 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+/**
+ * 각 page.tsx는 title에 페이지 고유 이름만 넘긴다("Projects" 등) — 아래 template이
+ * "Projects | Game Designer Portfolio" 형태로 자동 완성한다(중복 텍스트 최소화).
+ * metadataBase는 lib/seo가 만드는 상대 이미지 경로를 절대 URL로 해석하는 기준이다.
+ */
 export const metadata: Metadata = {
-  title: "Game Designer Portfolio",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    template: `%s | ${SITE_NAME}`,
+    default: SITE_NAME,
+  },
   description: "게임 기획자 포트폴리오",
 };
 

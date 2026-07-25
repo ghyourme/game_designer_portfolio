@@ -2,6 +2,13 @@ import { getProjects } from "@/lib/data";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { ProjectGrid } from "@/features/projects/ProjectGrid";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata = buildMetadata({
+  title: "Projects",
+  description: "진행한 프로젝트를 모아볼 수 있는 페이지입니다.",
+  path: "/projects",
+});
 
 /**
  * Projects

@@ -1,3 +1,11 @@
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata = buildMetadata({
+  title: "Contact",
+  description: "연락 가능한 경로를 안내하는 페이지입니다.",
+  path: "/contact",
+});
+
 /**
  * Contact (임시 placeholder)
  *

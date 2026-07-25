@@ -3,6 +3,14 @@ import { Introduction } from "@/features/home/Introduction";
 import { FeaturedProjects } from "@/features/home/FeaturedProjects";
 import { FeaturedAnalysis } from "@/features/home/FeaturedAnalysis";
 import { CallToAction } from "@/features/home/CallToAction";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata = buildMetadata({
+  title: "Game Designer Portfolio",
+  description: "게임 기획자 포트폴리오 — 프로젝트, 게임 분석, 이력을 확인할 수 있습니다.",
+  path: "/",
+  suffixTitle: false,
+});
 
 /**
  * Home (임시 placeholder)

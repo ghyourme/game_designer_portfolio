@@ -35,7 +35,16 @@
       "Bash(curl -s http://localhost:3000/projects/nonexistent-slug -o /tmp/page.html)",
       "Bash(python3 -c ' *)",
       "Bash(curl -s http://localhost:3000/about -o /tmp/about.html)",
-      "Bash(pkill -f \"next start\")"
+      "Bash(pkill -f \"next start\")",
+      "Bash(echo \"exit: $?\")",
+      "Bash(curl -s http://localhost:3000/ -o /tmp/home.html -w \"status:%{http_code}\\\\n\")",
+      "Bash(echo \"grep exit: $?\")",
+      "Bash(curl -s http://localhost:3000/robots.txt)",
+      "Bash(curl -s http://localhost:3000/sitemap.xml)",
+      "Bash(curl -s http://localhost:3000/projects)",
+      "Bash(curl -s -o /dev/null -w \"status:%{http_code}\\\\n\" http://localhost:3000/projects/nonexistent-slug)",
+      "Bash(MSYS_NO_PATHCONV=1 curl -s -o /dev/null -w \"projects/x -> %{http_code}\\\\n\" \"http://localhost:3000/projects/x\")",
+      "Bash(MSYS_NO_PATHCONV=1 curl -s -o /dev/null -w \"analysis/x -> %{http_code}\\\\n\" \"http://localhost:3000/analysis/x\")"
     ],
     "additionalDirectories": [
       "\\tmp"

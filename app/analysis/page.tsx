@@ -2,6 +2,13 @@ import { getAnalysis } from "@/lib/data";
 import { Section } from "@/components/ui/Section";
 import { Container } from "@/components/ui/Container";
 import { AnalysisGrid } from "@/features/analysis/AnalysisGrid";
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata = buildMetadata({
+  title: "Analysis",
+  description: "진행한 게임 분석을 모아볼 수 있는 페이지입니다.",
+  path: "/analysis",
+});
 
 /**
  * Analysis

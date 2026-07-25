@@ -1,3 +1,11 @@
+import { buildMetadata } from "@/lib/seo";
+
+export const metadata = buildMetadata({
+  title: "Personal Works",
+  description: "정식 프로젝트 외에 개인적으로 진행한 작업물을 소개하는 페이지입니다.",
+  path: "/personal",
+});
+
 /**
  * Personal Works (임시 placeholder)
  *
