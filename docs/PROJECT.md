@@ -175,11 +175,11 @@ Architecture → Implementation → Real Contents → Content Review
 
 | Feature | JSON 렌더링 | Empty State | Loading/Error | SEO/Metadata | Performance | 비고 |
 |---|---|---|---|---|---|---|
-| Projects | ✅ | ✅ (목록), ✅ (상세 `notFound()`+전용 not-found.tsx) | ✅ (Error Boundary만 사용, Loading 제거 — 아래 참고) | ✅ (`generateMetadata` + OG + canonical) | ❌ (`<img>` 사용) | `feature/platform-routing`에서 Loading/Error·Record Not Found, `feature/platform-seo`에서 SEO 해소 |
-| Analysis | ✅ | ✅ (목록), ✅ (상세 `notFound()`+전용 not-found.tsx) | ✅ (동일) | ✅ (동일) | ⬜ | 동일 |
-| Home | ✅ | ✅ (Introduction/FeaturedProjects/FeaturedAnalysis 확인됨) | ✅ (Loading 제거, Error Boundary만) | ✅ (`suffixTitle: false`로 중복 방지) | ⬜ | |
-| About | ✅ | ✅ (CareerTimeline/SkillOverview 확인됨) | ✅ (동일) | ✅ | ⬜ | |
-| Resume | ✅ | ✅ (SkillSummary/ExperienceTimeline/Education/ProjectExperience 확인됨) | ✅ (동일) | ✅ | ⬜ | |
+| Projects | ✅ | ✅ (목록), ✅ (상세 `notFound()`+전용 not-found.tsx) | ✅ (Error Boundary만 사용, Loading 제거 — 아래 참고) | ✅ (`generateMetadata` + OG + canonical) | ✅ (Gallery 썸네일 `next/image`, 확대 보기는 의도적으로 `<img>` 유지 — §12.1 참고) | `feature/platform-routing`→`platform-seo`→`platform-performance` 순서로 High/Medium/Low 전부 해소 |
+| Analysis | ✅ | ✅ (목록), ✅ (상세 `notFound()`+전용 not-found.tsx) | ✅ (동일) | ✅ (동일) | ⬜ (이미지 필드 자체가 없음, §5.7 해당 없음) | 동일 |
+| Home | ✅ | ✅ (Introduction/FeaturedProjects/FeaturedAnalysis 확인됨) | ✅ (Loading 제거, Error Boundary만) | ✅ (`suffixTitle: false`로 중복 방지) | ⬜ (이미지 없음) | |
+| About | ✅ | ✅ (CareerTimeline/SkillOverview 확인됨) | ✅ (동일) | ✅ | ⬜ (이미지 없음) | |
+| Resume | ✅ | ✅ (SkillSummary/ExperienceTimeline/Education/ProjectExperience 확인됨) | ✅ (동일) | ✅ | ⬜ (이미지 없음) | |
 | Personal Works | ⬜ | ⬜ | ✅ (동일) | ✅ | ⬜ | Architecture 자체가 미확정(위 §11 표 참고)이지만 메타데이터는 이미 갖춤 |
 | Contact | ⬜ | ⬜ | ✅ (동일) | ✅ | ⬜ | Architecture Decision 필요(위 §11 표 참고)이지만 메타데이터는 이미 갖춤 |
 
@@ -222,8 +222,8 @@ Architecture → Implementation → Real Contents → Content Review
 
 | 항목 | 상태 | 설명 |
 |------|------|------|
-| next/image 미사용 | 잔존 | `features/projects/Gallery/Gallery.tsx`가 `<img>`를 직접 사용(기존 ESLint `no-img-element` 경고 2건과 동일 지점) |
-| dynamic import 미사용 | 잔존 | 프로젝트 전체에서 `next/dynamic` 미사용 — 콘텐츠가 아직 없어 번들 크기가 실제 문제가 되지는 않는다 |
+| next/image 미사용 | 해결됨 (`feature/platform-performance`) | Gallery 썸네일을 `fill`+`sizes`로 전환(ESLint `no-img-element` 경고 2건 중 1건 해소). 확대 보기 이미지는 원본 비율 유지가 우선이라 의도적으로 `<img>` 유지 — `docs/ARCHITECTURE.md` §14.2에 근거 기록 |
+| dynamic import 미사용 | 검토 완료, 미적용(재검토 조건 명시) | `.next/static/chunks` 실측 결과 무거운 서드파티 의존성 자체가 없고(package.json에 next/react/react-dom 외 없음), 자체 컴포넌트는 전부 수 KB 수준이라 지금 적용하면 이득 없이 복잡도만 는다. 실제 무거운 라이브러리나 컴포넌트가 추가되는 시점에 재검토한다 |
 | Cross Browser / Device 검증 없음 | 잔존 | 실제 브라우저·기기 교차 테스트 기록 없음 (`docs/ARCHITECTURE.md` §13.4) — `docs/ARCHITECTURE.md` §16 Release DoD의 Cross Browser QA 단계에서 수행 |
 
 **Not Debt (설계상 의도적)**

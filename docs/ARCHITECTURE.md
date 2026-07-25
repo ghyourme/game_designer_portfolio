@@ -336,9 +336,11 @@ Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력�
 
 | 항목 | 요구 사항 | 현재 상태 |
 |------|-----------|-------------|
-| Image Optimization | 콘텐츠 이미지는 `next/image`를 사용한다 | `next/image`가 프로젝트 전체에서 미사용. `features/projects/Gallery/Gallery.tsx`가 `<img>`를 직접 사용(기존 ESLint `no-img-element` 경고와 일치) — **미비 — Technical Debt** |
-| Dynamic Import | 초기 로드에 필요하지 않은 컴포넌트(예: Modal, 대용량 갤러리)는 `next/dynamic`으로 지연 로드한다 | 프로젝트 전체에서 `dynamic(() => import(...))` 미사용 — **미비 — Technical Debt(낮은 우선순위 — 콘텐츠가 없어 번들 크기가 아직 문제되지 않음)** |
+| Image Optimization | 콘텐츠 이미지는 실제로 이득이 있는 곳에 `next/image`를 사용한다 | 이미 구현됨(`feature/platform-performance`) — Gallery 썸네일(그리드, 이미 `aspect-video`로 비율 고정, 스크롤 하단이라 lazy loading 이득 있음)만 `fill`+`sizes`로 전환. 확대 보기 이미지는 `<img>` 유지 — 아래 참고 |
+| Dynamic Import | 초기 로드에 필요하지 않은 컴포넌트는 `next/dynamic`으로 지연 로드한다 | 검토 완료, 미적용 — `.next/static/chunks` 크기를 직접 확인한 결과 프로젝트 자체 코드(Modal 76줄, Gallery 등)는 전부 수 KB 수준이고 번들의 대부분(224K/148K/112K)은 React/Next 런타임 공유 청크라 code splitting으로 줄일 수 있는 부분이 아니다. 무거운 서드파티 의존성 자체가 없다(package.json에 next/react/react-dom 외 없음) — 지금 적용하면 실제 이득 없이 복잡도만 는다(과설계 방지) |
 | Bundle Size | 새 의존성 추가 시 번들 크기 영향을 검토한다(CLAUDE.md §4 "불필요한 의존성 추가 금지"와 동일한 원칙) | 기존 원칙 재확인, 신규 아님 |
+
+**확대 보기(Modal) 이미지를 `next/image`로 전환하지 않는 이유**: 스크린샷/와이어프레임/UML/ERD/컨셉 아트 등(`docs/DATA_MODEL.md` §5.7 `ProjectGalleryImageType`) 원본 비율이 제각각이라 `max-h-[70vh] w-full object-contain`으로 자연스러운 비율을 유지해야 한다. `next/image`의 `fill`은 고정 비율 컨테이너가 필요해 강제로 씌우면 세로로 긴 이미지가 레터박싱되는 시각적 회귀가 생긴다. 게다가 클릭 전에는 `{selected && ...}` 조건부 렌더링으로 아예 마운트되지 않아 초기 로드에 영향이 없다 — 전환해도 성능 이득이 없다.
 
 ### 14.3 적용 범위와 우선순위
 
