@@ -1,16 +1,16 @@
-# Project G — Evidence Inventory
+# Project Evidence Inventory Template
 
-이 문서는 Source of Truth가 아니다. `docs/CONTENT_GUIDE.md` §13(Content Source Rule)·§14(Traceability Rule)를 Project G 하나에 적용한 작업 중 자료이며, `data/projects.json`에는 반영되지 않는다 (`docs/ARCHITECTURE.md` §6).
+이 문서는 Source of Truth가 아니다. `docs/CONTENT_GUIDE.md` §13(Content Source Rule)·§14(Traceability Rule)를 개별 프로젝트에 적용하기 위한 범용 템플릿이며, `data/projects.json`에는 반영되지 않는다 (`docs/ARCHITECTURE.md` §6).
 
-**목적**: Project G를 작성하기 전, 어떤 근거 자료가 확보되어 있고 무엇이 부족한지 먼저 파악한다 — 자료 없이 섹션을 채우는 것(§12 Evidence Rule 위반)을 막기 위한 선행 점검이다.
+**사용 방법**: 실제 프로젝트가 확정되고 `slug`(`docs/DATA_MODEL.md` §5.1)가 결정되면, 이 파일을 `docs/projects/<project-slug>/evidence.md`로 복사한 뒤 제목과 §3의 "출처 상세"를 실제 프로젝트 자료로 채운다. 프로젝트명이 확정되기 전까지는 이 템플릿 자체를 특정 프로젝트에 종속시키지 않는다.
 
-**현재 상태**: 전체 Evidence 미확보. 아래 인벤토리는 수집 대상을 정의한 템플릿이며, 실제 자료가 도착하는 대로 "확보 여부" 열을 갱신한다.
+**현재 상태**: 특정 프로젝트에 연결되지 않은 템플릿 상태.
 
 ---
 
 ## 1. Evidence 목록 정의
 
-Project G 작성에 쓰일 수 있는 근거 자료를 9개 유형으로 정의한다. `docs/CONTENT_GUIDE.md` §13의 6단계 체인(기획서→개발 문서→회의록→Git Commit→PPT→실제 구현 화면)을 실제 자료 형태 기준으로 더 세분화한 것이다.
+프로젝트 작성에 쓰일 수 있는 근거 자료를 9개 유형으로 정의한다. `docs/CONTENT_GUIDE.md` §13의 6단계 체인(기획서→개발 문서→회의록→Git Commit→PPT→실제 구현 화면)을 실제 자료 형태 기준으로 더 세분화한 것이다.
 
 | 유형 | 정의 | 전형적 형식 |
 |------|------|--------------|
@@ -46,7 +46,7 @@ Project G 작성에 쓰일 수 있는 근거 자료를 9개 유형으로 정의�
 
 ---
 
-## 3. Evidence Inventory (현재 상태)
+## 3. Evidence Inventory (템플릿 — 프로젝트 확정 후 채움)
 
 | Evidence 유형 | 확보 여부 | 출처 상세 | 사용 예정 필드 | 비고 |
 |----------------|------------|-----------|------------------|------|
@@ -67,7 +67,7 @@ Project G 작성에 쓰일 수 있는 근거 자료를 9개 유형으로 정의�
 
 ### 4.1 현재 갭
 
-9개 Evidence 유형과 헤더 메타 전부가 미확보 상태다. `docs/CONTENT_GUIDE.md` §12 Evidence Rule에 따라, 근거가 없는 섹션은 초안조차 작성할 수 없다 — Content Workflow(§11)의 1단계(자료 수집)가 아직 시작되지 않은 상태다.
+이 템플릿을 처음 복사한 시점에는 9개 Evidence 유형과 헤더 메타 전부가 미확보 상태다. `docs/CONTENT_GUIDE.md` §12 Evidence Rule에 따라, 근거가 없는 섹션은 초안조차 작성할 수 없다 — Content Workflow(§11)의 1단계(자료 수집)부터 시작한다.
 
 ### 4.2 초안 작성 가능한 최소 조건
 
@@ -83,10 +83,10 @@ Content Workflow 2단계(초안 작성)로 넘어가려면 최소한 아래가 �
 
 ### 4.3 스키마 갭 — 영상 Evidence
 
-`docs/DATA_MODEL.md` §5.7 `gallery`는 이미지 전용 타입(`screenshot | wireframe | uml | erd | concept | other`)이며, GIF는 파일 확장자로 흡수되지만 동영상(MP4 등)을 위한 전용 슬롯은 없다. 현재 스키마에서 영상 Evidence는 `links`(예: YouTube URL)로만 노출 가능하다 — `gallery`에 직접 담을 수 없다. 새 필드가 필요한지는 이번 브랜치의 범위가 아니며, 실제로 영상 Evidence가 확보되고 `links`만으로 부족하다고 판단될 때 별도 Architecture Decision으로 다룬다.
+`docs/DATA_MODEL.md` §5.7 `gallery`는 이미지 전용 타입(`screenshot | wireframe | uml | erd | concept | other`)이며, GIF는 파일 확장자로 흡수되지만 동영상(MP4 등)을 위한 전용 슬롯은 없다. 현재 스키마에서 영상 Evidence는 `links`(예: YouTube URL)로만 노출 가능하다 — `gallery`에 직접 담을 수 없다. 새 필드가 필요한지는 스키마 변경 범위이며, 실제로 영상 Evidence가 확보되고 `links`만으로 부족하다고 판단될 때 별도 Architecture Decision으로 다룬다.
 
 ---
 
 ## 5. 다음 단계
 
-이 인벤토리를 기준으로 실제 자료가 도착하는 대로 §3의 "확보 여부"/"출처 상세" 열을 갱신한다. §4.2의 최소 조건이 충족되면 `feature/projects-projectg-content` 브랜치에서 Content Workflow(§11) 2단계(초안 작성)부터 진행한다.
+실제 프로젝트가 확정되면 이 템플릿을 `docs/projects/<project-slug>/evidence.md`로 복사해 사용한다. §4.2의 최소 조건이 충족되면 `feature/projects-<project-slug>-content` 브랜치에서 Content Workflow(§11) 2단계(초안 작성)부터 진행한다.

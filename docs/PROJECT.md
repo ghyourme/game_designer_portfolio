@@ -160,12 +160,12 @@ Architecture → Implementation → Real Contents → Content Review
 | Home | ✅ | ✅ | 🔶 (`profile.json`/`skills.json`이 placeholder 문자열·빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
 | About | ✅ | ✅ | 🔶 (동일) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
 | Resume | ✅ | ✅ | 🔶 (`personalInfo`만 placeholder, `career`/`education` 등은 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
-| **Projects** | ✅ | ✅ | ❌ (`data/projects.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | **Infrastructure 완료 + Content Governance 완료 — Project G Evidence 수집 단계 (`docs/projects/project-g-evidence.md` 참고, 전체 미확보)** |
+| **Projects** | ✅ | ✅ | ❌ (`data/projects.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | **Infrastructure 완료 + Content Governance 완료 — 실제 프로젝트 미확정 (Evidence Inventory는 `docs/projects/evidence-template.md` 템플릿 상태로 대기)** |
 | Analysis | ✅ | ✅ | ❌ (`data/analysis.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 (Review Checklist 미구축 — §12 참고) |
 | Personal Works | ❌ (`docs/DATA_MODEL.md`에 세부 필드 미정) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 설계 전 단계 |
 | Contact | 🔶 (연락처 데이터 소스 미정 — `profile.json` 확장 vs `resume.json.personalInfo` 재사용) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Architecture Decision 필요 |
 
-이전에 통용되던 "Projects Feature 진행 중"이라는 표현은 Architecture/Implementation과 Real Contents 이후 단계를 구분하지 않아 폐기한다. 정확한 표현은 **"Projects Infrastructure 완료 + Content Governance 완료 — Projects Content 단계 진입"**이다. "Content Governance 완료"는 §10 Quality Gate의 4·6·7단계(Content/Recruiter/Senior Planner Review)를 검증할 체크리스트가 `docs/CONTENT_GUIDE.md` §10에 구축되었다는 뜻이며, Projects의 Real Contents 자체는 여전히 ❌다 — Project G 콘텐츠는 다음 브랜치(`feature/projects-projectg-content`)에서 작성한다.
+이전에 통용되던 "Projects Feature 진행 중"이라는 표현은 Architecture/Implementation과 Real Contents 이후 단계를 구분하지 않아 폐기한다. 정확한 표현은 **"Projects Infrastructure 완료 + Content Governance 완료 — Projects Content 단계 진입"**이다. "Content Governance 완료"는 §10 Quality Gate의 4·6·7단계(Content/Recruiter/Senior Planner Review)를 검증할 체크리스트가 `docs/CONTENT_GUIDE.md` §10에 구축되었다는 뜻이며, Projects의 Real Contents 자체는 여전히 ❌다 — 실제 프로젝트명이 확정되면 그 slug를 딴 `feature/projects-<project-slug>-content` 브랜치에서 콘텐츠를 작성한다 (근거 없는 프로젝트명을 미리 정하지 않는다).
 
 ---
 
@@ -186,6 +186,7 @@ Architecture → Implementation → Real Contents → Content Review
 | Content Workflow 미문서화 | 해결됨 (`feature/projects-content-workflow`) | `docs/CONTENT_GUIDE.md` §11에 자료 수집→초안→JSON→3개 Review Checklist→수정→Quality Gate 통과→data 반영→최종 검증의 10단계 워크플로우 정의 |
 | Evidence / Content Source / Traceability Rule 미구축 | 해결됨 (`feature/projects-content-workflow`) | `docs/CONTENT_GUIDE.md` §12(Evidence Rule)·§13(Content Source Rule)·§14(Traceability Rule)에 정의 |
 | Analysis Evidence/Traceability 매핑 미구축 | 잔존 | §12~§14는 Projects 9개 섹션에만 매핑되어 있다. Analysis(`docs/CONTENT_GUIDE.md` §5)의 근거·출처·추적성 규칙은 아직 없으며, Analysis Content 단계 진입 전 별도 브랜치가 필요하다 |
-| 콘텐츠 일관성 검증 자동화 없음 | 잔존 | 현재 체크리스트는 전부 수동 검토 절차다. Project G 1건만 존재하는 지금은 충분하지만, 프로젝트 수가 늘어나면(§2 목표 3 "최소 3개 시스템 설계 문서" 등) 체크리스트 위반을 자동 감지하는 스크립트가 필요할 수 있다 — 지금은 만들지 않는다(과설계 방지) |
+| 콘텐츠 일관성 검증 자동화 없음 | 잔존 | 현재 체크리스트는 전부 수동 검토 절차다. 실제 프로젝트가 아직 없는 지금은 충분하지만, 프로젝트 수가 늘어나면(§2 목표 3 "최소 3개 시스템 설계 문서" 등) 체크리스트 위반을 자동 감지하는 스크립트가 필요할 수 있다 — 지금은 만들지 않는다(과설계 방지) |
+| 근거 없는 프로젝트명("Project G") 사용 | 해결됨 (`docs/evidence-structure-generalization`) | 과거 대화의 다른 프로젝트명을 잘못 이어받아 `docs/projects/project-g-evidence.md`, 본 문서 §11/§12 등 여러 곳에 사용했다. 실제 프로젝트명이 확정되기 전이라 전부 제거하고, `docs/projects/evidence-template.md`(프로젝트명 비종속 템플릿)로 대체했다 |
 
 ---
