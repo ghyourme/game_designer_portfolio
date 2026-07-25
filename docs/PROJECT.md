@@ -199,4 +199,14 @@ Project를 가리키는 식별자·브랜치명 규칙에 관한 부채다.
 | "브랜치 하나 = 프로젝트 하나" 원칙 미문서화 | 해결됨 (`docs/project-identifier-rule`) | 최근 여러 브랜치에서 구두로만 통용되던 원칙을 `docs/GIT_WORKFLOW.md` §1.1에 명문화하고, `feature/projects-<slug>-content` 브랜치 패턴을 예시로 추가 |
 | 브랜치명 대상-중심 원칙 위반 사례 | 해결됨(교훈으로 기록) | `docs/evidence-structure-generalization`의 "generalization"은 작업 대상이 아니라 방법론이라 `docs/GIT_WORKFLOW.md` §1의 대상-중심 네이밍과 어긋났다(§12.1의 "근거 없는 프로젝트명" 이슈를 해결한 그 브랜치). 이미 `develop`에 병합되어 브랜치 자체를 rename하지는 않으며, 이후 브랜치(`docs/project-identifier-rule` 등)부터 대상 중심 명명을 적용한다 |
 
+### 12.3 Lifecycle Debt
+
+Project 생성부터 완료까지의 전체 흐름에 관한 부채다.
+
+| 항목 | 상태 | 설명 |
+|------|------|------|
+| Project Lifecycle 미문서화 | 해결됨 (`docs/project-lifecycle`) | Identifier Rule·Evidence Rule·Content Workflow·Quality Gate가 각 문서에 흩어져 있어 전체 순서가 한눈에 보이지 않았다. `docs/ARCHITECTURE.md` §12에 9단계로 연결하고, 표시용 Project State 별칭(Draft/Evidence/Writing/Review/Completed)을 정의했다 — 새 필드나 새 규칙 없이 기존 규칙을 가리키기만 한다 |
+| Archive 정책 미정 | 잔존 | 프로젝트를 포트폴리오에서 내리거나 이력으로만 남기는 정책이 없다. `data/projects.json`은 필드 추가가 금지된 고정 스키마라 Archive를 표현하려면 스키마 변경 Architecture Decision이 필요하다 — 실제로 Archive할 프로젝트가 없는 지금은 설계하지 않는다(과설계 방지, `docs/ARCHITECTURE.md` §12.4) |
+| DATA_MODEL §4/§5 필드 범위 불일치(관찰) | 잔존(낮은 우선순위) | `docs/DATA_MODEL.md` §4는 "모든 데이터"에 `status`/`description`/`createdAt`/`updatedAt`/`order`가 공통 적용된다고 서술하지만, Project(§5.1)·Analysis(§6.1) 실제 필드 목록에는 없다. Project State(§12.1)를 이 `status` 필드로 표현하고 싶은 유혹이 있었으나, 필드 추가 금지 원칙에 따라 이번 브랜치에서는 다루지 않는다 — §4가 실제로 "선택적 공통 어휘"인지 "필수 규칙"인지는 별도로 명확히 할 필요가 있다 |
+
 ---

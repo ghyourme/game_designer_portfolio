@@ -170,6 +170,89 @@ Project를 참조하는 여러 시스템(Route, Branch, Folder, JSON, Loader, Do
 
 ---
 
+## 12. Project Lifecycle
+
+Project 하나가 생성되어 포트폴리오에 실리기까지, 이미 각자 다른 문서에 정의된 규칙(§11 Project Identifier Rule, `docs/CONTENT_GUIDE.md` §11 Content Workflow, `docs/CONTENT_GUIDE.md` §10 Review Checklist, `docs/PROJECT.md` §10 Quality Gate)이 어떤 순서로 켜지는지 하나의 흐름으로 연결한다. **이 절은 새 규칙을 만들지 않는다** — 기존 규칙이 언제 적용되는지만 정의한다.
+
+```
+① Project 생성 (실제 프로젝트명·자료 확정)
+   ↓
+② slug 생성
+   ↓
+③ Evidence Template 인스턴스화
+   ↓
+④ Evidence 수집
+   ↓
+⑤ Content 작성
+   ↓
+⑥ Review
+   ↓
+⑦ Quality Gate 통과
+   ↓
+⑧ Completed
+   ↓
+⑨ Archive (필요 시)
+```
+
+| 단계 | 내용 | 근거 (원본 규칙 — 여기서는 재정의하지 않음) |
+|------|------|-----------------------------------------------|
+| ① Project 생성 | 실제 프로젝트명과 자료가 확정되는 시점 | 이 문서에서 처음 정의하는 시작점 — 다른 문서에 대응 규칙 없음 |
+| ② slug 생성 | `data/projects.json`에 넣을 slug 확정 | 본 문서 §11 |
+| ③ Evidence Template 인스턴스화 | `docs/projects/evidence-template.md` → `docs/projects/<slug>/evidence.md` 복사 | 본 문서 §6, §11 |
+| ④ Evidence 수집 | Evidence Inventory의 확보 여부 갱신 | `docs/CONTENT_GUIDE.md` §12(Evidence Rule)·§13(Content Source Rule), `evidence-template.md` §3 |
+| ⑤ Content 작성 | 초안 작성 → `docs/DATA_MODEL.md` §5 기준 JSON 작성 | `docs/CONTENT_GUIDE.md` §11 Content Workflow 2~3단계 |
+| ⑥ Review | Content/Recruiter/Senior Game Designer Review Checklist 통과 | `docs/CONTENT_GUIDE.md` §10.1~§10.3, §11 Content Workflow 4~7단계 |
+| ⑦ Quality Gate 통과 | Real Contents 3단계가 `data/projects.json`에 반영되기 직전, 세 체크리스트 통과 확정 | `docs/PROJECT.md` §10, `docs/CONTENT_GUIDE.md` §11 Content Workflow 8~9단계 |
+| ⑧ Completed | `data/projects.json` 반영 + 최종 검증(UX Review·Portfolio Quality 포함) | `docs/PROJECT.md` §10 8단계 전부 ✅, `docs/CONTENT_GUIDE.md` §11 Content Workflow 10단계 |
+| ⑨ Archive | 필요 시 — 정책 미정 | §12.4 참고 |
+
+### 12.1 Project State (표시용 별칭)
+
+9단계를 매번 그대로 부르면 길어서, 대화·문서에서 빠르게 참조할 수 있도록 5개 이름을 둔다. **새 필드나 새 상태 머신이 아니다** — 이미 존재하는 Lifecycle 단계에 붙이는 이름표일 뿐이다.
+
+| State | 대응 Lifecycle 단계 |
+|-------|----------------------|
+| Draft | ①~② |
+| Evidence | ③~④ |
+| Writing | ⑤ |
+| Review | ⑥~⑦ |
+| Completed | ⑧ |
+
+`data/projects.json`에 State 필드를 추가하지 않는다 — `docs/DATA_MODEL.md` §5의 "필드 추가 금지" 원칙과 정면으로 충돌한다. 어떤 프로젝트가 지금 어느 단계에 있는지는 실제로 존재하는 산출물로 확인한다: `docs/projects/<slug>/evidence.md`가 있으면 최소 Evidence 단계, `feature/projects-<slug>-content` 브랜치가 열려 있으면 Writing~Review 단계, `data/projects.json`에 반영되어 있으면 Completed다.
+
+### 12.2 slug Lifecycle
+
+```
+생성 (② Project 생성 시 확정)
+  ↓
+사용 (③~⑧ 전 단계에서 Route/Branch/Folder/Evidence의 식별자로 사용)
+  ↓
+변경 금지
+  ↓
+Archive (필요 시 — §12.4 참고)
+```
+
+"생성"과 "변경 금지"는 §11 Immutability와 동일한 내용이다 — 여기서는 그 두 지점이 Lifecycle 어디에 해당하는지만 표시하며, 정책을 다시 정의하지 않는다.
+
+### 12.3 기존 Rule과의 관계 (중복 확인)
+
+이 절이 실제로 새로 정의하는 것은 ①(Project 생성 시점)과 ⑨(Archive 자리)뿐이다. 나머지는 아래처럼 기존 문서를 그대로 가리킨다.
+
+| 이 절이 가리키는 개념 | 원래 정의된 곳 |
+|-------------------------|------------------|
+| slug 생성·불변성 | 본 문서 §11 |
+| Evidence 유형·매핑·수집 | `docs/CONTENT_GUIDE.md` §12~§13, `docs/projects/evidence-template.md` |
+| Content 작성 순서 | `docs/CONTENT_GUIDE.md` §11 |
+| Review Checklist | `docs/CONTENT_GUIDE.md` §10 |
+| Quality Gate 8단계 | `docs/PROJECT.md` §10 |
+| 브랜치 명명 | `docs/GIT_WORKFLOW.md` §1.1 |
+
+### 12.4 Archive — 미정 (과설계 방지)
+
+Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력으로만 남기는 것)은 정의하지 않는다. `data/projects.json`은 필드 추가가 금지된 고정 스키마라, Archive를 표현하려면 최소 하나의 새 필드나 별도 저장 위치가 필요하며 이는 그 자체로 Architecture Decision이다. 지금은 실제로 Archive할 프로젝트가 없으므로 미리 설계하지 않는다 — 실제로 필요해지는 시점에 별도 브랜치에서 다룬다 (`docs/PROJECT.md` §12 Technical Debt에 기록).
+
+---
+
 ## 요약
 
 이 프로젝트는 **데이터 중심의 프론트엔드 포트폴리오 시스템**이며,
