@@ -18,6 +18,8 @@ import type { Analysis } from "@/types/analysis";
  *
  * ProjectCard와 동일한 패턴의 Analysis 전용 인스턴스다 — components/ui의
  * Card/Tag/Badge/Button만 조합하며, 새 UI 원자 컴포넌트는 만들지 않는다.
+ * "분석 보기" 반복 텍스트에 aria-label로 분석 제목을 포함한다(ProjectCard와 동일한
+ * 이유, feature/platform-accessibility).
  */
 export interface AnalysisCardProps {
   analysis: Analysis;
@@ -36,7 +38,11 @@ export function AnalysisCard({ analysis }: AnalysisCardProps) {
           ))}
         </div>
       )}
-      <Button href={`/analysis/${analysis.slug}`} variant="tertiary">
+      <Button
+        href={`/analysis/${analysis.slug}`}
+        variant="tertiary"
+        aria-label={`${analysis.title} 분석 보기`}
+      >
         분석 보기
       </Button>
     </Card>

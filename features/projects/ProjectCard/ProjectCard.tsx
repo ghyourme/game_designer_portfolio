@@ -16,6 +16,9 @@ import type { Project } from "@/types/project";
  * - "자세히 보기" 클릭 시 Project Detail(/projects/[slug])로 이동한다.
  *
  * components/ui의 Card/Tag/Badge/Button만 조합하며, 새 UI 원자 컴포넌트는 만들지 않는다.
+ * 카드마다 "자세히 보기" 텍스트가 반복되어 스크린 리더의 "링크 목록" 탐색에서
+ * 서로 구분되지 않으므로, aria-label로 프로젝트 제목을 포함한 접근 가능한 이름을
+ * 붙인다(ExternalLinks/DocumentPreviewCard와 동일한 기존 패턴, feature/platform-accessibility).
  */
 export interface ProjectCardProps {
   project: Project;
@@ -34,7 +37,11 @@ export function ProjectCard({ project }: ProjectCardProps) {
           ))}
         </div>
       )}
-      <Button href={`/projects/${project.slug}`} variant="tertiary">
+      <Button
+        href={`/projects/${project.slug}`}
+        variant="tertiary"
+        aria-label={`${project.title} 자세히 보기`}
+      >
         자세히 보기
       </Button>
     </Card>

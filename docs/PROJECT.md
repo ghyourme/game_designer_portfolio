@@ -183,7 +183,7 @@ Architecture → Implementation → Real Contents → Content Review
 | Personal Works | ⬜ | ⬜ | ✅ (동일) | ✅ | ⬜ | Architecture 자체가 미확정(위 §11 표 참고)이지만 메타데이터는 이미 갖춤 |
 | Contact | ⬜ | ⬜ | ✅ (동일) | ✅ | ⬜ | Architecture Decision 필요(위 §11 표 참고)이지만 메타데이터는 이미 갖춤 |
 
-`⬜ 미확인` 항목은 다음 구현 브랜치에서 실제로 코드를 열어 확인한 뒤 갱신한다. **Navigation은 Feature별이 아니라 전역이라 표에 별도 컬럼을 두지 않는다** — `Header`의 Active Navigation과 `Footer`는 `feature/platform-routing`에서 7개 Feature 전체에 동일하게 해소되었다(아래 §12.1 참고). **robots.txt/sitemap.xml은 Feature 단위가 아니라 사이트 전체 라우트를 다루므로 이 표에 별도 행을 두지 않는다** — `docs/ARCHITECTURE.md` §14.1 참고.
+`⬜ 미확인` 항목은 다음 구현 브랜치에서 실제로 코드를 열어 확인한 뒤 갱신한다. **Navigation은 Feature별이 아니라 전역이라 표에 별도 컬럼을 두지 않는다** — `Header`의 Active Navigation과 `Footer`는 `feature/platform-routing`에서 7개 Feature 전체에 동일하게 해소되었다(아래 §12.1 참고). **robots.txt/sitemap.xml은 Feature 단위가 아니라 사이트 전체 라우트를 다루므로 이 표에 별도 행을 두지 않는다** — `docs/ARCHITECTURE.md` §14.1 참고. **Accessibility도 대부분 전역이라 별도 컬럼을 두지 않는다**(`docs/ARCHITECTURE.md` §13.5) — Skip Link/Focus Visibility/Reduced Motion은 `MainLayout`/`globals.css` 변경으로 7개 Feature 전체에 동일 적용되었고(`feature/platform-accessibility`), Feature별로 다른 부분은 Projects/Analysis의 `ProjectCard`/`AnalysisCard`(반복 링크 텍스트 구분)와 Projects의 `Gallery`/`Modal`(포커스 트랩·복귀, 접근 가능한 이름)뿐이다.
 
 **Loading State 전역 제거**: `app/loading.tsx`가 있으면 Next.js가 하위 비동기 컴포넌트를 Suspense로 감싸 스트리밍하는데, 이 상태에서는 `notFound()`가 평가되기 전에 HTTP 200이 이미 커밋되어버려 잘못된 slug도 200으로 응답했다(`curl`로 재현 확인). 실사용 빈도가 낮다고 이미 문서화되어 있던 파일이라 제거했다 — `docs/ARCHITECTURE.md` §13.2에 근거를 기록했다.
 
@@ -225,12 +225,15 @@ Architecture → Implementation → Real Contents → Content Review
 | next/image 미사용 | 해결됨 (`feature/platform-performance`) | Gallery 썸네일을 `fill`+`sizes`로 전환(ESLint `no-img-element` 경고 2건 중 1건 해소). 확대 보기 이미지는 원본 비율 유지가 우선이라 의도적으로 `<img>` 유지 — `docs/ARCHITECTURE.md` §14.2에 근거 기록 |
 | dynamic import 미사용 | 검토 완료, 미적용(재검토 조건 명시) | `.next/static/chunks` 실측 결과 무거운 서드파티 의존성 자체가 없고(package.json에 next/react/react-dom 외 없음), 자체 컴포넌트는 전부 수 KB 수준이라 지금 적용하면 이득 없이 복잡도만 는다. 실제 무거운 라이브러리나 컴포넌트가 추가되는 시점에 재검토한다 |
 | Cross Browser / Device 검증 없음 | 잔존 | 실제 브라우저·기기 교차 테스트 기록 없음 (`docs/ARCHITECTURE.md` §13.4) — `docs/ARCHITECTURE.md` §16 Release DoD의 Cross Browser QA 단계에서 수행 |
+| Accessibility(`docs/DESIGN_SYSTEM.md` §13) 실제 구현 미검증 | 해결됨 (`feature/platform-accessibility`) | Keyboard Navigation(Modal 포커스 트랩·복귀), Screen Readers(`ProjectCard`/`AnalysisCard` aria-label, Modal aria-label), Focus Visibility(Skip Link 추가), Semantic HTML/Color Contrast(조사 결과 기존에 이미 충족) 전부 `docs/ARCHITECTURE.md` §13.5에 근거 기록. Reduced Motion·Skip Navigation은 DESIGN_SYSTEM §13에 없던 추가 항목으로 함께 구현 |
 
 **Not Debt (설계상 의도적)**
 
 | 항목 | 판단 | 설명 |
 |------|------|------|
 | Breadcrumb 없음 | 부채 아님 | `docs/INFORMATION_ARCHITECTURE.md` §4가 이미 "최대 2단계 깊이 + Header/Footer 상시 접근"을 설계 원칙으로 명시했다 — 사이트 깊이가 늘어나기 전까지는 만들 필요가 없다(과설계 방지) |
+| `<section>`별 `aria-labelledby` 미적용 | 부채 아님 | 이미 `<h1>`~`<h3>` 계층이 완결되어 있어 스크린 리더의 헤딩 탐색으로 동일 효용을 얻을 수 있다. 적용하려면 `Section`/`DetailSection` Contract를 여러 페이지가 공유하는 채로 넓혀야 해 이득 대비 위험이 크다(`docs/ARCHITECTURE.md` §13.5 참고, 과설계 방지) |
+| 카드 그리드 `<ul>/<li>` 미적용 | 부채 아님 | `ProjectCard`/`AnalysisCard` 내부에 이미 `<h3>` 제목이 있어 헤딩 탐색이 가능하다. `ProjectGrid`/`AnalysisGrid` Contract 확장 대비 실익이 낮다(과설계 방지) |
 
 ### 12.2 Projects Debt
 

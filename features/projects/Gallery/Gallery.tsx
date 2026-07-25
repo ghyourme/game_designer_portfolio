@@ -69,7 +69,11 @@ export function Gallery({ images }: GalleryProps) {
           </li>
         ))}
       </ul>
-      <Modal isOpen={selected !== null} onClose={() => setSelectedIndex(null)}>
+      <Modal
+        isOpen={selected !== null}
+        onClose={() => setSelectedIndex(null)}
+        ariaLabel={selected?.caption}
+      >
         {selected && (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element -- 원본 비율 유지가 next/image의 fill 제약과 충돌한다. 클릭 전 마운트되지 않아 초기 로드 영향 없음(위 컴포넌트 docblock 참고) */}

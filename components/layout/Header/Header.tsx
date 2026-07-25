@@ -21,6 +21,10 @@ import { getNavigation } from "@/lib/data";
  *   완전 일치("/projects")뿐 아니라 그 하위 경로("/projects/[slug]")에서도 상위 메뉴가
  *   활성 표시되도록 접두사 비교를 함께 한다 — "/"만 완전 일치로 남겨 모든 경로가
  *   Home에 걸리는 것을 막는다(docs/ARCHITECTURE.md §13.3 Navigation Resilience).
+ * - aria-current="page"는 스크린 리더에는 전달되지만 화면에는 아무 차이도 만들지
+ *   않았다 — `aria-[current="page"]:` 변형으로 밑줄+강조 서체를 추가해 마우스/키보드
+ *   사용자도 같은 정보를 시각적으로 확인할 수 있게 했다(새 색 토큰 없이 기존
+ *   `font-semibold` 유틸리티만 사용, feature/platform-accessibility).
  *
  * 스타일은 최소 구조 이상으로 구현하지 않는다.
  */
@@ -45,6 +49,7 @@ export function Header() {
                 <Link
                   href={item.path}
                   aria-current={isCurrentPage ? "page" : undefined}
+                  className='aria-[current="page"]:font-semibold aria-[current="page"]:underline'
                 >
                   {item.label}
                 </Link>

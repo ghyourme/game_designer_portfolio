@@ -311,9 +311,25 @@ Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력�
 
 이 두 항목은 코드 계약이 아니라 **검증 절차**다 — 새 컴포넌트나 규칙을 만들지 않고, 본 문서 §16 Platform Release Definition of Done의 "Cross Browser QA" 단계에서 실행한다.
 
-### 13.5 적용 범위
+### 13.5 Accessibility
 
-이 계약(§13.1~§13.4)은 `data/*.json`을 사용하는 모든 Feature(Home/About/Projects/Analysis/Resume/Personal Works/Contact)에 동일하게 적용된다. 이번 브랜치는 계약을 정의·확장하는 Architecture Decision 단계이며, 실제 코드 구현(공유 slug 조회 헬퍼, `notFound()` 전환, Footer 구현, Active Navigation 경로 매칭 개선 등)은 후속 브랜치에서 다룬다(`docs/PROJECT.md` §12.1 Platform Debt).
+`docs/DESIGN_SYSTEM.md` §13이 정의한 5개 원칙(Keyboard Navigation/Color Contrast/Semantic HTML/Screen Readers/Focus Visibility)이 실제 코드에 반영되었는지의 계약이다. 새 원칙을 만들지 않는다 — DESIGN_SYSTEM §13을 그대로 구현했는지만 확인한다.
+
+| 항목 | 요구 사항(`docs/DESIGN_SYSTEM.md` §13) | 현재 상태 |
+|------|------------------------------------------|-------------|
+| Keyboard Navigation | 모든 인터랙션이 키보드만으로 논리적 순서에 따라 접근 가능해야 한다 | 이미 구현됨(`feature/platform-accessibility`) — Header/Footer/Card는 원래부터 네이티브 `<a>`/`<button>`이라 Tab/Enter/Space가 자동 동작했다. `Modal`에 Tab/Shift+Tab 포커스 트랩을 추가해 확대 보기 중 배경으로 포커스가 새는 문제를 없앴다 |
+| Focus Visibility | 키보드 사용자를 위한 포커스 표시가 항상 보여야 하고 미관상 억제하지 않는다 | 이미 보장됨 — `--color-focus` 토큰과 `focus-visible:outline-*`가 Button 등 상호작용 요소에 이미 적용되어 있었다(신규 아님). Skip Link도 동일 토큰을 재사용한다 |
+| Semantic HTML | 시맨틱 요소(heading/landmark/`button` vs `link`)로 구조와 의미를 전달한다 | 이미 보장됨 — 조사 결과 페이지당 `<h1>` 1개, `<h2>`(DetailSection)/`<h3>`(개별 항목) 계층이 이미 일관되고, `<div onClick>` 같은 비시맨틱 상호작용 요소는 발견되지 않았다(전부 `<button>`/`<a>`) |
+| Screen Readers | 비텍스트 콘텐츠에 의미 있는 대체 텍스트를 제공해 읽어도 이해할 수 있어야 한다 | 이미 구현됨 — Gallery/ExternalLinks/DocumentPreviewCard는 이미 `alt`/`aria-label`을 갖추고 있었다. `ProjectCard`/`AnalysisCard`의 반복되는 "자세히 보기"/"분석 보기" 링크만 서로 구분되지 않아 `aria-label`(제목 포함)을 추가했다. `Modal`에는 `aria-label`(호출자가 지정) prop을 추가해 다이얼로그가 "dialog"로만 읽히지 않게 했다 |
+| Color Contrast | 텍스트/의미 있는 UI가 충분한 대비를 유지한다 | 이미 보장됨 — `--color-text-secondary`(#4b5563)는 흰 배경 대비 AA 기준을 충족한다. `--color-text-disabled`(#9ca3af, 낮은 대비)는 현재 어떤 컴포넌트에서도 사용되지 않아 실제 저대비 텍스트가 없다 — 색 토큰을 새로 만들지 않았다 |
+| Skip Navigation | (DESIGN_SYSTEM §13에 없는 추가 항목) | 이미 구현됨 — `MainLayout`에 `#main-content`로 이동하는 skip link 추가. Header가 7개 항목이라 매 페이지 Tab 7회를 건너뛸 수 있는 실질적 효용이 있다고 판단했다(과설계 아님) |
+| Reduced Motion | (DESIGN_SYSTEM §13에 없는 추가 항목) | 이미 구현됨 — `prefers-reduced-motion: reduce`에서 `--duration-*` 토큰만 거의 0으로 재정의해, 그 토큰을 참조하는 모든 transition(Button/Card/Header/Gallery)에 자동 적용. 새 토큰이나 컴포넌트별 예외 없음 |
+
+**검토했으나 적용하지 않은 것**: `<section>`마다 `aria-labelledby`로 랜드마크를 명시하는 방안과, 카드 그리드를 `<ul>/<li>`로 감싸는 방안을 검토했다. 둘 다 이미 `<h1>`/`<h2>`/`<h3>` 계층이 완결되어 있어 스크린 리더의 "헤딩 목록" 탐색으로 동일한 효용을 이미 얻을 수 있고, 적용하려면 `Section`/`ProjectGrid`/`AnalysisGrid` 등 여러 페이지가 공유하는 컴포넌트의 Contract를 넓혀야 해 이득 대비 위험이 크다고 판단했다(과설계 방지) — 실제 스크린 리더 사용자 피드백 등 구체적 필요가 생기면 재검토한다.
+
+### 13.6 적용 범위
+
+이 계약(§13.1~§13.5)은 `data/*.json`을 사용하는 모든 Feature(Home/About/Projects/Analysis/Resume/Personal Works/Contact)에 동일하게 적용된다. `feature/platform-routing`→`platform-seo`→`platform-performance`→`platform-accessibility` 순서로 §13.1~§13.5의 실제 구현이 모두 끝났다(`docs/PROJECT.md` §12.1 Platform Debt).
 
 ---
 

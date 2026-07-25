@@ -104,3 +104,21 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/**
+ * prefers-reduced-motion (feature/platform-accessibility)
+ *
+ * 컴포넌트마다 개별적으로 duration을 낮추는 대신, 모든 transition이 참조하는
+ * duration 토큰 자체를 이 media query 안에서만 거의 0으로 재정의한다 — Button/
+ * Card/Header/Gallery 등 --duration-*를 쓰는 곳 전부에 자동으로 적용되어, 새
+ * 토큰이나 컴포넌트별 예외를 만들지 않고도 "motion이 없어도 핵심 기능은 동작"을
+ * 만족한다. 이 프로젝트에 애니메이션 라이브러리나 큰 모션은 없고 hover/focus
+ * 전환뿐이라 완화만으로 충분하다(광범위한 모션 개편은 이번 범위 밖).
+ */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0.01ms;
+    --duration-normal: 0.01ms;
+    --duration-slow: 0.01ms;
+  }
+}

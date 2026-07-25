@@ -45,7 +45,8 @@
       "Bash(curl -s -o /dev/null -w \"status:%{http_code}\\\\n\" http://localhost:3000/projects/nonexistent-slug)",
       "Bash(MSYS_NO_PATHCONV=1 curl -s -o /dev/null -w \"projects/x -> %{http_code}\\\\n\" \"http://localhost:3000/projects/x\")",
       "Bash(MSYS_NO_PATHCONV=1 curl -s -o /dev/null -w \"analysis/x -> %{http_code}\\\\n\" \"http://localhost:3000/analysis/x\")",
-      "Bash(echo \"exit code: $?\")"
+      "Bash(echo \"exit code: $?\")",
+      "Bash(curl -s http://localhost:3000/about -o /tmp/about2.html)"
     ],
     "additionalDirectories": [
       "\\tmp"
