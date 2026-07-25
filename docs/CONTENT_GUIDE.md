@@ -248,3 +248,74 @@ PDF는 웹과 동일한 구조를 유지한다.
 - [ ] 모든 이미지에 설명·캡션·목적이 포함되어 있는가
 - [ ] PDF 버전이 웹 구조와 동일한가
 - [ ] 문서 내 수치와 사실이 정확한가
+
+---
+
+## 10. Project Review Checklist (작성 완료 후 검수 기준)
+
+§9는 "작성 전에 확인하는 것"이고, 이 절은 "작성 완료 후 통과해야 하는 것"이다. 모든 프로젝트는 `data/projects.json`에 반영되기 전 아래 세 체크리스트를 모두 통과해야 한다 (`docs/PROJECT.md` §10 Quality Gate의 Content Review / Recruiter Review / Senior Planner Review 단계에 각각 대응).
+
+세 체크리스트는 서로 다른 검토자의 관점을 대표하므로 순서대로 적용한다 — Content Review가 §3.2 기준 자체 충족 여부를 먼저 확인하고, 이를 통과한 프로젝트만 Recruiter Review(빠른 스크리닝)와 Senior Planner Review(심층 검토) 대상이 된다.
+
+### 10.1 Content Review Checklist
+
+섹션별로 아래 항목을 확인한다. 각 항목은 §3.2 각 섹션의 "써야 하는 것 / 쓰면 안 되는 것" 기준을 검증 가능한 질문으로 바꾼 것이다.
+
+■ Overview (`overview`)
+- [ ] 프로젝트를 한 문장으로 이해할 수 있는가
+- [ ] 헤더 메타 정보(장르/플랫폼/기간/팀, `docs/DATA_MODEL.md` §5.1)나 담당 역할(2번) 내용을 반복하지 않는가
+
+■ Role (`contribution`)
+- [ ] 담당 범위가 명확한가
+- [ ] 본인의 기여가 팀 전체의 기여와 구분되는가 ("팀과 함께" 같은 책임 불명확 서술이 없는가)
+
+■ Goal (`goal`)
+- [ ] 프로젝트 목표가 명확한가
+- [ ] 목표에 대응하는 성공 기준이 존재하는가 — 8번(결과)과 1:1로 대응할 수 있는 형태인가
+
+■ Problem (`problem`)
+- [ ] 해결하려는 문제가 명확한가
+- [ ] 문제의 중요성과 근거(데이터/유저 피드백/플레이테스트)가 함께 설명되는가
+
+■ Approach (`approach`)
+- [ ] 해결 과정이 논리적인가
+- [ ] 검토한 대안과 최종 선택 사이의 트레이드오프 판단이 보이는가
+
+■ System Design (`systems`)
+- [ ] 설계 이유(purpose)가 설명되는가
+- [ ] 확장성과 예외 상황(exceptionHandling)이 고려되었는가
+
+■ Core Features (`features`)
+- [ ] 핵심 기능이 프로젝트 목표(3번)와 연결되는가
+- [ ] 시스템 설계(6번)에서 이미 다룬 "왜/어떻게 설계했는가"를 반복하지 않는가
+
+■ Result (`result`)
+- [ ] 정량적 결과가 존재하는가
+- [ ] 프로젝트 성과가 목표(3번) 대비 객관적으로 설명되는가 — 근거 수치 없는 정성적 표현만 단독으로 쓰이지 않는가
+
+■ Retrospective (`retrospective`)
+- [ ] 단순 요약이 아니라 다음 프로젝트에서도 재사용 가능한 인사이트를 제공하는가
+- [ ] 문제 정의/접근 과정(4, 5번)을 그대로 재서술하지 않는가
+
+이 체크리스트를 통과하지 못한 프로젝트는 Quality Gate의 Content Review 단계를 통과할 수 없다.
+
+### 10.2 Recruiter Review Checklist
+
+채용담당자의 빠른 스크리닝 흐름(`docs/DESIGN_SYSTEM.md` §3, `docs/INFORMATION_ARCHITECTURE.md` §2.4 User Flow)을 기준으로 검증한다.
+
+- [ ] 2~3분 안에 프로젝트를 이해할 수 있는가
+- [ ] 핵심 성과(Result)가 빠르게 눈에 띄는가
+- [ ] 지원 직무(시스템/콘텐츠 기획자, `docs/PROJECT.md` §4)와의 관련성이 명확한가
+- [ ] 문장이 간결한가 (§6 문체 기준)
+- [ ] 9단계(§3.1) 순서를 따라 읽는 흐름이 자연스러운가
+
+### 10.3 Senior Game Designer Review Checklist
+
+시니어 기획자의 심층 검토 흐름(`docs/INFORMATION_ARCHITECTURE.md` §2.4 User Flow)을 기준으로 검증한다.
+
+- [ ] 문제 정의가 명확한가 (증상과 근본 원인이 구분되는가)
+- [ ] 설계 의도가 드러나는가 (purpose/expectedEffect가 실제 결과와 연결되는가)
+- [ ] Trade-off가 설명되는가 (접근 과정에서 검토한 대안이 보이는가)
+- [ ] 확장성이 고려되었는가 (시스템 설계의 exceptionHandling, 향후 콘텐츠 증가 대응)
+- [ ] 데이터 기반 의사결정이 보이는가 (문제 정의/결과가 수치·근거로 뒷받침되는가)
+- [ ] 시스템 간 관계를 이해할 수 있는가 (여러 `systems` 항목이 있을 경우 서로 어떻게 연결되는지)

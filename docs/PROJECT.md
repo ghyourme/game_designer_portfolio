@@ -124,37 +124,65 @@ Game Designer Portfolio
 
 ---
 
-## 10. Feature 완료 기준 (Definition of Done)
+## 10. Feature 완료 기준 (Definition of Done) — Quality Gate
 
-이 프로젝트에서 "완료"는 코드가 동작하는 것을 의미하지 않는다. 하나의 Feature는 아래 6단계를 모두 통과해야 완료로 간주한다 — 앞 단계가 끝나야 다음 단계로 넘어갈 수 있고, 중간 단계까지만 끝난 Feature를 "완료"라고 부르지 않는다.
+이 프로젝트에서 "완료"는 코드가 동작하는 것을 의미하지 않는다. 하나의 Feature는 아래 Quality Gate의 8단계를 모두 통과해야 **Completed**로 간주한다 — 앞 단계가 끝나야 다음 단계로 넘어갈 수 있고, 중간 단계까지만 끝난 Feature를 "완료"라고 부르지 않는다.
 
-| 단계 | 의미 | 완료 조건 |
+```
+Architecture → Implementation → Real Contents → Content Review
+   → UX Review → Recruiter Review → Senior Planner Review
+   → Portfolio Quality → Completed
+```
+
+| 단계 | 의미 | 통과 조건 |
 |------|------|-----------|
 | 1. Architecture | 구조가 문서에 확정되어 있는가 | `docs/DATA_MODEL.md`/`docs/DESIGN_SYSTEM.md`/`docs/INFORMATION_ARCHITECTURE.md`에 필드·컴포넌트·정보 구조가 정의됨 |
 | 2. Implementation | 그 구조가 코드로 존재하는가 | Type → JSON 스키마 → Loader → Feature → Component → Page가 전부 연결되어 동작함(`docs/ARCHITECTURE.md` §5 데이터 흐름) |
-| 3. Real Contents | 실제 콘텐츠가 채워져 있는가 | `data/*.json`에 가짜 데이터가 아닌 실제 프로젝트/분석/이력 내용이 존재함(`docs/CONTENT_GUIDE.md` 기준 충족) |
-| 4. UX Review | 실제 콘텐츠 기준으로 화면 흐름을 검증했는가 | 빈 배열/placeholder가 아닌 실데이터로 렌더링해 가독성·정보 위계·반응형을 확인함 |
-| 5. Recruiter Review | 목표 독자가 실제로 보고 의도한 판단을 내리는가 | 채용 담당자(2~3분 스크리닝)·시니어 기획자(심층 검토) 두 흐름 모두에서 `docs/PROJECT.md` §2 목표를 충족하는지 확인함 |
-| 6. Portfolio Quality | 취업에 바로 쓸 수 있는 완성도인가 | 오탈자, 이미지 품질, 문서 간 Drift 없음까지 확인됨 |
+| 3. Real Contents | 실제 콘텐츠가 채워져 있는가 | `data/*.json`에 가짜 데이터가 아닌 실제 프로젝트/분석/이력 내용이 존재함 |
+| 4. Content Review | 그 콘텐츠가 작성 기준 자체를 충족하는가 | `docs/CONTENT_GUIDE.md` §10.1 Content Review Checklist를 섹션별로 통과함 |
+| 5. UX Review | 실제 콘텐츠 기준으로 화면 흐름을 검증했는가 | 빈 배열/placeholder가 아닌 실데이터로 렌더링해 가독성·정보 위계·반응형을 확인함 |
+| 6. Recruiter Review | 채용 담당자가 의도한 판단을 내리는가 | `docs/CONTENT_GUIDE.md` §10.2 Recruiter Review Checklist(2~3분 스크리닝)를 통과함 |
+| 7. Senior Planner Review | 시니어 기획자가 의도한 판단을 내리는가 | `docs/CONTENT_GUIDE.md` §10.3 Senior Game Designer Review Checklist(심층 검토)를 통과함 |
+| 8. Portfolio Quality | 취업에 바로 쓸 수 있는 완성도인가 | 오탈자, 이미지 품질, 문서 간 Drift 없음까지 확인됨 |
 
-**Architecture + Implementation만 끝난 상태는 "Infrastructure 완료"라고 부르고, "Feature 완료"라고 부르지 않는다.** 이 구분이 없으면 데이터가 비어 있는데도 "구현이 끝났다"는 착각이 생긴다.
+**Architecture + Implementation만 끝난 상태는 "Infrastructure 완료"라고 부르고, "Feature 완료"라고 부르지 않는다.** 8단계를 모두 통과한 상태만 **Completed**라고 부른다. 이 구분이 없으면 데이터가 비어 있는데도 "구현이 끝났다"는 착각이 생긴다.
+
+> **변경 이력 (`feature/projects-content-review-guide`)**: 기존 5단계("Recruiter Review")는 채용 담당자와 시니어 기획자 두 관점을 하나의 단계로 묶고 있었고, Real Contents와 UX Review 사이에 "콘텐츠가 작성 기준 자체를 충족하는가"를 검증하는 단계가 없었다. `docs/CONTENT_GUIDE.md` §10에 세 체크리스트(Content/Recruiter/Senior Game Designer Review)를 만들면서, 각 체크리스트가 검증하는 관점 그대로를 별도 Gate로 분리했다 — Content Review, Recruiter Review, Senior Planner Review 3단계 + 최종 Completed 상태.
 
 ---
 
 ## 11. 진행 상태 (Feature Completion Status)
 
-`data/*.json`의 실제 내용과 각 Feature의 코드 상태를 기준으로 위 6단계 중 어디까지 도달했는지 표시한다. ✅ 완료 · 🔶 부분(placeholder 값 존재) · ❌ 미완료 · ⬜ 아직 해당 단계에 도달하지 않음.
+`data/*.json`의 실제 내용과 각 Feature의 코드 상태를 기준으로 위 8단계 Quality Gate 중 어디까지 도달했는지 표시한다. ✅ 완료 · 🔶 부분(placeholder 값 존재) · ❌ 미완료 · ⬜ 아직 해당 단계에 도달하지 않음.
 
-| Feature | 1. Architecture | 2. Implementation | 3. Real Contents | 4. UX Review | 5. Recruiter Review | 6. Portfolio Quality | 현재 상태 |
-|---|---|---|---|---|---|---|---|
-| Home | ✅ | ✅ | 🔶 (`profile.json`/`skills.json`이 placeholder 문자열·빈 배열) | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
-| About | ✅ | ✅ | 🔶 (동일) | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
-| Resume | ✅ | ✅ | 🔶 (`personalInfo`만 placeholder, `career`/`education` 등은 빈 배열) | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
-| **Projects** | ✅ | ✅ | ❌ (`data/projects.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | **Infrastructure 완료 — Content 단계 진입** |
-| Analysis | ✅ | ✅ | ❌ (`data/analysis.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
-| Personal Works | ❌ (`docs/DATA_MODEL.md`에 세부 필드 미정) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | 설계 전 단계 |
-| Contact | 🔶 (연락처 데이터 소스 미정 — `profile.json` 확장 vs `resume.json.personalInfo` 재사용) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | Architecture Decision 필요 |
+| Feature | 1. Architecture | 2. Implementation | 3. Real Contents | 4. Content Review | 5. UX Review | 6. Recruiter Review | 7. Senior Planner Review | 8. Portfolio Quality | 현재 상태 |
+|---|---|---|---|---|---|---|---|---|---|
+| Home | ✅ | ✅ | 🔶 (`profile.json`/`skills.json`이 placeholder 문자열·빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
+| About | ✅ | ✅ | 🔶 (동일) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
+| Resume | ✅ | ✅ | 🔶 (`personalInfo`만 placeholder, `career`/`education` 등은 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
+| **Projects** | ✅ | ✅ | ❌ (`data/projects.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | **Infrastructure 완료 + Content Governance 완료 — Content 단계 진입 (Project G 작성 대기)** |
+| Analysis | ✅ | ✅ | ❌ (`data/analysis.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 (Review Checklist 미구축 — §12 참고) |
+| Personal Works | ❌ (`docs/DATA_MODEL.md`에 세부 필드 미정) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 설계 전 단계 |
+| Contact | 🔶 (연락처 데이터 소스 미정 — `profile.json` 확장 vs `resume.json.personalInfo` 재사용) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Architecture Decision 필요 |
 
-이전에 통용되던 "Projects Feature 진행 중"이라는 표현은 Architecture/Implementation과 Real Contents 이후 단계를 구분하지 않아 폐기한다. 정확한 표현은 **"Projects Infrastructure 완료 — Projects Content 단계 진입"**이다.
+이전에 통용되던 "Projects Feature 진행 중"이라는 표현은 Architecture/Implementation과 Real Contents 이후 단계를 구분하지 않아 폐기한다. 정확한 표현은 **"Projects Infrastructure 완료 + Content Governance 완료 — Projects Content 단계 진입"**이다. "Content Governance 완료"는 §10 Quality Gate의 4·6·7단계(Content/Recruiter/Senior Planner Review)를 검증할 체크리스트가 `docs/CONTENT_GUIDE.md` §10에 구축되었다는 뜻이며, Projects의 Real Contents 자체는 여전히 ❌다 — Project G 콘텐츠는 다음 브랜치(`feature/projects-projectg-content`)에서 작성한다.
+
+---
+
+## 12. Technical Debt
+
+이 프로젝트가 아직 해결하지 못한 구조적 부채를 추적한다. 코드 부채(`docs/ARCHITECTURE.md`/`docs/DESIGN_SYSTEM.md`에 개별 변경 이력으로 기록)와 달리, 이 절은 Feature 전체의 진행을 가로막을 수 있는 프로젝트 수준 부채만 다룬다.
+
+### 12.1 Content Governance Debt
+
+콘텐츠 품질을 일정하게 유지하기 위한 기준·검수 체계에 관한 부채다.
+
+| 항목 | 상태 | 설명 |
+|------|------|------|
+| Content Authoring Guide 미구축 | 해결됨 (`feature/projects-content-guide`) | `docs/CONTENT_GUIDE.md` §3.2에 9개 섹션별 작성 원칙 정의 |
+| Projects Review Checklist 미구축 | 해결됨 (`feature/projects-content-review-guide`) | `docs/CONTENT_GUIDE.md` §10에 Content/Recruiter/Senior Game Designer Review Checklist 정의 |
+| Quality Gate 미구축 | 해결됨 (`feature/projects-content-review-guide`) | 본 문서 §10에 8단계 Quality Gate로 정의 |
+| Analysis Review Checklist 미구축 | 잔존 | §10의 체크리스트는 Projects 전용이다. Analysis가 Content Review 단계(§10 4번)에 도달하려면 `docs/CONTENT_GUIDE.md` §5(게임 분석 작성 규칙) 기준의 별도 Review Checklist가 필요하며, 이번 브랜치 스코프 밖이다 |
+| 콘텐츠 일관성 검증 자동화 없음 | 잔존 | 현재 체크리스트는 전부 수동 검토 절차다. Project G 1건만 존재하는 지금은 충분하지만, 프로젝트 수가 늘어나면(§2 목표 3 "최소 3개 시스템 설계 문서" 등) 체크리스트 위반을 자동 감지하는 스크립트가 필요할 수 있다 — 지금은 만들지 않는다(과설계 방지) |
 
 ---
