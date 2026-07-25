@@ -427,5 +427,6 @@ PPT
 - 워크시트는 `data/projects.json`에 반영되지 않는 내부 자료다 — 포트폴리오 방문자에게 노출되지 않는다.
 - Content Review Checklist(§10.1)를 적용하기 전, 각 섹션에 최소 하나 이상의 출처가 표기되어 있는지 먼저 확인한다 — 출처가 없는 섹션은 Content Review 대상이 아니라 §12 Evidence Rule 위반으로 우선 반려한다.
 - `documents`(§5.6)에 첨부되는 자료는 워크시트의 출처 표기와 반드시 일치해야 한다 — 워크시트에 없는 자료를 `documents`에만 첨부하지 않는다(둘은 같은 근거를 가리켜야 한다).
+- 워크시트 파일이 실제로 어디에 위치하는지(`docs/projects/<slug>/evidence.md`)는 `docs/ARCHITECTURE.md` §11 Project Identifier Rule을 따른다 — 이 문서는 워크시트의 내용 규칙만 정의하고, 위치·명명 규칙은 중복 정의하지 않는다.
 
 이 규칙은 Projects에 한정된다. Analysis 등 다른 콘텐츠 유형의 Evidence/Source/Traceability 매핑은 아직 정의되지 않았다 (`docs/PROJECT.md` §12 Technical Debt 참고).

@@ -43,6 +43,18 @@ feature/projects-navigation
 feature/projects-polish
 ```
 
+### 1.1 프로젝트 콘텐츠 브랜치 원칙
+
+위 예시는 Projects **Infrastructure**(구조/코드)를 단계별로 쪼갠 것이다. Infrastructure가 끝난 뒤 개별 프로젝트의 실제 콘텐츠를 다루는 브랜치는 다른 원칙을 따른다 — **브랜치 하나 = 프로젝트 하나**. 여러 프로젝트를 한 브랜치에서 동시에 작성하지 않는다(§1의 "하나의 브랜치는 하나의 목적만 가진다"를 프로젝트 단위로 적용한 것).
+
+브랜치명은 `docs/DATA_MODEL.md` §5.1의 `slug`를 그대로 사용한다(`docs/ARCHITECTURE.md` §11 Project Identifier Rule):
+
+```
+feature/projects-<slug>-content
+```
+
+예: 프로젝트의 slug가 `maple-story-fan-server`라면 `feature/projects-maple-story-fan-server-content`. `<slug>`는 실제 프로젝트가 확정되어 `data/projects.json`에 slug가 결정된 뒤에만 생성한다 — 근거 없는 프로젝트명으로 브랜치명을 미리 만들지 않는다.
+
 ---
 
 ## 2. 작업 순서

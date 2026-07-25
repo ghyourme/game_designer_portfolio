@@ -165,7 +165,7 @@ Architecture → Implementation → Real Contents → Content Review
 | Personal Works | ❌ (`docs/DATA_MODEL.md`에 세부 필드 미정) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 설계 전 단계 |
 | Contact | 🔶 (연락처 데이터 소스 미정 — `profile.json` 확장 vs `resume.json.personalInfo` 재사용) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Architecture Decision 필요 |
 
-이전에 통용되던 "Projects Feature 진행 중"이라는 표현은 Architecture/Implementation과 Real Contents 이후 단계를 구분하지 않아 폐기한다. 정확한 표현은 **"Projects Infrastructure 완료 + Content Governance 완료 — Projects Content 단계 진입"**이다. "Content Governance 완료"는 §10 Quality Gate의 4·6·7단계(Content/Recruiter/Senior Planner Review)를 검증할 체크리스트가 `docs/CONTENT_GUIDE.md` §10에 구축되었다는 뜻이며, Projects의 Real Contents 자체는 여전히 ❌다 — 실제 프로젝트명이 확정되면 그 slug를 딴 `feature/projects-<project-slug>-content` 브랜치에서 콘텐츠를 작성한다 (근거 없는 프로젝트명을 미리 정하지 않는다).
+이전에 통용되던 "Projects Feature 진행 중"이라는 표현은 Architecture/Implementation과 Real Contents 이후 단계를 구분하지 않아 폐기한다. 정확한 표현은 **"Projects Infrastructure 완료 + Content Governance 완료 — Projects Content 단계 진입"**이다. "Content Governance 완료"는 §10 Quality Gate의 4·6·7단계(Content/Recruiter/Senior Planner Review)를 검증할 체크리스트가 `docs/CONTENT_GUIDE.md` §10에 구축되었다는 뜻이며, Projects의 Real Contents 자체는 여전히 ❌다 — 실제 프로젝트명이 확정되면 그 slug를 딴 `feature/projects-<slug>-content` 브랜치에서 콘텐츠를 작성한다 (근거 없는 프로젝트명을 미리 정하지 않는다).
 
 ---
 
@@ -188,5 +188,15 @@ Architecture → Implementation → Real Contents → Content Review
 | Analysis Evidence/Traceability 매핑 미구축 | 잔존 | §12~§14는 Projects 9개 섹션에만 매핑되어 있다. Analysis(`docs/CONTENT_GUIDE.md` §5)의 근거·출처·추적성 규칙은 아직 없으며, Analysis Content 단계 진입 전 별도 브랜치가 필요하다 |
 | 콘텐츠 일관성 검증 자동화 없음 | 잔존 | 현재 체크리스트는 전부 수동 검토 절차다. 실제 프로젝트가 아직 없는 지금은 충분하지만, 프로젝트 수가 늘어나면(§2 목표 3 "최소 3개 시스템 설계 문서" 등) 체크리스트 위반을 자동 감지하는 스크립트가 필요할 수 있다 — 지금은 만들지 않는다(과설계 방지) |
 | 근거 없는 프로젝트명("Project G") 사용 | 해결됨 (`docs/evidence-structure-generalization`) | 과거 대화의 다른 프로젝트명을 잘못 이어받아 `docs/projects/project-g-evidence.md`, 본 문서 §11/§12 등 여러 곳에 사용했다. 실제 프로젝트명이 확정되기 전이라 전부 제거하고, `docs/projects/evidence-template.md`(프로젝트명 비종속 템플릿)로 대체했다 |
+
+### 12.2 Identifier & Naming Debt
+
+Project를 가리키는 식별자·브랜치명 규칙에 관한 부채다.
+
+| 항목 | 상태 | 설명 |
+|------|------|------|
+| Project Identifier Rule 미정의 | 해결됨 (`docs/project-identifier-rule`) | Route/Branch/Folder/JSON/Loader/Documents/Gallery/Links/Evidence가 각자 다른 식별자를 쓸 위험이 있었다. `docs/ARCHITECTURE.md` §11에 `slug` 단일 식별자 규칙과 대상별 매핑을 정의 |
+| "브랜치 하나 = 프로젝트 하나" 원칙 미문서화 | 해결됨 (`docs/project-identifier-rule`) | 최근 여러 브랜치에서 구두로만 통용되던 원칙을 `docs/GIT_WORKFLOW.md` §1.1에 명문화하고, `feature/projects-<slug>-content` 브랜치 패턴을 예시로 추가 |
+| 브랜치명 대상-중심 원칙 위반 사례 | 해결됨(교훈으로 기록) | `docs/evidence-structure-generalization`의 "generalization"은 작업 대상이 아니라 방법론이라 `docs/GIT_WORKFLOW.md` §1의 대상-중심 네이밍과 어긋났다(§12.1의 "근거 없는 프로젝트명" 이슈를 해결한 그 브랜치). 이미 `develop`에 병합되어 브랜치 자체를 rename하지는 않으며, 이후 브랜치(`docs/project-identifier-rule` 등)부터 대상 중심 명명을 적용한다 |
 
 ---
