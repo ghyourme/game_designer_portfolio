@@ -253,6 +253,60 @@ Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력�
 
 ---
 
+## 13. Platform Resilience Contract
+
+이 프로젝트의 목적은 포트폴리오 콘텐츠 자체가 아니라, `data/*.json`을 갈아 끼우는 것만으로 계속 재사용할 수 있는 **Data Driven Portfolio Platform**이다(`docs/PROJECT.md` §1). 그러려면 `data/*.json`이 비어 있거나 항목이 없어도 모든 페이지가 정상 동작해야 한다. 이 절은 그 보장 범위를 정의한다 — 새 검증 시스템을 만드는 것이 아니라, 이미 구조적으로 성립하는 보장과 실제로 비어 있는 보장을 구분한다.
+
+### 13.1 Data Resilience
+
+| 항목 | 보장 방식 | 현재 상태 |
+|------|------------|-------------|
+| Missing Field | `docs/DATA_MODEL.md` §5 "Required/Optional 원칙" — 모든 필드는 Required이며 빈 값은 `""`/`[]`로 표현한다. 옵셔널 필드가 없으므로 `undefined` 접근 자체가 구조적으로 발생하지 않는다 | 구조적으로 이미 보장됨 |
+| Invalid JSON | `data/*.json`은 런타임 fetch가 아니라 `import ... from "@/data/*.json"` 정적 ESM import로 로드된다(`lib/data/*.ts`). JSON 문법이 깨지면 런타임이 아니라 **빌드 타임에 실패**한다 — "런타임에 도달하는 Invalid JSON"은 이 아키텍처에서 구조적으로 발생할 수 없다 | 구조적으로 이미 보장됨 |
+| Empty Array | 목록형 컴포넌트(`ProjectGrid`, `AnalysisGrid`, `SkillSummary`, `ExperienceTimeline` 등)는 이미 길이 0을 확인해 Empty State 메시지를 렌더링한다(`docs/DESIGN_SYSTEM.md` §12 Empty States) | 이미 구현됨 |
+| Record Not Found (slug 조회 실패) | `app/projects/[slug]/page.tsx`, `app/analysis/[slug]/page.tsx`가 각자 `.find(slug)` 결과를 인라인 텍스트("Project Not Found" 등)로만 처리하고, Next.js의 `notFound()`/`not-found.tsx` 컨벤션을 쓰지 않는다 | **미비 — Technical Debt(`docs/PROJECT.md` §12.4)** |
+| Loader 재사용 | slug 조회 로직(`.find(item => item.slug === slug)`)이 두 page 파일에 각각 중복 구현되어 있고, `lib/data`에 공유 헬퍼(예: `getProjectBySlug`)가 없다 | **미비 — Technical Debt** |
+
+### 13.2 Rendering Resilience
+
+| 항목 | 보장 방식 | 현재 상태 |
+|------|------------|-------------|
+| Loading State | Next.js App Router 컨벤션(`app/loading.tsx`)이 루트에 존재한다. 이 프로젝트는 전 페이지가 빌드 타임 정적 생성(SSG)이라 클라이언트가 실제로 로딩 화면을 볼 일이 거의 없다 — 향후 클라이언트 사이드 데이터 요청이 추가되기 전까지는 낮은 우선순위다 | 컨벤션 파일 존재(placeholder 문구), 현재 아키텍처상 실사용 빈도 낮음 |
+| Error Boundary | Next.js App Router의 `error.tsx` 컨벤션이 라우트 세그먼트를 감싸는 Error Boundary 역할을 자동으로 수행한다 — 별도의 커스텀 React Error Boundary 클래스는 프레임워크 컨벤션과 중복이라 만들지 않는다 | 루트 `app/error.tsx` 존재(placeholder 문구) |
+
+### 13.3 적용 범위
+
+이 계약은 `data/*.json`을 사용하는 모든 Feature(Home/About/Projects/Analysis/Resume/Personal Works/Contact)에 동일하게 적용된다. 이번 브랜치는 계약을 정의하는 Architecture Decision 단계이며, 실제 코드 구현(공유 slug 조회 헬퍼, `notFound()` 전환 등)은 후속 브랜치에서 다룬다(`docs/PROJECT.md` §12.4 Technical Debt).
+
+---
+
+## 14. SEO & Performance Contract
+
+### 14.1 SEO
+
+| 항목 | 요구 사항 | 현재 상태 |
+|------|-----------|-------------|
+| Metadata | 모든 `page.tsx`는 `metadata` 또는 `generateMetadata`를 통해 페이지별 제목/설명을 노출해야 한다. 목록형 페이지는 정적 `metadata`로, 상세 페이지(`[slug]`)는 `generateMetadata`로 실제 데이터(title/overview 등)를 반영한다 | `app/layout.tsx`에만 정적 `metadata` 존재. 그 외 모든 `page.tsx`는 없음 — **미비 — Technical Debt** |
+| OpenGraph | 위 metadata에 OpenGraph 필드(title/description/image)를 포함한다 | 없음 — **미비 — Technical Debt** |
+| robots | `app/robots.ts`(Next.js 컨벤션)으로 크롤링 정책을 정의한다 | 없음 — **미비 — Technical Debt** |
+| sitemap | `app/sitemap.ts`(Next.js 컨벤션)으로 전체 라우트를 노출한다 | 없음 — **미비 — Technical Debt** |
+| canonical | 상세 페이지(`[slug]`)의 `metadata.alternates.canonical`을 설정한다 | 없음 — **미비 — Technical Debt** |
+| favicon | `app/favicon.ico` | 이미 존재 |
+
+### 14.2 Performance
+
+| 항목 | 요구 사항 | 현재 상태 |
+|------|-----------|-------------|
+| Image Optimization | 콘텐츠 이미지는 `next/image`를 사용한다 | `next/image`가 프로젝트 전체에서 미사용. `features/projects/Gallery/Gallery.tsx`가 `<img>`를 직접 사용(기존 ESLint `no-img-element` 경고와 일치) — **미비 — Technical Debt** |
+| Dynamic Import | 초기 로드에 필요하지 않은 컴포넌트(예: Modal, 대용량 갤러리)는 `next/dynamic`으로 지연 로드한다 | 프로젝트 전체에서 `dynamic(() => import(...))` 미사용 — **미비 — Technical Debt(낮은 우선순위 — 콘텐츠가 없어 번들 크기가 아직 문제되지 않음)** |
+| Bundle Size | 새 의존성 추가 시 번들 크기 영향을 검토한다(CLAUDE.md §4 "불필요한 의존성 추가 금지"와 동일한 원칙) | 기존 원칙 재확인, 신규 아님 |
+
+### 14.3 적용 범위와 우선순위
+
+이 계약도 Data Resilience(§13)와 동일하게 모든 Feature에 적용되며, 실제 구현은 후속 브랜치의 몫이다. `docs/PROJECT.md`의 새 Platform Feature Definition of Done(§13)이 이 계약을 Feature별 완료 기준으로 연결한다.
+
+---
+
 ## 요약
 
 이 프로젝트는 **데이터 중심의 프론트엔드 포트폴리오 시스템**이며,

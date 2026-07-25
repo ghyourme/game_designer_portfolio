@@ -186,6 +186,18 @@ Claude Code는 다음 작업을 절대 자동으로 수행하지 않는다:
 - Route Consistency Audit
 - Feature Boundary Audit
 
+#### 7.2.1 Platform QA Checklists
+
+아래 체크리스트는 새 Audit 항목이 아니다 — 위 목록 중 관련 항목을 실행할 때 실제로 무엇을 확인하는지 구체화한 것이다(`docs/ARCHITECTURE.md` §13~§14, `docs/DESIGN_SYSTEM.md` §12~§13을 체크리스트 형태로 재배열).
+
+**Page QA** (Page Composition Audit에 포함) — 페이지 하나마다 확인한다: Layout, Section 순서, Breadcrumb, Navigation, CTA, Empty State, Loading, Error, Responsive(Mobile/Desktop).
+
+**Global QA** (UI Foundation Check·UI Consistency Review·Design Token Audit에 포함) — 사이트 전체 기준으로 확인한다: Header, Footer, Navigation, Theme, Typography, Color Token, Spacing, Radius, Shadow, Motion, Accessibility, Performance(`docs/DESIGN_SYSTEM.md` §4~§13).
+
+**SEO Audit** (Page Composition Audit에 포함) — `docs/ARCHITECTURE.md` §14.1: metadata, OpenGraph, robots, sitemap, canonical, favicon.
+
+**Performance Audit** (Data Flow Audit에 포함) — `docs/ARCHITECTURE.md` §14.2: Dynamic Import, Image Optimization(`next/image`), Bundle Size, Rendering, Suspense, Lazy Loading.
+
 ### 7.3 Architecture Review Cycle
 
 브랜치 종료 시 반드시 아래 순서로 리뷰하고 보고한다:

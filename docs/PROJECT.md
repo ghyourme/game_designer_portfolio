@@ -12,6 +12,8 @@ Game Designer Portfolio
 
 이 포트폴리오는 단순한 이력서가 아니라, 게임 디자인 능력을 구조적으로 증명하는 살아있는 서비스이다.
 
+**Platform vs Content**: 이 프로젝트의 완성 기준은 "포트폴리오 콘텐츠"가 아니라 "포트폴리오 플랫폼"이다 — `data/*.json`만 교체하면 Architecture 변경 없이 Projects/Home/Analysis/Resume 등에 즉시 반영되는 Data Driven 구조를 만드는 것이 목표이며, `data/*.json`은 완성된 콘텐츠가 아니라 콘텐츠를 갈아 끼우는 데이터 입력 인터페이스다. 이 구분은 §10(콘텐츠 완성도)과 §13(플랫폼 완성도)을 별도 축으로 두는 이유이기도 하다 — 플랫폼이 서비스 수준으로 완성되어야, 이후 실제 콘텐츠를 채우는 작업과 향후 콘텐츠 교체가 항상 안정적으로 반영된다.
+
 ### 배경
 
 게임 기획 직무는 단순한 아이디어가 아니라 시스템 설계 능력, 콘텐츠 설계 능력, 분석 능력을 함께 평가한다.
@@ -208,5 +210,56 @@ Project 생성부터 완료까지의 전체 흐름에 관한 부채다.
 | Project Lifecycle 미문서화 | 해결됨 (`docs/project-lifecycle`) | Identifier Rule·Evidence Rule·Content Workflow·Quality Gate가 각 문서에 흩어져 있어 전체 순서가 한눈에 보이지 않았다. `docs/ARCHITECTURE.md` §12에 9단계로 연결하고, 표시용 Project State 별칭(Draft/Evidence/Writing/Review/Completed)을 정의했다 — 새 필드나 새 규칙 없이 기존 규칙을 가리키기만 한다 |
 | Archive 정책 미정 | 잔존 | 프로젝트를 포트폴리오에서 내리거나 이력으로만 남기는 정책이 없다. `data/projects.json`은 필드 추가가 금지된 고정 스키마라 Archive를 표현하려면 스키마 변경 Architecture Decision이 필요하다 — 실제로 Archive할 프로젝트가 없는 지금은 설계하지 않는다(과설계 방지, `docs/ARCHITECTURE.md` §12.4) |
 | DATA_MODEL §4/§5 필드 범위 불일치(관찰) | 잔존(낮은 우선순위) | `docs/DATA_MODEL.md` §4는 "모든 데이터"에 `status`/`description`/`createdAt`/`updatedAt`/`order`가 공통 적용된다고 서술하지만, Project(§5.1)·Analysis(§6.1) 실제 필드 목록에는 없다. Project State(§12.1)를 이 `status` 필드로 표현하고 싶은 유혹이 있었으나, 필드 추가 금지 원칙에 따라 이번 브랜치에서는 다루지 않는다 — §4가 실제로 "선택적 공통 어휘"인지 "필수 규칙"인지는 별도로 명확히 할 필요가 있다 |
+
+### 12.4 Platform Resilience Debt
+
+`docs/ARCHITECTURE.md` §13(Platform Resilience Contract)·§14(SEO & Performance Contract) 정의 과정에서 실제 코드를 확인해 발견한 부채다. 전부 "지금 막혀 있는 것"이 아니라 "다음 구현 브랜치가 처리할 것"으로 기록한다.
+
+| 항목 | 상태 | 설명 |
+|------|------|------|
+| slug 조회 헬퍼 미공유 | 잔존 | `app/projects/[slug]/page.tsx`, `app/analysis/[slug]/page.tsx`가 각자 `.find(item => item.slug === slug)`를 중복 구현한다. `lib/data`에 공유 헬퍼(`getProjectBySlug` 등)가 없다 |
+| Record Not Found이 Next.js 컨벤션을 쓰지 않음 | 잔존 | slug 조회 실패 시 두 `[slug]` 페이지 모두 인라인 텍스트만 렌더링하고 `notFound()`/`not-found.tsx`를 쓰지 않는다 (`docs/ARCHITECTURE.md` §13.1) |
+| 페이지별 Metadata 없음 | 잔존 | `app/layout.tsx`에만 정적 `metadata`가 있고, 그 외 모든 `page.tsx`는 `metadata`/`generateMetadata`가 없다 |
+| sitemap/robots 없음 | 잔존 | `app/sitemap.ts`, `app/robots.ts` 모두 없음 |
+| next/image 미사용 | 잔존 | `features/projects/Gallery/Gallery.tsx`가 `<img>`를 직접 사용(기존 ESLint `no-img-element` 경고 2건과 동일 지점) |
+| dynamic import 미사용 | 잔존(낮은 우선순위) | 프로젝트 전체에서 `next/dynamic` 미사용 — 콘텐츠가 아직 없어 번들 크기가 실제 문제가 되지는 않는다 |
+
+---
+
+## 13. Platform Feature Definition of Done
+
+§10(Feature 완료 기준)이 **콘텐츠** 완성도(Architecture→...→Portfolio Quality)를 정의한다면, 이 절은 **플랫폼(코드)** 완성도를 정의한다. 이 프로젝트의 목적은 포트폴리오 콘텐츠 작성이 아니라 `data/*.json`만 교체하면 계속 재사용할 수 있는 Data Driven Portfolio Platform을 완성하는 것이다(§1) — 그래서 이 축은 **콘텐츠가 비어 있어도 통과할 수 있어야 한다.** 두 축은 서로 독립적이다: 어떤 Feature는 Platform DoD를 통과했지만 Content Quality Gate(§10)는 아직 못 미쳤을 수 있고(지금의 Projects/Analysis), 반대로 실제 콘텐츠가 있어도 Platform 쪽이 미비할 수 있다.
+
+이 절도 새 규칙을 만들지 않는다 — 이미 다른 문서에 정의된 것을 Feature 완료 기준이라는 하나의 체크리스트로 묶을 뿐이다.
+
+| 기준 | 정의된 곳 |
+|------|-------------|
+| JSON 기반 렌더링 | `docs/ARCHITECTURE.md` §5 데이터 흐름 |
+| Empty State | `docs/ARCHITECTURE.md` §13.1, `docs/DESIGN_SYSTEM.md` §12 |
+| Loading | `docs/ARCHITECTURE.md` §13.2 |
+| Error | `docs/ARCHITECTURE.md` §13.2, `docs/DESIGN_SYSTEM.md` §12 |
+| Responsive | `docs/DESIGN_SYSTEM.md` §5 Layout System |
+| Accessibility / Keyboard Navigation | `docs/DESIGN_SYSTEM.md` §13 |
+| SEO / Metadata | `docs/ARCHITECTURE.md` §14.1 |
+| Performance(Image/Dynamic Import) | `docs/ARCHITECTURE.md` §14.2 |
+| Component 재사용 | `docs/DESIGN_SYSTEM.md` §6~§9 (Component Library/Naming/Shared/Dependency) |
+| Design System 준수 | `docs/DESIGN_SYSTEM.md` 전체 |
+| Architecture Rule 준수 | `docs/ARCHITECTURE.md` §11(Identifier)·§12(Lifecycle)·§13~§14(Resilience/SEO/Performance) |
+
+### 13.1 Platform Readiness Status
+
+이번 브랜치에서 실제로 코드를 확인한 범위만 채운다 — 확인하지 않은 Feature를 추측으로 채우지 않는다. ✅ 충족 · 🔶 부분 · ❌ 미충족 · ⬜ 미확인(이번 브랜치에서 코드를 보지 않음).
+
+| Feature | JSON 렌더링 | Empty State | Loading/Error | SEO/Metadata | Performance | 비고 |
+|---|---|---|---|---|---|---|
+| Projects | ✅ | ✅ (목록), ❌ (상세 not-found) | 🔶 (컨벤션 파일만 존재, placeholder) | ❌ | ❌ (`<img>` 사용) | §12.4 참고 |
+| Analysis | ✅ | ✅ (목록), ❌ (상세 not-found) | 🔶 (동일) | ❌ | ⬜ | §12.4 참고 |
+| Home | ✅ | ✅ (Introduction/FeaturedProjects/FeaturedAnalysis 확인됨) | ⬜ | ❌ | ⬜ | |
+| About | ✅ | ✅ (CareerTimeline/SkillOverview 확인됨) | ⬜ | ❌ | ⬜ | |
+| Resume | ✅ | ✅ (SkillSummary/ExperienceTimeline/Education/ProjectExperience 확인됨) | ⬜ | ❌ | ⬜ | |
+| Personal Works | ⬜ | ⬜ | ⬜ | ❌ | ⬜ | Architecture 자체가 미확정(§11 진행 상태) |
+| Contact | ⬜ | ⬜ | ⬜ | ❌ | ⬜ | Architecture Decision 필요(§11 진행 상태) |
+
+`⬜ 미확인` 항목은 다음 구현 브랜치에서 실제로 코드를 열어 확인한 뒤 갱신한다 — 이번 브랜치는 Architecture Decision·Alignment 단계이며 코드를 수정하지 않았다(§12 Data Flow Audit 참고).
 
 ---
