@@ -253,9 +253,22 @@ Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력�
 
 ---
 
+# Platform Architecture Chapter (§13~§18)
+
+이 프로젝트의 목적은 포트폴리오 콘텐츠 자체가 아니라, `data/*.json`을 갈아 끼우는 것만으로 계속 재사용할 수 있는 **Data Driven Portfolio Platform**을 완성하는 것이다(`docs/PROJECT.md` §1). §13~§18은 그 Platform이 지켜야 할 계약과 완료 기준을 하나의 장(Chapter)으로 모은다 — 새로 정의하는 규칙은 §17 Architecture Evolution Policy 하나뿐이고, 나머지는 이전 브랜치에서 이미 정의된 것을 이 장 안에 모으거나(§13, §14) PROJECT.md에서 옮겨온 것(§15, §16, §18)이다.
+
+| 절 | 내용 |
+|-----|------|
+| §13 Platform Resilience Contract | Data/Rendering/Navigation/Compatibility 보장 범위 |
+| §14 SEO & Performance Contract | 메타데이터·성능 요구 사항 |
+| §15 Platform Feature Definition of Done | Feature 하나가 만족해야 할 12개 기준 |
+| §16 Platform Release Definition of Done | Platform 전체가 배포 가능한지 판단하는 최종 게이트 |
+| §17 Architecture Evolution Policy | Architecture를 앞으로 어떻게(만) 바꿀 수 있는가 |
+| §18 Platform Branch Strategy | Technical Debt를 브랜치로 옮기는 원칙(실제 목록은 `docs/GIT_WORKFLOW.md` §1.2가 Source of Truth) |
+
 ## 13. Platform Resilience Contract
 
-이 프로젝트의 목적은 포트폴리오 콘텐츠 자체가 아니라, `data/*.json`을 갈아 끼우는 것만으로 계속 재사용할 수 있는 **Data Driven Portfolio Platform**이다(`docs/PROJECT.md` §1). 그러려면 `data/*.json`이 비어 있거나 항목이 없어도 모든 페이지가 정상 동작해야 한다. 이 절은 그 보장 범위를 정의한다 — 새 검증 시스템을 만드는 것이 아니라, 이미 구조적으로 성립하는 보장과 실제로 비어 있는 보장을 구분한다.
+`data/*.json`이 비어 있거나 항목이 없어도 모든 페이지가 정상 동작해야 한다. 이 절은 그 보장 범위를 정의한다 — 새 검증 시스템을 만드는 것이 아니라, 이미 구조적으로 성립하는 보장과 실제로 비어 있는 보장을 구분한다.
 
 ### 13.1 Data Resilience
 
@@ -264,7 +277,7 @@ Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력�
 | Missing Field | `docs/DATA_MODEL.md` §5 "Required/Optional 원칙" — 모든 필드는 Required이며 빈 값은 `""`/`[]`로 표현한다. 옵셔널 필드가 없으므로 `undefined` 접근 자체가 구조적으로 발생하지 않는다 | 구조적으로 이미 보장됨 |
 | Invalid JSON | `data/*.json`은 런타임 fetch가 아니라 `import ... from "@/data/*.json"` 정적 ESM import로 로드된다(`lib/data/*.ts`). JSON 문법이 깨지면 런타임이 아니라 **빌드 타임에 실패**한다 — "런타임에 도달하는 Invalid JSON"은 이 아키텍처에서 구조적으로 발생할 수 없다 | 구조적으로 이미 보장됨 |
 | Empty Array | 목록형 컴포넌트(`ProjectGrid`, `AnalysisGrid`, `SkillSummary`, `ExperienceTimeline` 등)는 이미 길이 0을 확인해 Empty State 메시지를 렌더링한다(`docs/DESIGN_SYSTEM.md` §12 Empty States) | 이미 구현됨 |
-| Record Not Found (slug 조회 실패) | `app/projects/[slug]/page.tsx`, `app/analysis/[slug]/page.tsx`가 각자 `.find(slug)` 결과를 인라인 텍스트("Project Not Found" 등)로만 처리하고, Next.js의 `notFound()`/`not-found.tsx` 컨벤션을 쓰지 않는다 | **미비 — Technical Debt(`docs/PROJECT.md` §12.4)** |
+| Record Not Found (slug 조회 실패) | `app/projects/[slug]/page.tsx`, `app/analysis/[slug]/page.tsx`가 각자 `.find(slug)` 결과를 인라인 텍스트("Project Not Found" 등)로만 처리하고, Next.js의 `notFound()`/`not-found.tsx` 컨벤션을 쓰지 않는다 | **미비 — Technical Debt(`docs/PROJECT.md` §12.1 Platform Debt)** |
 | Loader 재사용 | slug 조회 로직(`.find(item => item.slug === slug)`)이 두 page 파일에 각각 중복 구현되어 있고, `lib/data`에 공유 헬퍼(예: `getProjectBySlug`)가 없다 | **미비 — Technical Debt** |
 
 ### 13.2 Rendering Resilience
@@ -274,9 +287,31 @@ Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력�
 | Loading State | Next.js App Router 컨벤션(`app/loading.tsx`)이 루트에 존재한다. 이 프로젝트는 전 페이지가 빌드 타임 정적 생성(SSG)이라 클라이언트가 실제로 로딩 화면을 볼 일이 거의 없다 — 향후 클라이언트 사이드 데이터 요청이 추가되기 전까지는 낮은 우선순위다 | 컨벤션 파일 존재(placeholder 문구), 현재 아키텍처상 실사용 빈도 낮음 |
 | Error Boundary | Next.js App Router의 `error.tsx` 컨벤션이 라우트 세그먼트를 감싸는 Error Boundary 역할을 자동으로 수행한다 — 별도의 커스텀 React Error Boundary 클래스는 프레임워크 컨벤션과 중복이라 만들지 않는다 | 루트 `app/error.tsx` 존재(placeholder 문구) |
 
-### 13.3 적용 범위
+### 13.3 Navigation Resilience
 
-이 계약은 `data/*.json`을 사용하는 모든 Feature(Home/About/Projects/Analysis/Resume/Personal Works/Contact)에 동일하게 적용된다. 이번 브랜치는 계약을 정의하는 Architecture Decision 단계이며, 실제 코드 구현(공유 slug 조회 헬퍼, `notFound()` 전환 등)은 후속 브랜치에서 다룬다(`docs/PROJECT.md` §12.4 Technical Debt).
+`docs/INFORMATION_ARCHITECTURE.md` §4(내비게이션 흐름)가 정의한 Header/Footer/상세 이동 구조가 실제로 끊김 없이 동작하는지의 계약이다.
+
+| 항목 | 보장 방식 | 현재 상태 |
+|------|------------|-------------|
+| Active Navigation | `components/layout/Header/Header.tsx`가 `usePathname()`과 `item.path`를 비교해 `aria-current="page"`를 부여한다 | 🔶 부분 — 최상위 경로(`/projects` 등)는 정확히 표시되지만, `pathname === item.path`가 완전 일치만 확인해 `/projects/[slug]`처럼 하위 경로에서는 "Projects" 항목이 활성 표시되지 않는다 — **미비, Technical Debt** |
+| Breadcrumb | `docs/INFORMATION_ARCHITECTURE.md` §4가 이미 "모든 흐름은 최대 2단계(목록→상세) 이내" + "언제든 Header/Footer로 다른 최상위 페이지 이동 가능"을 설계 원칙으로 명시했다 | Breadcrumb 컴포넌트 없음 — 이는 미구현이 아니라 **기존 IA 결정과 일치하는 상태일 가능성이 높다.** 깊이가 2단계로 고정되어 있는 한 새로 만들 필요가 없다(과설계 방지). 사이트 깊이가 실제로 늘어나는 시점에 재검토한다 |
+| Deep Link | 카드→상세 링크(`ProjectCard`/`AnalysisCard`)는 전부 `data/*.json`의 실제 `slug`로 생성되어 존재하지 않는 경로를 만들지 않는다 | 이미 보장됨 — §11 Identifier Rule과 동일한 slug 기반 구조 덕분 |
+| Back Navigation | `[slug]` 상세 페이지(`app/projects/[slug]/page.tsx`, `app/analysis/[slug]/page.tsx`)와 그 Hero 컴포넌트 어디에도 목록 페이지로 돌아가는 Link가 없다 | **미비 — Technical Debt** |
+| Broken Link | 전체 코드베이스의 내부 `href`를 실제 라우트와 대조한 결과, 존재하지 않는 경로를 가리키는 링크는 없다 | 이미 보장됨 |
+| Footer 네비게이션 | `docs/INFORMATION_ARCHITECTURE.md` §4는 Footer가 "글로벌 내비게이션과 동일한 핵심 링크 + Contact 강조"를 노출한다고 서술한다 | **Architecture Drift** — `components/layout/Footer/Footer.tsx`는 `{/* TODO */}` 뿐인 빈 플레이스홀더다. 문서가 서술하는 동작이 코드에 전혀 없다 — §18 Architecture Drift에 기록 |
+
+### 13.4 Compatibility
+
+| 항목 | 요구 사항 | 현재 상태 |
+|------|-----------|-------------|
+| Cross Browser | Chrome/Edge/Firefox/Safari 최신 버전에서 레이아웃·인터랙션이 동일하게 동작해야 한다 | 미확인 — 실제 브라우저 교차 테스트가 수행된 적 없음. Tailwind CSS 기반이라 구조적 위험은 낮지만 검증되지는 않았다 |
+| Device | Desktop/Tablet/Mobile 반응형(`docs/DESIGN_SYSTEM.md` §5 Responsive Behavior)이 실제 기기에서 확인되어야 한다 | 미확인 — 반응형 원칙은 문서화되어 있으나(§5) 실기기/에뮬레이터 검증 기록 없음 |
+
+이 두 항목은 코드 계약이 아니라 **검증 절차**다 — 새 컴포넌트나 규칙을 만들지 않고, 본 문서 §16 Platform Release Definition of Done의 "Cross Browser QA" 단계에서 실행한다.
+
+### 13.5 적용 범위
+
+이 계약(§13.1~§13.4)은 `data/*.json`을 사용하는 모든 Feature(Home/About/Projects/Analysis/Resume/Personal Works/Contact)에 동일하게 적용된다. 이번 브랜치는 계약을 정의·확장하는 Architecture Decision 단계이며, 실제 코드 구현(공유 slug 조회 헬퍼, `notFound()` 전환, Footer 구현, Active Navigation 경로 매칭 개선 등)은 후속 브랜치에서 다룬다(`docs/PROJECT.md` §12.1 Platform Debt).
 
 ---
 
@@ -303,7 +338,85 @@ Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력�
 
 ### 14.3 적용 범위와 우선순위
 
-이 계약도 Data Resilience(§13)와 동일하게 모든 Feature에 적용되며, 실제 구현은 후속 브랜치의 몫이다. `docs/PROJECT.md`의 새 Platform Feature Definition of Done(§13)이 이 계약을 Feature별 완료 기준으로 연결한다.
+이 계약도 Data Resilience(§13)와 동일하게 모든 Feature에 적용되며, 실제 구현은 후속 브랜치의 몫이다. 본 문서 §15 Platform Feature Definition of Done이 이 계약을 Feature별 완료 기준으로 연결한다.
+
+---
+
+## 15. Platform Feature Definition of Done
+
+`docs/PROJECT.md` §10(Feature 완료 기준)이 **콘텐츠** 완성도(Architecture→...→Portfolio Quality)를 정의한다면, 이 절은 **플랫폼(코드)** 완성도를 정의한다 — 그래서 이 축은 **콘텐츠가 비어 있어도 통과할 수 있어야 한다.** 두 축은 서로 독립적이다: 어떤 Feature는 Platform DoD를 통과했지만 Content Quality Gate(`docs/PROJECT.md` §10)는 아직 못 미쳤을 수 있고(지금의 Projects/Analysis), 반대로 실제 콘텐츠가 있어도 Platform 쪽이 미비할 수 있다.
+
+이 절도 새 규칙을 만들지 않는다 — 이미 다른 문서에 정의된 것을 Feature 완료 기준이라는 하나의 체크리스트로 묶을 뿐이다.
+
+| 기준 | 정의된 곳 |
+|------|-------------|
+| JSON 기반 렌더링 | §5 데이터 흐름 |
+| Empty State | §13.1, `docs/DESIGN_SYSTEM.md` §12 |
+| Loading | §13.2 |
+| Error | §13.2, `docs/DESIGN_SYSTEM.md` §12 |
+| Responsive | `docs/DESIGN_SYSTEM.md` §5 Layout System |
+| Accessibility / Keyboard Navigation | `docs/DESIGN_SYSTEM.md` §13 |
+| SEO / Metadata | §14.1 |
+| Performance(Image/Dynamic Import) | §14.2 |
+| Component 재사용 | `docs/DESIGN_SYSTEM.md` §6~§9 (Component Library/Naming/Shared/Dependency) |
+| Design System 준수 | `docs/DESIGN_SYSTEM.md` 전체 |
+| Architecture Rule 준수 | §11(Identifier)·§12(Lifecycle)·§13~§14(Resilience/SEO/Performance) |
+
+실제 진행 상태(Feature별로 지금 어디까지 왔는지)는 `docs/PROJECT.md` §11.1 Platform Readiness Status가 추적한다 — 이 절은 기준만 정의하고, 상태 추적은 PROJECT.md의 책임이다(§1 문서 책임 분리).
+
+---
+
+## 16. Platform Release Definition of Done
+
+§15(Feature 단위 완료 기준)를 전부 통과한 이후, Platform 전체가 배포 가능한 상태인지 판단하는 마지막 게이트다. 새 배포 절차를 만들지 않는다 — `docs/DEPLOYMENT.md`(배포 절차, 이번 7개 Source of Truth 문서에는 포함되지 않음)의 앞단에 QA 게이트를 붙이는 것뿐이다.
+
+```
+Feature Complete (§15 전체 Feature ✅)
+   ↓
+Platform QA (docs/GIT_WORKFLOW.md §7.2.1 Page QA)
+   ↓
+Accessibility QA (docs/DESIGN_SYSTEM.md §13)
+   ↓
+SEO 완료 (§14.1)
+   ↓
+Performance 완료 (§14.2)
+   ↓
+Cross Browser QA (§13.4)
+   ↓
+Build 성공 (docs/DEPLOYMENT.md §4)
+   ↓
+Deploy (docs/DEPLOYMENT.md §3, §6)
+   ↓
+Release
+```
+
+이 게이트는 `docs/PROJECT.md` §10 Content Quality Gate와 독립적이다 — Platform Release는 콘텐츠가 비어 있어도 통과할 수 있어야 한다(§1 목적). 실제로 배포하는 결정은 항상 사용자가 내리며(`docs/DEPLOYMENT.md` §8 "Claude Code는 배포 준비까지만 수행"), 이 절은 그 이전 단계에서 무엇을 확인해야 하는지만 정의한다.
+
+---
+
+## 17. Architecture Evolution Policy
+
+이 프로젝트의 Governance(Identifier Rule·Lifecycle·Content Workflow·Review System·Quality Gate·Evidence System·Platform Resilience/SEO/Performance Contract)는 완료 상태다. 이 절은 완료 이후 Architecture를 어떻게(만) 바꿀 수 있는지 정의한다 — Governance를 종료하면서도 Architecture가 영원히 고정되는 것은 아니라는 점을 명시하기 위함이다.
+
+**Architecture는 Stable 상태로 간주한다.** 다음 세 가지 경우에만 변경을 허용하며, 그 외에는 새로운 Rule을 원칙적으로 추가하지 않는다.
+
+| 허용 경로 | 의미 | 예시 |
+|-----------|------|------|
+| Architecture Decision | 실제로 필요한 새 구조적 결정이 생겼을 때 | Personal Works/Contact의 데이터 소스 확정(`docs/PROJECT.md` §11 미결 항목) |
+| Architecture Drift | 문서와 코드가 실제로 어긋난 것을 발견했을 때 | `docs/INFORMATION_ARCHITECTURE.md` §4 vs 빈 `Footer.tsx`(`docs/PROJECT.md` §12.1) |
+| Technical Debt | 이미 기록된 부채를 실제로 해소할 때 | `docs/PROJECT.md` §12의 각 도메인 부채 항목 |
+
+이 세 경로 밖에서 "더 나은 방법이 떠올랐다"는 이유만으로 새 Rule이나 새 문서 섹션을 추가하지 않는다. Platform 완성(§13~§16)이 지금부터의 최우선 목표이며, Governance 확장은 이 정책으로 종료한다.
+
+---
+
+## 18. Platform Branch Strategy
+
+Technical Debt(`docs/PROJECT.md` §12.1 Platform Debt)를 우선순위 순서로 처리하는 책임 단위 브랜치 원칙이다. 실제 브랜치명·순서·목록의 **Source of Truth는 `docs/GIT_WORKFLOW.md` §1.2 하나뿐이다** — 여기서 다시 나열하면 두 문서가 서로 다른 목록을 갖게 될 위험(Drift)이 생기므로, 이 절은 원칙만 명시한다.
+
+- 브랜치 하나는 하나의 책임 영역만 다룬다(`docs/GIT_WORKFLOW.md` §1).
+- 순서는 Technical Debt의 우선순위(High → Medium → Low)를 그대로 따른다.
+- 실제 목록은 `docs/GIT_WORKFLOW.md` §1.2를 확인한다.
 
 ---
 

@@ -55,6 +55,24 @@ feature/projects-<slug>-content
 
 예: 프로젝트의 slug가 `maple-story-fan-server`라면 `feature/projects-maple-story-fan-server-content`. `<slug>`는 실제 프로젝트가 확정되어 `data/projects.json`에 slug가 결정된 뒤에만 생성한다 — 근거 없는 프로젝트명으로 브랜치명을 미리 만들지 않는다.
 
+### 1.2 Platform 브랜치 원칙
+
+콘텐츠가 아니라 플랫폼 자체(Empty State/Error/SEO/Performance/Accessibility 등, `docs/ARCHITECTURE.md` §13~§14)를 다루는 브랜치는 책임 영역 단위로 쪼갠다. `docs/PROJECT.md` §12.1 Platform Debt(High→Medium→Low)를 우선순위 그대로 처리하며, 이 문서가 실제 브랜치명·순서의 Source of Truth다(`docs/ARCHITECTURE.md` §18은 원칙만 가리키고 목록을 복제하지 않는다).
+
+```
+feature/platform-routing       (§12.1 High — slug Helper, Record Not Found, Active Navigation, Back Navigation, Footer)
+   ↓
+feature/platform-seo           (§12.1 Medium — Metadata, OpenGraph, sitemap, robots, canonical)
+   ↓
+feature/platform-performance   (§12.1 Low — next/image, Dynamic Import)
+   ↓
+feature/platform-accessibility (docs/DESIGN_SYSTEM.md §13 실제 구현 검증)
+   ↓
+feature/platform-qa            (§7.2.1 Page/Global QA 실행)
+   ↓
+feature/platform-release       (docs/ARCHITECTURE.md §16 Platform Release Definition of Done 통과 확인)
+```
+
 ---
 
 ## 2. 작업 순서
@@ -190,13 +208,19 @@ Claude Code는 다음 작업을 절대 자동으로 수행하지 않는다:
 
 아래 체크리스트는 새 Audit 항목이 아니다 — 위 목록 중 관련 항목을 실행할 때 실제로 무엇을 확인하는지 구체화한 것이다(`docs/ARCHITECTURE.md` §13~§14, `docs/DESIGN_SYSTEM.md` §12~§13을 체크리스트 형태로 재배열).
 
-**Page QA** (Page Composition Audit에 포함) — 페이지 하나마다 확인한다: Layout, Section 순서, Breadcrumb, Navigation, CTA, Empty State, Loading, Error, Responsive(Mobile/Desktop).
+**Page QA** (Page Composition Audit에 포함) — 페이지 하나마다 확인한다: Layout, Header, Footer, Section 순서, Navigation, CTA, Empty State, Loading, Error, Responsive(Mobile/Tablet/Desktop).
 
-**Global QA** (UI Foundation Check·UI Consistency Review·Design Token Audit에 포함) — 사이트 전체 기준으로 확인한다: Header, Footer, Navigation, Theme, Typography, Color Token, Spacing, Radius, Shadow, Motion, Accessibility, Performance(`docs/DESIGN_SYSTEM.md` §4~§13).
+**Global QA** (UI Foundation Check·UI Consistency Review·Design Token Audit에 포함) — 사이트 전체 기준으로 확인한다: Typography, Color Token, Radius, Shadow, Motion, Accessibility, UX Consistency, Component Consistency(`docs/DESIGN_SYSTEM.md` §7 Naming Convention·§8 Shared Components), Navigation Consistency(`docs/ARCHITECTURE.md` §13.3), Performance(`docs/DESIGN_SYSTEM.md` §4~§13).
+
+**Navigation QA** (Route Consistency Audit에 포함) — `docs/ARCHITECTURE.md` §13.3: Active Navigation, Breadcrumb(필요 여부 포함), Deep Link, Back Navigation, Broken Link 없음.
+
+**Accessibility QA** (UI Foundation Check에 포함) — `docs/DESIGN_SYSTEM.md` §13: aria, semantic HTML, keyboard navigation, focus management, screen reader 대응.
 
 **SEO Audit** (Page Composition Audit에 포함) — `docs/ARCHITECTURE.md` §14.1: metadata, OpenGraph, robots, sitemap, canonical, favicon.
 
 **Performance Audit** (Data Flow Audit에 포함) — `docs/ARCHITECTURE.md` §14.2: Dynamic Import, Image Optimization(`next/image`), Bundle Size, Rendering, Suspense, Lazy Loading.
+
+**Compatibility Audit** (Route Consistency Audit에 포함) — `docs/ARCHITECTURE.md` §13.4: Cross Browser(Chrome/Edge/Firefox/Safari), Device(Desktop/Tablet/Mobile).
 
 ### 7.3 Architecture Review Cycle
 

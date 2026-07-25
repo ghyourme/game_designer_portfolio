@@ -16,7 +16,8 @@
       "Bash(awk '/^## 5\\\\./,/^## 6\\\\./' docs/DATA_MODEL.md)",
       "Bash(npx tsc *)",
       "Bash(git rm *)",
-      "Bash(echo \"exit:$?\")"
+      "Bash(echo \"exit:$?\")",
+      "Bash(git branch *)"
     ]
   }
 }
