@@ -123,3 +123,38 @@ Game Designer Portfolio
 - 실제 서비스 수준의 완성도
 
 ---
+
+## 10. Feature 완료 기준 (Definition of Done)
+
+이 프로젝트에서 "완료"는 코드가 동작하는 것을 의미하지 않는다. 하나의 Feature는 아래 6단계를 모두 통과해야 완료로 간주한다 — 앞 단계가 끝나야 다음 단계로 넘어갈 수 있고, 중간 단계까지만 끝난 Feature를 "완료"라고 부르지 않는다.
+
+| 단계 | 의미 | 완료 조건 |
+|------|------|-----------|
+| 1. Architecture | 구조가 문서에 확정되어 있는가 | `docs/DATA_MODEL.md`/`docs/DESIGN_SYSTEM.md`/`docs/INFORMATION_ARCHITECTURE.md`에 필드·컴포넌트·정보 구조가 정의됨 |
+| 2. Implementation | 그 구조가 코드로 존재하는가 | Type → JSON 스키마 → Loader → Feature → Component → Page가 전부 연결되어 동작함(`docs/ARCHITECTURE.md` §5 데이터 흐름) |
+| 3. Real Contents | 실제 콘텐츠가 채워져 있는가 | `data/*.json`에 가짜 데이터가 아닌 실제 프로젝트/분석/이력 내용이 존재함(`docs/CONTENT_GUIDE.md` 기준 충족) |
+| 4. UX Review | 실제 콘텐츠 기준으로 화면 흐름을 검증했는가 | 빈 배열/placeholder가 아닌 실데이터로 렌더링해 가독성·정보 위계·반응형을 확인함 |
+| 5. Recruiter Review | 목표 독자가 실제로 보고 의도한 판단을 내리는가 | 채용 담당자(2~3분 스크리닝)·시니어 기획자(심층 검토) 두 흐름 모두에서 `docs/PROJECT.md` §2 목표를 충족하는지 확인함 |
+| 6. Portfolio Quality | 취업에 바로 쓸 수 있는 완성도인가 | 오탈자, 이미지 품질, 문서 간 Drift 없음까지 확인됨 |
+
+**Architecture + Implementation만 끝난 상태는 "Infrastructure 완료"라고 부르고, "Feature 완료"라고 부르지 않는다.** 이 구분이 없으면 데이터가 비어 있는데도 "구현이 끝났다"는 착각이 생긴다.
+
+---
+
+## 11. 진행 상태 (Feature Completion Status)
+
+`data/*.json`의 실제 내용과 각 Feature의 코드 상태를 기준으로 위 6단계 중 어디까지 도달했는지 표시한다. ✅ 완료 · 🔶 부분(placeholder 값 존재) · ❌ 미완료 · ⬜ 아직 해당 단계에 도달하지 않음.
+
+| Feature | 1. Architecture | 2. Implementation | 3. Real Contents | 4. UX Review | 5. Recruiter Review | 6. Portfolio Quality | 현재 상태 |
+|---|---|---|---|---|---|---|---|
+| Home | ✅ | ✅ | 🔶 (`profile.json`/`skills.json`이 placeholder 문자열·빈 배열) | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
+| About | ✅ | ✅ | 🔶 (동일) | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
+| Resume | ✅ | ✅ | 🔶 (`personalInfo`만 placeholder, `career`/`education` 등은 빈 배열) | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
+| **Projects** | ✅ | ✅ | ❌ (`data/projects.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | **Infrastructure 완료 — Content 단계 진입** |
+| Analysis | ✅ | ✅ | ❌ (`data/analysis.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
+| Personal Works | ❌ (`docs/DATA_MODEL.md`에 세부 필드 미정) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | 설계 전 단계 |
+| Contact | 🔶 (연락처 데이터 소스 미정 — `profile.json` 확장 vs `resume.json.personalInfo` 재사용) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | Architecture Decision 필요 |
+
+이전에 통용되던 "Projects Feature 진행 중"이라는 표현은 Architecture/Implementation과 Real Contents 이후 단계를 구분하지 않아 폐기한다. 정확한 표현은 **"Projects Infrastructure 완료 — Projects Content 단계 진입"**이다.
+
+---
