@@ -220,4 +220,17 @@ Diagram이 필요하다고 판단되어도 즉시 만들지 않는다. Self Revi
 
 대상: Flow Chart, ERD, UML, State Diagram, Sequence Diagram, User Flow, Journey Map, Information Hierarchy, Timeline, Architecture Diagram.
 
+#### 7.5.1 Diagram Candidate Registry
+
+Self Review에서 기록된 Diagram Candidate를 브랜치가 끝나도 잊히지 않도록 한곳에 누적한다. 실제 제작 여부와 무관하게, 후보로 판단된 시점에 이 표에 추가한다.
+
+| Diagram | 유형 | 대응 문서/섹션 | 등록 브랜치 | 제작 상태 |
+|---------|------|------------------|--------------|-----------|
+| Content Workflow Diagram | Flow Chart | `docs/CONTENT_GUIDE.md` §11 Project Content Workflow | `feature/projects-content-workflow` | 미제작 |
+| Quality Gate Flow | Flow Chart / State Diagram | `docs/PROJECT.md` §10 Feature 완료 기준 (Quality Gate) | `feature/projects-content-workflow` | 미제작 |
+| Evidence Flow | Flow Chart | `docs/CONTENT_GUIDE.md` §12 Evidence Rule, §13 Content Source Rule | `feature/projects-content-workflow` | 미제작 |
+| Content Traceability Diagram | Sequence Diagram / Mapping Diagram | `docs/CONTENT_GUIDE.md` §14 Traceability Rule | `feature/projects-content-workflow` | 미제작 |
+
 > **변경 이력 (`feature/ui-quality-audit`)**: 프로젝트 거버넌스 확장 시점에 §1(브랜치 세분화 예시)과 §7.1~§7.5를 추가했다. 이 내용은 채팅으로 먼저 전달되었으나, "Source of Truth 문서는 항상 최신 상태를 유지하고 문서간 Drift를 허용하지 않는다"는 원칙에 따라 실제 작업(Projects Feature) 착수 전에 이 문서로 옮겼다 — Architecture Decision → Architecture Alignment → 문서 수정 → 구현 순서를 그대로 따른 것이다.
+>
+> **변경 이력 (`feature/projects-content-workflow`)**: §7.5가 "Diagram Candidate는 Self Review에서만 기록한다"는 정책만 갖고 있어, 브랜치가 끝나면 후보 목록 자체가 대화 기록에만 남고 문서에는 남지 않았다. §7.5.1 Diagram Candidate Registry를 추가해 후보를 영구적으로 누적하도록 했다.
