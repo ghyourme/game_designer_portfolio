@@ -85,7 +85,8 @@ JSON 기반 데이터가 UI를 결정한다.
 - lib/ : 외부 연동
 - types/ : TypeScript 타입
 - data/ : JSON 데이터
-- docs/ : 설계 문서
+- docs/ : 설계 문서 (Source of Truth — 프로젝트 전체에 적용되는 규칙/구조만 다룬다)
+- docs/projects/ : 프로젝트별 콘텐츠 작업 자료 (예: Evidence Inventory). Source of Truth가 아니다 — `data/*.json`에 반영되기 전 개별 프로젝트 하나에 대해서만 유효한 작업 중 자료이며, `docs/CONTENT_GUIDE.md` §14 Traceability Rule의 "작성 워크시트" 개념을 실제 파일로 구현한 것이다
 - prompts/ : AI 프롬프트
 
 ---

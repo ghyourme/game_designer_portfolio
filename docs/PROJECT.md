@@ -160,7 +160,7 @@ Architecture → Implementation → Real Contents → Content Review
 | Home | ✅ | ✅ | 🔶 (`profile.json`/`skills.json`이 placeholder 문자열·빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
 | About | ✅ | ✅ | 🔶 (동일) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
 | Resume | ✅ | ✅ | 🔶 (`personalInfo`만 placeholder, `career`/`education` 등은 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
-| **Projects** | ✅ | ✅ | ❌ (`data/projects.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | **Infrastructure 완료 + Content Governance 완료(Workflow/Evidence/Source/Traceability 포함) — Content 단계 진입 (Project G 작성 대기)** |
+| **Projects** | ✅ | ✅ | ❌ (`data/projects.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | **Infrastructure 완료 + Content Governance 완료 — Project G Evidence 수집 단계 (`docs/projects/project-g-evidence.md` 참고, 전체 미확보)** |
 | Analysis | ✅ | ✅ | ❌ (`data/analysis.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 (Review Checklist 미구축 — §12 참고) |
 | Personal Works | ❌ (`docs/DATA_MODEL.md`에 세부 필드 미정) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 설계 전 단계 |
 | Contact | 🔶 (연락처 데이터 소스 미정 — `profile.json` 확장 vs `resume.json.personalInfo` 재사용) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Architecture Decision 필요 |
