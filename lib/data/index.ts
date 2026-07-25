@@ -14,3 +14,4 @@ export * from "./getAnalysis";
 export * from "./getSkills";
 export * from "./getCompanies";
 export * from "./getNavigation";
+export * from "./findBySlug";

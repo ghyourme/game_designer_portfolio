@@ -1,18 +1,43 @@
+import Link from "next/link";
+import { getNavigation } from "@/lib/data";
+import { Button } from "@/components/ui/Button";
+
 /**
  * Footer
  *
- * 참고 문서: docs/DESIGN_SYSTEM.md - 6. Component Library (Footer)
+ * 참고 문서:
+ * - docs/DESIGN_SYSTEM.md - 6. Component Library (Footer)
+ * - docs/INFORMATION_ARCHITECTURE.md - 4. 내비게이션 흐름 ("글로벌 내비게이션과 동일한
+ *   핵심 링크 + Contact 강조")
  *
  * 책임:
- * - 모든 페이지 하단에 공통으로 표시되는 전역 푸터 영역을 제공하는 placeholder.
- * - 보조 내비게이션, 연락처 등의 콘텐츠는 아직 포함하지 않는다. (구현 예정)
- *
- * 스타일과 비즈니스 로직은 포함하지 않는다.
+ * - 모든 페이지 하단에 공통으로 표시되는 전역 푸터 영역을 제공한다.
+ * - Header와 동일하게 data/navigation.json(getNavigation)을 유일한 데이터 소스로
+ *   쓰되, IA가 "핵심 링크"로 한정한 대로 전체 7개가 아니라 CORE_PATHS로 추린 항목만
+ *   노출한다 — 라벨/경로가 Header와 어긋나는 것을 막기 위해 하드코딩하지 않는다.
+ * - Contact는 CORE_PATHS에서 제외하고 Button(primary)으로 별도 강조한다.
  */
+const CORE_PATHS = ["/", "/projects", "/analysis", "/resume"];
+
 export function Footer() {
+  const items = getNavigation()
+    .filter((item) => item.isActive && CORE_PATHS.includes(item.path))
+    .sort((a, b) => a.order - b.order);
+
   return (
     <footer>
-      {/* TODO: 푸터 내비게이션 및 연락처 콘텐츠 구현 예정 */}
+      <nav aria-label="Footer navigation">
+        <ul>
+          {items.map((item) => (
+            <li key={item.path}>
+              <Link href={item.path}>{item.label}</Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <Button href="/contact" variant="primary">
+        Contact
+      </Button>
     </footer>
   );
 }

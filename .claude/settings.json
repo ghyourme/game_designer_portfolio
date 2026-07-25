@@ -17,7 +17,28 @@
       "Bash(npx tsc *)",
       "Bash(git rm *)",
       "Bash(echo \"exit:$?\")",
-      "Bash(git branch *)"
+      "Bash(git branch *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/projects/nonexistent-slug)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/analysis/nonexistent-slug)",
+      "Bash(curl -s http://localhost:3000/projects/nonexistent-slug)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -sI http://localhost:3000/projects/nonexistent-slug)",
+      "Bash(curl -s -o /dev/null -w \"HTTP_CODE:%{http_code}\\\\n\" http://localhost:3000/projects/nonexistent-slug)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill //PID 21636 //F)",
+      "Bash(curl -s -o /dev/null -w \"HTTP_CODE:%{http_code}\\\\n\" http://localhost:3000/analysis/nonexistent-slug)",
+      "Bash(curl -s -o /dev/null -w \"HTTP_CODE:%{http_code}\\\\n\" http://localhost:3000/projects)",
+      "Bash(curl -sv http://localhost:3000/projects/nonexistent-slug)",
+      "Bash(curl -s -o /dev/null -w \"root catch-all 404 status: %{http_code}\\\\n\" http://localhost:3000/some-totally-random-route-xyz)",
+      "Bash(mv app/loading.tsx /tmp/loading.tsx.bak)",
+      "Bash(curl -s -o /dev/null -w \"WITHOUT loading.tsx - /projects/nonexistent-slug status: %{http_code}\\\\n\" http://localhost:3000/projects/nonexistent-slug)",
+      "Bash(curl -s http://localhost:3000/projects/nonexistent-slug -o /tmp/page.html)",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s http://localhost:3000/about -o /tmp/about.html)",
+      "Bash(pkill -f \"next start\")"
+    ],
+    "additionalDirectories": [
+      "\\tmp"
     ]
   }
 }

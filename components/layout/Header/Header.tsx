@@ -18,6 +18,9 @@ import { getNavigation } from "@/lib/data";
  *   항목만 렌더링한다.
  * - 현재 경로와 항목의 path를 비교해 방문 중인 페이지에 aria-current="page"를 부여한다.
  *   (이 "현재 페이지 활성 상태"는 항목 데이터의 isActive와는 다른, 렌더링 시점의 값이다)
+ *   완전 일치("/projects")뿐 아니라 그 하위 경로("/projects/[slug]")에서도 상위 메뉴가
+ *   활성 표시되도록 접두사 비교를 함께 한다 — "/"만 완전 일치로 남겨 모든 경로가
+ *   Home에 걸리는 것을 막는다(docs/ARCHITECTURE.md §13.3 Navigation Resilience).
  *
  * 스타일은 최소 구조 이상으로 구현하지 않는다.
  */
@@ -32,7 +35,11 @@ export function Header() {
       <nav aria-label="Global navigation">
         <ul>
           {items.map((item) => {
-            const isCurrentPage = pathname === item.path;
+            const isCurrentPage =
+              item.path === "/"
+                ? pathname === "/"
+                : pathname === item.path ||
+                  pathname.startsWith(`${item.path}/`);
             return (
               <li key={item.path}>
                 <Link

@@ -175,15 +175,17 @@ Architecture → Implementation → Real Contents → Content Review
 
 | Feature | JSON 렌더링 | Empty State | Loading/Error | SEO/Metadata | Performance | 비고 |
 |---|---|---|---|---|---|---|
-| Projects | ✅ | ✅ (목록), ❌ (상세 not-found) | 🔶 (컨벤션 파일만 존재, placeholder) | ❌ | ❌ (`<img>` 사용) | §12.1 Platform Debt 참고 |
-| Analysis | ✅ | ✅ (목록), ❌ (상세 not-found) | 🔶 (동일) | ❌ | ⬜ | §12.1 Platform Debt 참고 |
-| Home | ✅ | ✅ (Introduction/FeaturedProjects/FeaturedAnalysis 확인됨) | ⬜ | ❌ | ⬜ | |
-| About | ✅ | ✅ (CareerTimeline/SkillOverview 확인됨) | ⬜ | ❌ | ⬜ | |
-| Resume | ✅ | ✅ (SkillSummary/ExperienceTimeline/Education/ProjectExperience 확인됨) | ⬜ | ❌ | ⬜ | |
-| Personal Works | ⬜ | ⬜ | ⬜ | ❌ | ⬜ | Architecture 자체가 미확정(위 §11 표 참고) |
-| Contact | ⬜ | ⬜ | ⬜ | ❌ | ⬜ | Architecture Decision 필요(위 §11 표 참고) |
+| Projects | ✅ | ✅ (목록), ✅ (상세 `notFound()`+전용 not-found.tsx) | ✅ (Error Boundary만 사용, Loading 제거 — 아래 참고) | ❌ | ❌ (`<img>` 사용) | `feature/platform-routing`에서 Loading/Error·Record Not Found 해소 |
+| Analysis | ✅ | ✅ (목록), ✅ (상세 `notFound()`+전용 not-found.tsx) | ✅ (동일) | ❌ | ⬜ | 동일 |
+| Home | ✅ | ✅ (Introduction/FeaturedProjects/FeaturedAnalysis 확인됨) | ✅ (Loading 제거, Error Boundary만) | ❌ | ⬜ | |
+| About | ✅ | ✅ (CareerTimeline/SkillOverview 확인됨) | ✅ (동일) | ❌ | ⬜ | |
+| Resume | ✅ | ✅ (SkillSummary/ExperienceTimeline/Education/ProjectExperience 확인됨) | ✅ (동일) | ❌ | ⬜ | |
+| Personal Works | ⬜ | ⬜ | ✅ (동일) | ❌ | ⬜ | Architecture 자체가 미확정(위 §11 표 참고) |
+| Contact | ⬜ | ⬜ | ✅ (동일) | ❌ | ⬜ | Architecture Decision 필요(위 §11 표 참고) |
 
-`⬜ 미확인` 항목은 다음 구현 브랜치에서 실제로 코드를 열어 확인한 뒤 갱신한다. **Navigation은 Feature별이 아니라 전역이라 표에 별도 컬럼을 두지 않는다** — `Header`의 Active Navigation 부분 구현과 빈 `Footer`(§12.1 Platform Debt, High)는 7개 Feature 전체에 동일하게 적용된다.
+`⬜ 미확인` 항목은 다음 구현 브랜치에서 실제로 코드를 열어 확인한 뒤 갱신한다. **Navigation은 Feature별이 아니라 전역이라 표에 별도 컬럼을 두지 않는다** — `Header`의 Active Navigation과 `Footer`는 `feature/platform-routing`에서 7개 Feature 전체에 동일하게 해소되었다(아래 §12.1 참고).
+
+**Loading State 전역 제거**: `app/loading.tsx`가 있으면 Next.js가 하위 비동기 컴포넌트를 Suspense로 감싸 스트리밍하는데, 이 상태에서는 `notFound()`가 평가되기 전에 HTTP 200이 이미 커밋되어버려 잘못된 slug도 200으로 응답했다(`curl`로 재현 확인). 실사용 빈도가 낮다고 이미 문서화되어 있던 파일이라 제거했다 — `docs/ARCHITECTURE.md` §13.2에 근거를 기록했다.
 
 ---
 
@@ -201,11 +203,11 @@ Architecture → Implementation → Real Contents → Content Review
 
 | 항목 | 상태 | 설명 |
 |------|------|------|
-| slug 조회 헬퍼 미공유 | 잔존 | `app/projects/[slug]/page.tsx`, `app/analysis/[slug]/page.tsx`가 각자 `.find(item => item.slug === slug)`를 중복 구현한다. `lib/data`에 공유 헬퍼(`getProjectBySlug` 등)가 없다 |
-| Record Not Found이 Next.js 컨벤션을 쓰지 않음 | 잔존 | slug 조회 실패 시 두 `[slug]` 페이지 모두 인라인 텍스트만 렌더링하고 `notFound()`/`not-found.tsx`를 쓰지 않는다 (`docs/ARCHITECTURE.md` §13.1) |
-| Route 일관성 — Active Navigation 부분 구현 | 잔존 | `Header.tsx`의 활성 경로 판정이 완전 일치만 확인해 `/projects/[slug]`에서 "Projects" 항목이 활성 표시되지 않는다 (`docs/ARCHITECTURE.md` §13.3) |
-| Route 일관성 — Back Navigation 없음 | 잔존 | `[slug]` 상세 페이지와 Hero 컴포넌트 어디에도 목록으로 돌아가는 Link가 없다 (`docs/ARCHITECTURE.md` §13.3) |
-| Footer가 빈 플레이스홀더(Architecture Drift 겸함) | 잔존 | `components/layout/Footer/Footer.tsx`가 `{/* TODO */}` 뿐이다. `docs/INFORMATION_ARCHITECTURE.md` §4는 Footer가 "핵심 링크 + Contact 강조"를 노출한다고 서술하는데 코드에 전혀 없다 |
+| slug 조회 헬퍼 미공유 | 해결됨 (`feature/platform-routing`) | `lib/data/findBySlug.ts`(제네릭 `findBySlug<T extends { slug: string }>`)로 통합, `app/projects/[slug]/page.tsx`·`app/analysis/[slug]/page.tsx` 모두 이 헬퍼를 사용하도록 전환 |
+| Record Not Found이 Next.js 컨벤션을 쓰지 않음 | 해결됨 (`feature/platform-routing`) | 두 `[slug]` 페이지 모두 `notFound()`로 전환하고, `app/projects/[slug]/not-found.tsx`·`app/analysis/[slug]/not-found.tsx`를 세그먼트별로 추가. 전환 과정에서 루트 `app/loading.tsx`가 있으면 스트리밍 때문에 `notFound()`가 HTTP 200으로 응답되는 것을 발견해 함께 제거했다(`docs/ARCHITECTURE.md` §13.2) |
+| Route 일관성 — Active Navigation 부분 구현 | 해결됨 (`feature/platform-routing`) | `Header.tsx`가 `/projects` 완전 일치뿐 아니라 `/projects/`로 시작하는 하위 경로도 활성으로 판정하도록 수정(`/`만 완전 일치 유지) |
+| Route 일관성 — Back Navigation 없음 | 해결됨 (`feature/platform-routing`) | `docs/INFORMATION_ARCHITECTURE.md` §2.4/§2.6이 이미 서술한 "다른 프로젝트로 이동하는 내비게이션"을 두 상세 페이지 마지막에 추가(기존 `Button` 컴포넌트 재사용, 새 컴포넌트 없음) |
+| Footer가 빈 플레이스홀더(Architecture Drift 겸함) | 해결됨 (`feature/platform-routing`) | `docs/INFORMATION_ARCHITECTURE.md` §4가 서술한 "핵심 링크 + Contact 강조"를 구현 — Home/Projects/Analysis/Resume는 `Link`, Contact는 `Button(primary)`으로 강조. `getNavigation()`을 Header와 동일하게 재사용해 라벨 Drift를 막았다 |
 
 **Medium**
 

@@ -277,15 +277,17 @@ Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력�
 | Missing Field | `docs/DATA_MODEL.md` §5 "Required/Optional 원칙" — 모든 필드는 Required이며 빈 값은 `""`/`[]`로 표현한다. 옵셔널 필드가 없으므로 `undefined` 접근 자체가 구조적으로 발생하지 않는다 | 구조적으로 이미 보장됨 |
 | Invalid JSON | `data/*.json`은 런타임 fetch가 아니라 `import ... from "@/data/*.json"` 정적 ESM import로 로드된다(`lib/data/*.ts`). JSON 문법이 깨지면 런타임이 아니라 **빌드 타임에 실패**한다 — "런타임에 도달하는 Invalid JSON"은 이 아키텍처에서 구조적으로 발생할 수 없다 | 구조적으로 이미 보장됨 |
 | Empty Array | 목록형 컴포넌트(`ProjectGrid`, `AnalysisGrid`, `SkillSummary`, `ExperienceTimeline` 등)는 이미 길이 0을 확인해 Empty State 메시지를 렌더링한다(`docs/DESIGN_SYSTEM.md` §12 Empty States) | 이미 구현됨 |
-| Record Not Found (slug 조회 실패) | `app/projects/[slug]/page.tsx`, `app/analysis/[slug]/page.tsx`가 각자 `.find(slug)` 결과를 인라인 텍스트("Project Not Found" 등)로만 처리하고, Next.js의 `notFound()`/`not-found.tsx` 컨벤션을 쓰지 않는다 | **미비 — Technical Debt(`docs/PROJECT.md` §12.1 Platform Debt)** |
-| Loader 재사용 | slug 조회 로직(`.find(item => item.slug === slug)`)이 두 page 파일에 각각 중복 구현되어 있고, `lib/data`에 공유 헬퍼(예: `getProjectBySlug`)가 없다 | **미비 — Technical Debt** |
+| Record Not Found (slug 조회 실패) | `app/projects/[slug]/page.tsx`, `app/analysis/[slug]/page.tsx`가 `findBySlug()` 결과가 없으면 `notFound()`를 호출하고, 각각 `app/projects/[slug]/not-found.tsx`·`app/analysis/[slug]/not-found.tsx`가 렌더링한다 | 이미 구현됨(`feature/platform-routing`) |
+| Loader 재사용 | slug 조회 로직이 `lib/data/findBySlug.ts`의 제네릭 헬퍼(`findBySlug<T extends { slug: string }>`)로 통합되어, `getProjects()`/`getAnalysis()` 어느 배열에든 재사용된다 | 이미 구현됨(`feature/platform-routing`) |
 
 ### 13.2 Rendering Resilience
 
 | 항목 | 보장 방식 | 현재 상태 |
 |------|------------|-------------|
-| Loading State | Next.js App Router 컨벤션(`app/loading.tsx`)이 루트에 존재한다. 이 프로젝트는 전 페이지가 빌드 타임 정적 생성(SSG)이라 클라이언트가 실제로 로딩 화면을 볼 일이 거의 없다 — 향후 클라이언트 사이드 데이터 요청이 추가되기 전까지는 낮은 우선순위다 | 컨벤션 파일 존재(placeholder 문구), 현재 아키텍처상 실사용 빈도 낮음 |
+| Loading State | 없음(`feature/platform-routing`에서 제거) — 아래 참고 | `app/loading.tsx` 없음 |
 | Error Boundary | Next.js App Router의 `error.tsx` 컨벤션이 라우트 세그먼트를 감싸는 Error Boundary 역할을 자동으로 수행한다 — 별도의 커스텀 React Error Boundary 클래스는 프레임워크 컨벤션과 중복이라 만들지 않는다 | 루트 `app/error.tsx` 존재(placeholder 문구) |
+
+**Loading State를 제거한 이유**: `app/loading.tsx`(루트)가 존재하면 Next.js가 하위 모든 비동기 Server Component를 자동으로 Suspense 경계로 감싼다. 이 경계가 있으면 스트리밍이 시작된 뒤에야 `notFound()`가 평가되므로, 실제 HTTP 응답 상태 코드가 이미 커밋된 200으로 굳어버린다 — `curl`/모니터링 도구/일부 크롤러처럼 JS를 실행하지 않는 클라이언트에는 잘못된 slug 요청도 200으로 보인다(`feature/platform-routing`에서 직접 재현·확인). `app/loading.tsx` 자신의 기존 주석도 "이 프로젝트는 전 페이지가 동기 SSG라 로딩 화면을 볼 일이 거의 없다"고 이미 밝히고 있었다 — 실사용 가치가 낮은 파일이 Record Not Found의 route safety를 깨고 있었으므로 제거했다. 제거 후 `/projects/[slug]`·`/analysis/[slug]`의 잘못된 slug가 정확히 404를 반환함을 프로덕션 빌드로 재현 확인했다. 향후 실제 클라이언트 사이드 비동기 요청이 생기면, 그 라우트에 한정된 지역 `loading.tsx`를 그때 다시 검토한다(전역 파일로 되돌리지 않는다).
 
 ### 13.3 Navigation Resilience
 
@@ -293,12 +295,12 @@ Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력�
 
 | 항목 | 보장 방식 | 현재 상태 |
 |------|------------|-------------|
-| Active Navigation | `components/layout/Header/Header.tsx`가 `usePathname()`과 `item.path`를 비교해 `aria-current="page"`를 부여한다 | 🔶 부분 — 최상위 경로(`/projects` 등)는 정확히 표시되지만, `pathname === item.path`가 완전 일치만 확인해 `/projects/[slug]`처럼 하위 경로에서는 "Projects" 항목이 활성 표시되지 않는다 — **미비, Technical Debt** |
-| Breadcrumb | `docs/INFORMATION_ARCHITECTURE.md` §4가 이미 "모든 흐름은 최대 2단계(목록→상세) 이내" + "언제든 Header/Footer로 다른 최상위 페이지 이동 가능"을 설계 원칙으로 명시했다 | Breadcrumb 컴포넌트 없음 — 이는 미구현이 아니라 **기존 IA 결정과 일치하는 상태일 가능성이 높다.** 깊이가 2단계로 고정되어 있는 한 새로 만들 필요가 없다(과설계 방지). 사이트 깊이가 실제로 늘어나는 시점에 재검토한다 |
+| Active Navigation | `components/layout/Header/Header.tsx`가 `usePathname()`과 `item.path`를 비교해 `aria-current="page"`를 부여한다. `/`만 완전 일치, 나머지는 완전 일치 또는 `${item.path}/`로 시작하는 하위 경로도 활성으로 판정한다 | 이미 구현됨(`feature/platform-routing`) — `/projects/[slug]`에서도 "Projects"가 정확히 활성 표시된다 |
+| Breadcrumb | `docs/INFORMATION_ARCHITECTURE.md` §4가 이미 "모든 흐름은 최대 2단계(목록→상세) 이내" + "언제든 Header/Footer로 다른 최상위 페이지 이동 가능"을 설계 원칙으로 명시했다 | Breadcrumb 컴포넌트 없음 — 이는 미구현이 아니라 **기존 IA 결정과 일치하는 상태다.** 깊이가 2단계로 고정되어 있는 한 새로 만들지 않는다(과설계 방지). 사이트 깊이가 실제로 늘어나는 시점에 재검토한다 |
 | Deep Link | 카드→상세 링크(`ProjectCard`/`AnalysisCard`)는 전부 `data/*.json`의 실제 `slug`로 생성되어 존재하지 않는 경로를 만들지 않는다 | 이미 보장됨 — §11 Identifier Rule과 동일한 slug 기반 구조 덕분 |
-| Back Navigation | `[slug]` 상세 페이지(`app/projects/[slug]/page.tsx`, `app/analysis/[slug]/page.tsx`)와 그 Hero 컴포넌트 어디에도 목록 페이지로 돌아가는 Link가 없다 | **미비 — Technical Debt** |
+| Back Navigation | `[slug]` 상세 페이지가 마지막에 목록으로 돌아가는 `Button`(secondary)을 렌더링한다 — `docs/INFORMATION_ARCHITECTURE.md` §2.4/§2.6의 "다른 프로젝트로 이동하는 내비게이션"에 대응 | 이미 구현됨(`feature/platform-routing`) |
 | Broken Link | 전체 코드베이스의 내부 `href`를 실제 라우트와 대조한 결과, 존재하지 않는 경로를 가리키는 링크는 없다 | 이미 보장됨 |
-| Footer 네비게이션 | `docs/INFORMATION_ARCHITECTURE.md` §4는 Footer가 "글로벌 내비게이션과 동일한 핵심 링크 + Contact 강조"를 노출한다고 서술한다 | **Architecture Drift** — `components/layout/Footer/Footer.tsx`는 `{/* TODO */}` 뿐인 빈 플레이스홀더다. 문서가 서술하는 동작이 코드에 전혀 없다 — §18 Architecture Drift에 기록 |
+| Footer 네비게이션 | `docs/INFORMATION_ARCHITECTURE.md` §4가 서술한 "글로벌 내비게이션과 동일한 핵심 링크 + Contact 강조"를 구현했다 — Home/Projects/Analysis/Resume는 `Link`, Contact는 `Button(primary)`으로 강조. `getNavigation()`을 Header와 동일하게 재사용해 라벨이 어긋나지 않는다 | 이미 구현됨(`feature/platform-routing`) — 이전에 기록된 Architecture Drift 해소 |
 
 ### 13.4 Compatibility
 
