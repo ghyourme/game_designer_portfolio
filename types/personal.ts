@@ -1,10 +1,16 @@
 /**
  * PersonalWork
  *
- * 참고 문서: docs/DATA_MODEL.md - 3. 데이터 디렉토리 구조 (personal.json : 개인 작업물)
+ * 참고 문서: docs/DATA_MODEL.md - 13. 개인 작업물 데이터 모델
  *
- * docs/DATA_MODEL.md는 personal.json의 세부 필드를 아직 정의하지 않았다.
- * 문서가 구체화되기 전까지 필드를 임의로 만들지 않고 미확정 타입으로 남긴다.
+ * data/personal.json의 각 항목이 따르는 구조를 정의한다. 상세 라우트가 없어
+ * (docs/INFORMATION_ARCHITECTURE.md §2.7 범위 참고) slug/featured는 두지 않았다.
+ * 모든 필드는 Required다 — 콘텐츠가 없는 항목은 빈 문자열/빈 배열로 표현한다.
  */
-// TODO: docs/DATA_MODEL.md에 개인 작업물의 세부 필드가 정의되면 구체적인 interface로 대체한다.
-export type PersonalWork = Record<string, unknown>;
+export interface PersonalWork {
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  link: string;
+}

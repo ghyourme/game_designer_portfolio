@@ -444,7 +444,7 @@ Release
 
 | 허용 경로 | 의미 | 예시 |
 |-----------|------|------|
-| Architecture Decision | 실제로 필요한 새 구조적 결정이 생겼을 때 | Personal Works/Contact의 데이터 소스 확정(`docs/PROJECT.md` §11 미결 항목) |
+| Architecture Decision | 실제로 필요한 새 구조적 결정이 생겼을 때 | Personal Works/Contact의 데이터 소스 확정 — `feature/contact-personal-infra`에서 해결됨(Contact는 `profile.json` 확장, Personal Works는 `docs/DATA_MODEL.md` §13 신규 정의, `docs/PROJECT.md` §11 참고) |
 | Architecture Drift | 문서와 코드가 실제로 어긋난 것을 발견했을 때 | `docs/INFORMATION_ARCHITECTURE.md` §4 vs 빈 `Footer.tsx`(`docs/PROJECT.md` §12.1) |
 | Technical Debt | 이미 기록된 부채를 실제로 해소할 때 | `docs/PROJECT.md` §12의 각 도메인 부채 항목 |
 

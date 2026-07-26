@@ -164,8 +164,8 @@ Architecture → Implementation → Real Contents → Content Review
 | Resume | ✅ | ✅ | 🔶 (`personalInfo`만 placeholder, `career`/`education` 등은 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
 | **Projects** | ✅ | ✅ | ❌ (`data/projects.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | **Infrastructure 완료 + Content Governance 완료 — 실제 프로젝트 미확정 (Evidence Inventory는 `docs/projects/evidence-template.md` 템플릿 상태로 대기)** |
 | Analysis | ✅ | ✅ | ❌ (`data/analysis.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 (Review Checklist 미구축 — §12 참고) |
-| Personal Works | ❌ (`docs/DATA_MODEL.md`에 세부 필드 미정) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 설계 전 단계 |
-| Contact | 🔶 (연락처 데이터 소스 미정 — `profile.json` 확장 vs `resume.json.personalInfo` 재사용) | ❌ | ❌ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Architecture Decision 필요 |
+| Personal Works | ✅ (`docs/DATA_MODEL.md` §13, `feature/contact-personal-infra`) | ✅ | ❌ (`data/personal.json`이 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
+| Contact | ✅ (`profile.json` 확장으로 확정 — `docs/DATA_MODEL.md` §12/§12.1, `feature/contact-personal-infra`) | ✅ | 🔶 (`email`/`contactIntro`만 placeholder, `links`는 빈 배열) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | Infrastructure 완료, Content 단계 예정 |
 
 이전에 통용되던 "Projects Feature 진행 중"이라는 표현은 Architecture/Implementation과 Real Contents 이후 단계를 구분하지 않아 폐기한다. 정확한 표현은 **"Projects Infrastructure 완료 + Content Governance 완료 — Projects Content 단계 진입"**이다. "Content Governance 완료"는 §10 Quality Gate의 4·6·7단계(Content/Recruiter/Senior Planner Review)를 검증할 체크리스트가 `docs/CONTENT_GUIDE.md` §10에 구축되었다는 뜻이며, Projects의 Real Contents 자체는 여전히 ❌다 — 실제 프로젝트명이 확정되면 그 slug를 딴 `feature/projects-<slug>-content` 브랜치에서 콘텐츠를 작성한다 (근거 없는 프로젝트명을 미리 정하지 않는다).
 
@@ -180,8 +180,8 @@ Architecture → Implementation → Real Contents → Content Review
 | Home | ✅ | ✅ (Introduction/FeaturedProjects/FeaturedAnalysis 확인됨) | ✅ (Loading 제거, Error Boundary만) | ✅ (`suffixTitle: false`로 중복 방지) | ⬜ (이미지 없음) | |
 | About | ✅ | ✅ (CareerTimeline/SkillOverview 확인됨) | ✅ (동일) | ✅ | ⬜ (이미지 없음) | |
 | Resume | ✅ | ✅ (SkillSummary/ExperienceTimeline/Education/ProjectExperience 확인됨) | ✅ (동일) | ✅ | ⬜ (이미지 없음) | |
-| Personal Works | ⬜ | ⬜ | ✅ (동일) | ✅ | ⬜ | Architecture 자체가 미확정(위 §11 표 참고)이지만 메타데이터는 이미 갖춤 |
-| Contact | ⬜ | ⬜ | ✅ (동일) | ✅ | ⬜ | Architecture Decision 필요(위 §11 표 참고)이지만 메타데이터는 이미 갖춤 |
+| Personal Works | ✅ (`getPersonal()` + `PersonalGrid`/`PersonalCard`) | ✅ (`PersonalGrid`, 현재 `data/personal.json`이 빈 배열이라 항상 이 경로) | ✅ (동일) | ✅ | ⬜ (이미지 필드 자체가 없음, §13 참고 — Analysis와 동일한 이유) | 구현 완료(`feature/contact-personal-infra`). 상세 라우트 없음(§2.7 범위 참고) — `PersonalCard`는 `link`이 있을 때만 외부 링크를 노출 |
+| Contact | ✅ (`getProfile()` 재사용) | ✅ (`links` 배열이 비었을 때 `ContactInfo`가 링크 목록 렌더링을 생략 — 목록형 페이지가 아니라 "결과 없음" 전체 화면 상태는 해당 없음) | ✅ (동일) | ✅ | ⬜ (이미지 없음) | 구현 완료(`feature/contact-personal-infra`). 데이터 소스는 `profile.json` 확장으로 확정(§12/§12.1) |
 
 `⬜ 미확인` 항목은 다음 구현 브랜치에서 실제로 코드를 열어 확인한 뒤 갱신한다. **Navigation은 Feature별이 아니라 전역이라 표에 별도 컬럼을 두지 않는다** — `Header`의 Active Navigation과 `Footer`는 `feature/platform-routing`에서 7개 Feature 전체에 동일하게 해소되었다(아래 §12.1 참고). **robots.txt/sitemap.xml은 Feature 단위가 아니라 사이트 전체 라우트를 다루므로 이 표에 별도 행을 두지 않는다** — `docs/ARCHITECTURE.md` §14.1 참고. **Accessibility도 대부분 전역이라 별도 컬럼을 두지 않는다**(`docs/ARCHITECTURE.md` §13.5) — Skip Link/Focus Visibility/Reduced Motion은 `MainLayout`/`globals.css` 변경으로 7개 Feature 전체에 동일 적용되었고(`feature/platform-accessibility`), Feature별로 다른 부분은 Projects/Analysis의 `ProjectCard`/`AnalysisCard`(반복 링크 텍스트 구분)와 Projects의 `Gallery`/`Modal`(포커스 트랩·복귀, 접근 가능한 이름)뿐이다.
 

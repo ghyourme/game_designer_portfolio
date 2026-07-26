@@ -340,10 +340,47 @@ profile.json은 §3에 이름만 있고 세부 필드가 정의되어 있지 않
 | problemSolving | 문제 해결 방식 | DesignPhilosophy |
 | playerExperience | 플레이어 경험을 바라보는 관점 | DesignPhilosophy |
 | coreStrengths | 자기 서술형(정성적) 핵심 강점 목록 | CoreStrength |
+| email | 연락용 이메일 주소 | ContactInfo |
+| contactIntro | 연락 안내 문구 | ContactIntro |
+| links | 소셜/포트폴리오 링크 목록 | ContactInfo |
 
 profile.json은 이력서(§7)와 마찬가지로 목록이 아닌 단일 레코드이므로, §4 공통 데이터 규칙(id/slug/tags/status/order 등)을 따르지 않는다.
 
 `coreStrengths`는 `skills.json`(§8)이 관리하는 정량적 기술 분류와 역할이 다르다 — `skills.json`은 분류·숙련도를 데이터로 관리하는 반면, `coreStrengths`는 자기 서술형 강점 키워드 목록일 뿐이다.
+
+### 12.1 links 필드 구조 (ContactLink)
+
+LinkedIn, X(Twitter), 개인 포트폴리오, 블로그 등 연락처 페이지에서 노출할 외부 링크를 나열한다. Project Model의 `links`(§5.8, `ProjectLink`)와 형태는 비슷하지만 별도 타입으로 정의한다 — 하나는 프로젝트의 참고 자료(GitHub/Figma/Notion/YouTube/배포 URL)를, 다른 하나는 방문자가 후보자에게 연락하거나 팔로우하는 개인 채널을 가리켜 도메인이 다르다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| type | ContactLinkType | 링크 플랫폼. `"linkedin" \| "twitter" \| "portfolio" \| "blog" \| "other"` |
+| label | string | 링크 설명 (예: "LinkedIn", "개인 블로그") |
+| url | string | 링크 주소 |
+
+`email`은 `links` 배열에 포함하지 않고 별도 필드로 둔다 — "이메일 보내기" CTA(`docs/INFORMATION_ARCHITECTURE.md` §2.9)가 `mailto:` 링크로 항상 우선 노출되어야 하는 필수 연락 수단이라, 있을 수도 없을 수도 있는 소셜 링크 목록과 같은 배열에 섞지 않는다.
+
+> **Architecture Decision (`feature/contact-personal-infra`)**: Contact의 데이터 소스가 `docs/PROJECT.md` §11에 "미정(`profile.json` 확장 vs `resume.json.personalInfo` 재사용)"으로 남아있었다. `profile.json` 확장으로 결정했다 — About과 마찬가지로 Contact도 목록이 아닌 단일 레코드이고, `profile.json`은 이미 그 목적(정체성 정보의 단일 소스)으로 쓰이고 있어 새 파일을 만들 이유가 없다. `resume.json.personalInfo`(§7)는 이력서라는 문맥에 종속된 축약 정보(이력서 다운로드 대상)라, 연락처 페이지가 이를 재사용하면 "이력서 맥락"과 "연락 맥락"이 뒤섞인다. 새 필드는 `email`/`contactIntro`/`links` 3개뿐이며, 기존 9개 필드는 변경하지 않았다.
+
+---
+
+## 13. 개인 작업물 데이터 모델
+
+`personal.json`은 §3에 이름만 있고 세부 필드가 정의되어 있지 않았다. `docs/INFORMATION_ARCHITECTURE.md` §2.7이 실제로 사용하는 것만 정의한다 — Project Model(§5)·Profile Model(§12)과 동일한 원칙이다.
+
+**Required/Optional 원칙**: Project Model(§5)과 동일하다 — 모든 필드는 Required이며, 콘텐츠가 없는 항목은 빈 문자열/빈 배열로 표현한다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | string | 고유 식별자 (목록 렌더링 시 React key로 사용) |
+| title | string | 작업물 제목 |
+| description | string | 작업물 설명 |
+| tags | string[] | 검색 및 분류용 태그 |
+| link | string | 외부 링크 (저장소, 플레이 링크, 게시물 등) |
+
+**Personal Works에 없는 필드**: `slug`를 두지 않는다 — `docs/INFORMATION_ARCHITECTURE.md` §2.7이 "이번 IA 범위에는 Personal Work Detail 페이지가 포함되어 있지 않다"고 명시했고, 상세 라우트가 없으면 라우팅용 식별자가 필요 없다. 같은 이유로 `featured`도 두지 않는다 — Home의 featured 필터(§2.1)는 Project/Analysis만 대상으로 하며, Personal Works를 노출 대상으로 언급하지 않는다. 필요해지면 그때 이 문서를 먼저 갱신한다(§2.7 "범위 참고"와 동일한 원칙).
+
+`link`이 가리키는 대상 하나로 "항목별 상세 보기 또는 외부 링크"(§2.7 CTA)를 모두 처리한다 — 아코디언/모달 확장은 실제로 내용이 길어지는 사례가 생기기 전까지 배치하지 않는다(과설계 방지, `docs/DESIGN_SYSTEM.md` §6.2 ExternalLinks 항목 참고).
 
 ---
 

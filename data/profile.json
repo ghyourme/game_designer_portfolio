@@ -7,5 +7,8 @@
   "designApproach": "게임 설계 관점 placeholder",
   "problemSolving": "문제 해결 방식 placeholder",
   "playerExperience": "플레이어 경험 관점 placeholder",
-  "coreStrengths": ["Systems Thinking", "Player-first Mindset", "Communication", "Problem Solving"]
+  "coreStrengths": ["Systems Thinking", "Player-first Mindset", "Communication", "Problem Solving"],
+  "email": "placeholder@example.com",
+  "contactIntro": "연락 안내 문구 placeholder",
+  "links": []
 }
