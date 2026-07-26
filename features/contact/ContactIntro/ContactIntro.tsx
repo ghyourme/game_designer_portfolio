@@ -15,7 +15,7 @@ export function ContactIntro() {
   const profile = getProfile();
 
   return (
-    <Section>
+    <Section className="border-b border-border-default bg-gradient-to-b from-background-elevated to-background-base">
       <Container>
         <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl lg:text-5xl">
           Contact

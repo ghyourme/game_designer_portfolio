@@ -70,25 +70,25 @@ export default async function AnalysisDetailPage({
   return (
     <>
       <AnalysisHero analysis={analysis} />
-      <DetailSection title="시스템 분석">
+      <DetailSection title="시스템 분석" tone="muted">
         <AnalysisDimensionSection
           dimension={analysis.systemAnalysis}
           keyElementLabel="핵심 시스템"
         />
       </DetailSection>
-      <DetailSection title="콘텐츠 분석">
+      <DetailSection title="콘텐츠 분석" tone="base">
         <AnalysisDimensionSection
           dimension={analysis.contentAnalysis}
           keyElementLabel="핵심 콘텐츠"
         />
       </DetailSection>
-      <DetailSection title="UX 분석">
+      <DetailSection title="UX 분석" tone="muted">
         <AnalysisDimensionSection
           dimension={analysis.uxAnalysis}
           keyElementLabel="핵심 경험"
         />
       </DetailSection>
-      <DetailSection title="결론">
+      <DetailSection title="결론" tone="base">
         <AnalysisConclusion conclusion={analysis.conclusion} />
       </DetailSection>
       <Section>

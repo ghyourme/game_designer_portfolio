@@ -60,7 +60,7 @@ Each entry below defines a component's responsibility and intended usage, consis
 - **Badge** — Highlights a short status or distinction (e.g., "Featured," "Case Study") drawing brief attention without competing with primary content.
 - **Navigation** — The global navigation bar defined in `docs/ARCHITECTURE.md`, providing consistent, persistent access to all top-level pages.
 - **Footer** — The secondary navigation and supporting information area (contact links, resume access, meta information), present consistently across all pages.
-- **Section** — A structural wrapper providing consistent spacing, width, and heading treatment for a distinct block of content within a page.
+- **Section** — A structural wrapper providing consistent spacing, width, and heading treatment for a distinct block of content within a page. Accepts a `tone` (`base` | `muted`) so consecutive sections on a page can alternate background using the existing `background-elevated` token — no new color tokens, just rhythm (`feature/platform-visual-polish`). `DetailSection` (Section 6.1) passes this through unchanged.
 - **Hero** — The introductory block at the top of a page (most prominently Home), responsible for immediate first-impression communication of identity and focus.
 - **Timeline** — Presents chronological information (e.g., experience history, a project's design process) in a structured, sequential visual form.
 - **Accordion** — Progressively discloses supplementary detail (e.g., extended explanation within a case study) without consuming space until the visitor chooses to expand it.
@@ -82,10 +82,12 @@ Project Detail and Analysis Detail are built from the same Detail page skeleton 
 
 | Component | Props |
 |-----------|-------|
-| DetailSection | `{ title: string, children?: ReactNode }` |
+| DetailSection | `{ title: string, tone?: "base" \| "muted", children?: ReactNode }` |
 | MetaInfo | `{ label: string, value: string }` |
 
 > **변경 이력 (feature/detail-ui-foundation)**: 이전 이름은 `ProjectSection`/`ProjectInfo`였고 `features/projects/` 아래 있었다. Analysis Detail도 동일 컴포넌트를 그대로 재사용하면서 `Project` 접두사가 실제 소유 범위(두 Feature 모두)보다 좁아졌다 — Section 7이 금지하는 "특정 소비자에 종속된 이름"과 같은 문제였다. `DetailSection`/`MetaInfo`로 이름을 바꾸고 `components/common/`으로 옮겨 코드와 문서를 동기화했다.
+>
+> **변경 이력 (feature/platform-visual-polish)**: `tone`을 추가해 Section의 `tone` prop을 그대로 통과시킨다 — Project Detail 9개, Analysis Detail 4개 섹션이 번갈아 배경을 바꿔 시각적으로 구분되도록, 호출부(`page.tsx`)가 순서대로 `base`/`muted`를 지정한다. 새 컴포넌트나 새 색상 토큰 없이 기존 Section 확장만으로 해결했다.
 
 ### 6.2 Project Detail Components
 

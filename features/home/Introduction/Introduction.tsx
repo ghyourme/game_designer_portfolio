@@ -26,7 +26,7 @@ export function Introduction() {
   const allSkills = flattenSkills(getSkills());
 
   return (
-    <Section>
+    <Section tone="muted">
       <Container>
         {allSkills.length === 0 ? (
           <p className="text-base text-text-secondary">등록된 기술 정보가 없습니다.</p>

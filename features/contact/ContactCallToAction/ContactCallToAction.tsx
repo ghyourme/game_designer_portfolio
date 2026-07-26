@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/Button";
  */
 export function ContactCallToAction() {
   return (
-    <Section>
+    <Section tone="muted">
       <Container>
         <div className="flex flex-wrap gap-4">
           <Button href="/resume" variant="secondary">

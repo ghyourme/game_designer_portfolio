@@ -17,7 +17,7 @@ export function Education() {
   const { education } = getResume();
 
   return (
-    <Section>
+    <Section tone="muted">
       <Container>
         <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
           Education

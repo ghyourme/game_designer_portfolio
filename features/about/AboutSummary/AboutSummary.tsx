@@ -15,7 +15,7 @@ export function AboutSummary() {
   const profile = getProfile();
 
   return (
-    <Section>
+    <Section tone="muted">
       <Container>
         <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
           {profile.summary}

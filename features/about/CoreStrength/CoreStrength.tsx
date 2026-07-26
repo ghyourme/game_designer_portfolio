@@ -20,7 +20,7 @@ export function CoreStrength() {
   const profile = getProfile();
 
   return (
-    <Section>
+    <Section tone="muted">
       <Container>
         <div className="flex items-center gap-3">
           <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">

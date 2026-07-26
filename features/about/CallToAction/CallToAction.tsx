@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/Button";
  */
 export function CallToAction() {
   return (
-    <Section>
+    <Section tone="muted">
       <Container>
         <p className="text-lg text-text-secondary">
           프로젝트, 이력서, 연락처로 이어지는 CTA 영역입니다.

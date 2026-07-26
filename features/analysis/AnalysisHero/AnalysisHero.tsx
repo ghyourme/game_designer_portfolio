@@ -24,7 +24,7 @@ export interface AnalysisHeroProps {
 
 export function AnalysisHero({ analysis }: AnalysisHeroProps) {
   return (
-    <Section>
+    <Section className="border-b border-border-default bg-gradient-to-b from-background-elevated to-background-base">
       <Container>
         {analysis.featured && <Badge variant="featured">Featured</Badge>}
         <h1 className="mt-2 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">

@@ -28,7 +28,7 @@ export function PersonalGrid({
   }
 
   return (
-    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3">
       {works.map((work) => (
         <PersonalCard key={work.id} work={work} />
       ))}

@@ -25,14 +25,15 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANT_CLASSES: Record<Required<ButtonProps>["variant"], string> = {
-  primary: "bg-brand-primary text-text-inverse hover:bg-brand-primary/90",
+  primary:
+    "bg-brand-primary text-text-inverse shadow-sm hover:bg-brand-primary/90 hover:shadow-md",
   secondary:
     "bg-transparent text-brand-primary border border-brand-primary hover:bg-brand-primary/10",
   tertiary: "bg-transparent text-text-primary hover:bg-background-muted",
 };
 
 const BASE_CLASSES =
-  "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] disabled:pointer-events-none disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-focus)] disabled:pointer-events-none disabled:opacity-50 disabled:hover:translate-y-0";
 
 export function Button({
   variant = "primary",

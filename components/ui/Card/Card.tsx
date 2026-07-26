@@ -8,8 +8,9 @@ import type { ReactNode } from "react";
  * 책임:
  * - 프로젝트, 분석, 개인 작업 등 단일 콘텐츠 항목을 목록/그리드에서
  *   훑어보기 쉬운 축약된 형태로 요약해 보여준다. (Progressive Disclosure)
- * - 목록 → 상세로 이어지는 진입점 역할을 하므로, hover 시 elevation을 살짝 올려
- *   상호작용 가능함을 알린다.
+ * - 목록 → 상세로 이어지는 진입점 역할을 하므로, hover 시 elevation을 올리고
+ *   테두리를 브랜드 색으로 살짝 물들여 상호작용 가능함을 더 뚜렷하게 알린다
+ *   (feature/platform-visual-polish — 기존에는 그림자 변화만 있어 인지하기 어려웠다).
  */
 export interface CardProps {
   children?: ReactNode;
@@ -18,7 +19,7 @@ export interface CardProps {
 
 export function Card({ children }: CardProps) {
   return (
-    <div className="rounded-lg border border-border-default bg-background-base p-6 shadow-sm transition-shadow duration-[var(--duration-normal)] ease-[var(--ease-standard)] hover:shadow-md">
+    <div className="rounded-lg border border-border-default bg-background-base p-6 shadow-sm transition-all duration-[var(--duration-normal)] ease-[var(--ease-standard)] hover:-translate-y-0.5 hover:border-brand-primary/40 hover:shadow-lg">
       {children}
     </div>
   );
