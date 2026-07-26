@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# content editor local backups (tools/content-editor/README.md 참고)
+/data/.backups/

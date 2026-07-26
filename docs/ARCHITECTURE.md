@@ -88,6 +88,7 @@ JSON 기반 데이터가 UI를 결정한다.
 - docs/ : 설계 문서 (Source of Truth — 프로젝트 전체에 적용되는 규칙/구조만 다룬다)
 - docs/projects/ : 프로젝트별 콘텐츠 작업 자료 (예: Evidence Inventory). Source of Truth가 아니다 — `data/*.json`에 반영되기 전 개별 프로젝트 하나에 대해서만 유효한 작업 중 자료이며, `docs/CONTENT_GUIDE.md` §14 Traceability Rule의 "작성 워크시트" 개념을 실제 파일로 구현한 것이다. 프로젝트명이 확정되지 않은 동안에는 `docs/projects/evidence-template.md` 하나만 두고, 실제 프로젝트가 확정되어 `slug`(`docs/DATA_MODEL.md` §5.1)가 정해지면 그 시점에 템플릿을 `docs/projects/<slug>/evidence.md`로 복사해 개별 폴더를 만든다 — 근거 없는 프로젝트명으로 폴더를 미리 만들지 않는다
 - prompts/ : AI 프롬프트
+- tools/ : 배포되지 않는 로컬 전용 개발 도구. `tools/content-editor/`(§10 참고)가 첫 사례다 — Next.js 앱이 이 폴더를 import하지 않으며, `next build`/Vercel 배포 대상에도 포함되지 않는다
 
 ---
 
@@ -139,6 +140,8 @@ JSON 기반 데이터가 UI를 결정한다.
 - 관리자 페이지
 - CMS
 - 데이터베이스 설계
+
+**`tools/content-editor/`는 이 제외 목록과 충돌하지 않는다**: 배포되는 포트폴리오 사이트(이 아키텍처가 다루는 대상) 자체에는 여전히 백엔드/인증/관리자 페이지/CMS/DB가 없다. `tools/content-editor/`는 로컬(`127.0.0.1`)에서만 실행되는 별도의 개발 스크립트로, `npm run content-editor`로 직접 실행한 사람만 접근할 수 있어 인증이 필요 없다 — Next.js 라우트가 아니고, `next build` 결과물에 포함되지 않으며, Vercel에 배포되지 않는다. 데이터를 데이터베이스가 아닌 `data/*.json` 파일에 직접 읽고 쓴다는 점도 "JSON 우선" 원칙(CLAUDE.md §6)과 그대로 일치한다.
 
 ---
 

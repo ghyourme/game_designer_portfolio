@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "content-editor": "node tools/content-editor/server.js"
   },
   "dependencies": {
     "next": "16.2.10",
