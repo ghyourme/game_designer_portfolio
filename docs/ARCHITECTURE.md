@@ -414,6 +414,26 @@ Release
 
 이 게이트는 `docs/PROJECT.md` §10 Content Quality Gate와 독립적이다 — Platform Release는 콘텐츠가 비어 있어도 통과할 수 있어야 한다(§1 목적). 실제로 배포하는 결정은 항상 사용자가 내리며(`docs/DEPLOYMENT.md` §8 "Claude Code는 배포 준비까지만 수행"), 이 절은 그 이전 단계에서 무엇을 확인해야 하는지만 정의한다.
 
+### 16.1 QA 실행 결과 (`feature/platform-qa`)
+
+위 게이트를 실제로 실행한 결과다. 각 단계를 통과(✅) / 부분 통과(🔶) / 미실행(⬜)으로 표시하고, 무엇을 근거로 판단했는지 남긴다 — 확인하지 않은 것을 확인했다고 기록하지 않는다.
+
+**Vercel 연결 및 배포**: 이번 브랜치 진행 중 사용자 승인을 받아 Vercel 프로젝트(`yourme/game-designer-portfolio`)를 생성하고 GitHub 저장소(`ghyourme/game_designer_portfolio`)와 연결했다(Login Connection은 사용자가 직접 추가). 최초 배포라 Vercel이 이 배포를 Production으로 처리했다 — `main` 병합 시 실제 Production이 갱신되는 `docs/DEPLOYMENT.md`의 흐름과는 별개로, 지금은 `feature/platform-qa`의 스냅샷이 Production 별칭에 올라가 있는 상태다.
+
+| 단계 | 결과 | 근거 |
+|------|------|------|
+| Feature Complete | 🔶 | Platform 축(§15)은 7개 Feature 전체 충족(`docs/PROJECT.md` §11.1). Content 축(§10)은 Projects/Analysis 등 대부분 미충족 — Platform Release는 이 축과 독립적이므로 게이트를 막지 않는다 |
+| Platform QA / Page QA / Global QA | ✅ | 로컬 프로덕션 빌드에 이어 **실제 배포 URL**(`https://game-designer-portfolio-yourme.vercel.app`)에서 7개 정적 페이지 전체를 curl로 재확인 — 전부 200, Skip Link·`<main id="main-content">`·Footer(Home/Projects/Analysis/Resume/Contact 동일)·Active Navigation(`aria-current="page"`) 렌더링 확인 |
+| Accessibility QA | 🔶 | Skip Link·`aria-current`·Footer/Header 구조는 실제 배포 URL에서 curl로 재확인. Modal 포커스 트랩·Tab 순환처럼 실제 키 입력이 필요한 항목은 브라우저 자동화 도구가 이 환경에 없어(Playwright 등 미설치) 코드 리뷰로만 재확인했다(실제 키 입력 시뮬레이션은 아님) |
+| Navigation QA | 🔶 | 실제 배포 URL에서 Header/Footer 링크 전체와 `/projects/x`·`/analysis/x` 모두 정상 404를 재확인. `/projects/[slug]`의 Active Navigation 하이라이트는 `data/projects.json`이 비어 있어 실제 상세 페이지가 없어 재확인 불가 — `feature/platform-routing`에서 동일 시나리오를 직접 관찰해 정상 동작을 이미 확인했고 이후 로직 변경 없음 |
+| SEO / Performance 완료 | ✅ | `feature/platform-seo`/`feature/platform-performance`에서 코드 검증 완료. **실제 배포에서 새로 발견한 버그**: `NEXT_PUBLIC_SITE_URL` 미설정으로 canonical/OG/sitemap/robots가 `localhost:3000`을 가리키고 있었다 — Vercel Production 환경 변수 설정 후 재배포해 해결(`docs/PROJECT.md` §12.1) |
+| Cross Browser QA | ⬜ | 미실행 — Chrome/Edge/Firefox/Safari를 실제로 구동할 브라우저 자동화 도구가 이 환경에 없다. Tailwind CSS와 표준 HTML/CSS API만 사용해 구조적 위험은 낮다고 판단하지만(§13.4), 실제 시각적 검증은 사람이 직접 하거나 별도 CI(BrowserStack 등) 도입이 필요하다 |
+| Device QA | ⬜ | 미실행 — 실 기기/에뮬레이터가 없다. `Container`/`Gallery`의 반응형 Tailwind 클래스(`sm:`/`lg:` 브레이크포인트)가 코드에 존재함을 확인했을 뿐, 실제 렌더링은 검증하지 못했다 |
+| Build 성공 | ✅ | `tsc --noEmit`/`eslint`/`next build` 전부 통과(§23 검증 결과) |
+| Deploy / Release | ✅ | 사용자 승인 하에 Vercel Preview/Production 배포 완료, 실제 URL에서 라우트 전체 재검증 완료 |
+
+**결론**: 코드·로컬·실제 배포 URL로 검증 가능한 항목은 전부 통과했고, 배포 과정에서 프로덕션 전용 버그(SITE_URL 미설정) 하나를 발견해 즉시 수정했다. 브라우저 자동화가 필요한 항목(Cross Browser/Device QA)만 이 환경의 도구 한계로 미실행 상태로 남아 있다 — 임의로 통과 처리하지 않는다.
+
 ---
 
 ## 17. Architecture Evolution Policy

@@ -217,6 +217,7 @@ Architecture → Implementation → Real Contents → Content Review
 | OpenGraph 없음 | 해결됨 (`feature/platform-seo`) | `buildMetadata`가 title/description/url/siteName/type을 채우고, 실제 이미지가 있을 때만(Project Detail `cover`) image를 추가한다 |
 | sitemap/robots 없음 | 해결됨 (`feature/platform-seo`) | `app/robots.ts`(전체 allow) + `app/sitemap.ts`(정적 7개 + 실제 slug만) 추가 |
 | canonical 없음 | 해결됨 (`feature/platform-seo`) | `buildMetadata`가 모든 페이지에 자기 자신을 가리키는 canonical을 설정 |
+| Production 배포에서 canonical/OG/sitemap/robots가 `localhost:3000`을 가리킴 | 해결됨 (`feature/platform-qa`) | `feature/platform-seo`에서 만든 `SITE_URL`(`lib/seo/siteUrl.ts`)은 코드상 정확했지만, Vercel 프로젝트에 `NEXT_PUBLIC_SITE_URL` 환경 변수가 설정되지 않아 프로덕션 빌드가 로컬 기본값(`http://localhost:3000`)으로 폴백했다 — 실제 배포 후 `curl`로 직접 확인해서만 발견할 수 있었던 버그다. Vercel Production 환경에 `NEXT_PUBLIC_SITE_URL=https://game-designer-portfolio-yourme.vercel.app`를 설정하고 재배포해 해결했다. Preview 배포(브랜치별 URL)는 여전히 이 값이 없어 localhost로 폴백한다 — 프리뷰는 크롤러가 색인하지 않아 우선순위가 낮다고 판단해 이번엔 그대로 두었다 |
 
 **Low**
 
@@ -224,7 +225,7 @@ Architecture → Implementation → Real Contents → Content Review
 |------|------|------|
 | next/image 미사용 | 해결됨 (`feature/platform-performance`) | Gallery 썸네일을 `fill`+`sizes`로 전환(ESLint `no-img-element` 경고 2건 중 1건 해소). 확대 보기 이미지는 원본 비율 유지가 우선이라 의도적으로 `<img>` 유지 — `docs/ARCHITECTURE.md` §14.2에 근거 기록 |
 | dynamic import 미사용 | 검토 완료, 미적용(재검토 조건 명시) | `.next/static/chunks` 실측 결과 무거운 서드파티 의존성 자체가 없고(package.json에 next/react/react-dom 외 없음), 자체 컴포넌트는 전부 수 KB 수준이라 지금 적용하면 이득 없이 복잡도만 는다. 실제 무거운 라이브러리나 컴포넌트가 추가되는 시점에 재검토한다 |
-| Cross Browser / Device 검증 없음 | 잔존 | 실제 브라우저·기기 교차 테스트 기록 없음 (`docs/ARCHITECTURE.md` §13.4) — `docs/ARCHITECTURE.md` §16 Release DoD의 Cross Browser QA 단계에서 수행 |
+| Cross Browser / Device 검증 없음 | 잔존(시도됨) | `feature/platform-qa`에서 실행을 시도했으나, 이 환경에 브라우저 자동화 도구(Playwright 등)가 없어 미실행으로 남겼다(`docs/ARCHITECTURE.md` §16.1). 실제 검증은 사람이 여러 브라우저/기기로 직접 확인하거나 별도 CI 도입이 필요하다 |
 | Accessibility(`docs/DESIGN_SYSTEM.md` §13) 실제 구현 미검증 | 해결됨 (`feature/platform-accessibility`) | Keyboard Navigation(Modal 포커스 트랩·복귀), Screen Readers(`ProjectCard`/`AnalysisCard` aria-label, Modal aria-label), Focus Visibility(Skip Link 추가), Semantic HTML/Color Contrast(조사 결과 기존에 이미 충족) 전부 `docs/ARCHITECTURE.md` §13.5에 근거 기록. Reduced Motion·Skip Navigation은 DESIGN_SYSTEM §13에 없던 추가 항목으로 함께 구현 |
 
 **Not Debt (설계상 의도적)**
