@@ -98,6 +98,67 @@
       .filter((line) => line.length > 0);
   }
 
+  function fileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function renderImageField(wrapper, field, path, value) {
+    const box = el("div", { class: "image-field" });
+
+    const preview = el("img", { class: "image-preview" });
+    preview.style.display = value ? "block" : "none";
+    if (value) preview.src = `/public-assets${value}`;
+    box.appendChild(preview);
+
+    const pathInput = el("input", { type: "text", placeholder: "/images/..." });
+    pathInput.value = value || "";
+    pathInput.addEventListener("input", () => {
+      setAtPath(currentData, path, pathInput.value);
+      preview.style.display = pathInput.value ? "block" : "none";
+      if (pathInput.value) preview.src = `/public-assets${pathInput.value}`;
+    });
+    box.appendChild(pathInput);
+
+    const row = el("div", { class: "image-upload-row" });
+    const fileInput = el("input", { type: "file", accept: "image/*" });
+    const status = el("span", { class: "image-status" });
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files[0];
+      if (!file) return;
+      status.textContent = "업로드 중...";
+      try {
+        const dataUrl = await fileToDataUrl(file);
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ folder: field.uploadFolder, filename: file.name, dataUrl }),
+        });
+        const body = await res.json();
+        if (!res.ok) {
+          status.textContent = `실패: ${body.error || "알 수 없는 오류"}`;
+          return;
+        }
+        setAtPath(currentData, path, body.path);
+        pathInput.value = body.path;
+        preview.src = `/public-assets${body.path}`;
+        preview.style.display = "block";
+        status.textContent = "업로드 완료";
+      } catch (err) {
+        status.textContent = `실패: ${err.message}`;
+      }
+    });
+    row.appendChild(fileInput);
+    row.appendChild(status);
+    box.appendChild(row);
+
+    wrapper.appendChild(box);
+  }
+
   function renderField(container, field, path) {
     const wrapper = el("div", { class: "field" });
     const value = getAtPath(currentData, path);
@@ -161,6 +222,8 @@
         }
       });
       wrapper.appendChild(textarea);
+    } else if (field.type === "image") {
+      renderImageField(wrapper, field, path, value);
     } else if (field.type === "object") {
       const group = el("div", { class: "group" });
       group.appendChild(el("div", { class: "group-title", text: labelFor(field) }));

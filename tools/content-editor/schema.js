@@ -17,6 +17,9 @@
  * - object: 중첩된 단일 객체(반복 없음), fields로 하위 필드 정의
  * - objectArray: 객체 배열(반복 가능), fields로 항목 하나의 하위 필드 정의
  * - raw: 구조가 아직 문서에 정의되지 않은 값 — JSON 텍스트로 그대로 편집
+ * - image: 이미지 경로 문자열(text와 저장 형태는 동일). 업로드 버튼 + 미리보기가
+ *   추가로 붙는다. `uploadFolder`(public/images/ 아래 하위 폴더)를 반드시 지정한다 —
+ *   server.js의 ALLOWED_UPLOAD_FOLDERS와 일치해야 업로드가 허용된다.
  */
 
 const PROJECT_SYSTEM_FIELDS = [
@@ -53,7 +56,7 @@ const PROJECT_GALLERY_FIELDS = [
     type: "select",
     options: ["screenshot", "wireframe", "uml", "erd", "concept", "other"],
   },
-  { key: "src", label: "이미지 경로", type: "text" },
+  { key: "src", label: "이미지", type: "image", uploadFolder: "projects/gallery" },
   { key: "description", label: "설명", type: "textarea" },
   { key: "caption", label: "캡션", type: "text" },
   { key: "purpose", label: "목적", type: "textarea" },
@@ -150,8 +153,8 @@ const FILES = {
       { key: "slug", label: "slug (URL 경로, 생성 후 변경 금지)", type: "text" },
       { key: "title", label: "제목", type: "text" },
       { key: "subtitle", label: "부제", type: "text" },
-      { key: "thumbnail", label: "썸네일 이미지 경로", type: "text" },
-      { key: "cover", label: "커버 이미지 경로", type: "text" },
+      { key: "thumbnail", label: "썸네일 이미지 (목록 카드용)", type: "image", uploadFolder: "projects" },
+      { key: "cover", label: "커버 이미지 (상세 페이지 헤더용)", type: "image", uploadFolder: "projects" },
       { key: "role", label: "담당 역할(짧은 라벨)", type: "text" },
       { key: "genre", label: "장르", type: "text" },
       { key: "platform", label: "플랫폼", type: "text" },
