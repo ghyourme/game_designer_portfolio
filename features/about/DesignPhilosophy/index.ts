@@ -1,0 +1,1 @@
+export { DesignPhilosophy } from "./DesignPhilosophy";

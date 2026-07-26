@@ -70,59 +70,206 @@
 
 ## 5. 프로젝트 데이터 모델
 
-프로젝트는 다음 구조를 가진다:
+프로젝트는 다음 구조를 가진다. Project Detail의 공식 9단계 섹션 구조(`docs/CONTENT_GUIDE.md` §3, `docs/INFORMATION_ARCHITECTURE.md` §2.4와 동일)를 기준으로 필드명을 맞췄다.
 
-- id
-- slug
-- title
-- subtitle
-- thumbnail
-- cover
-- role
-- genre
-- platform
-- period
-- team
-- contribution
-- overview
-- problem
-- solution
-- result
-- systems
-- contents
-- skills
-- tags
-- gallery
-- pdf
-- featured
+**Required/Optional 원칙**: 모든 필드는 Required다 — 옵셔널 필드를 두지 않는다. 콘텐츠가 아직 없는 항목은 필드를 생략하는 대신 빈 문자열(`""`) 또는 빈 배열(`[]`)로 표현한다. 모든 프로젝트가 동일한 필드 집합을 가지므로, 프로젝트가 30개, 300개로 늘어나도 소비하는 쪽(Loader, 컴포넌트)이 `undefined` 분기를 따로 처리할 필요가 없다.
+
+### 5.1 헤더 메타 정보
+
+9개 섹션에는 포함되지 않는, 페이지 상단 요약 정보다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | string | 고유 식별자 |
+| slug | string | URL 경로 |
+| title | string | 제목 |
+| subtitle | string | 부제 |
+| thumbnail | string | 목록/카드에서 사용하는 썸네일 이미지 경로 |
+| cover | string | 상세 페이지 헤더에서 사용하는 커버 이미지 경로 |
+| role | string | 담당 역할의 짧은 요약 라벨 (예: "시스템 기획자"). 서술형 내용은 9단계 섹션의 contribution이 담당한다. |
+| genre | string | 장르 |
+| platform | string | 플랫폼 |
+| period | string | 진행 기간 |
+| team | string | 팀 규모 |
+| tags | string[] | 검색 및 분류용 태그 |
+| featured | boolean | 대표 프로젝트 여부 |
+
+### 5.2 9단계 섹션 본문
+
+`docs/CONTENT_GUIDE.md` §3 순서와 동일하다.
+
+| 순서 | 섹션명 | 필드명 | 타입 | 설명 |
+|------|--------|--------|------|------|
+| 1 | 프로젝트 개요 | overview | string | 프로젝트 개요 서술 |
+| 2 | 담당 역할 | contribution | string | role(짧은 라벨)을 서술형으로 풀어낸 내용 |
+| 3 | 목표 | goal | string | 프로젝트 목표 |
+| 4 | 문제 정의 | problem | string | 해결하고자 한 문제 |
+| 5 | 접근 과정 | approach | string | 문제를 해결해 나간 과정/방법론 |
+| 6 | 시스템 설계 | systems | ProjectSystem[] | 시스템 설계 항목 목록. 구조는 §5.3 참고 |
+| 7 | 핵심 기능 | features | ProjectFeature[] | 핵심 기능 항목 목록. 구조는 §5.4 참고 |
+| 8 | 결과 | result | string | 결과 (수치 중심, `docs/CONTENT_GUIDE.md` §2) |
+| 9 | 회고 | retrospective | string | 회고 |
+
+#### 5.3 systems 필드 구조 (ProjectSystem)
+
+`docs/CONTENT_GUIDE.md` §4(시스템 기획 작성 규칙)가 정의한 7개 항목을 그대로 필드화했다. 한 프로젝트가 여러 시스템(예: 전투 시스템, 성장 시스템)을 다룰 수 있으므로, 배열의 각 항목을 구분하는 `name`만 추가했다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| name | string | 시스템 이름 (예: "전투 시스템") |
+| purpose | string | 목적 |
+| playerExperience | string | 플레이어 경험 |
+| structure | string | 시스템 구조 |
+| flow | string | 플로우 |
+| data | string | 데이터 |
+| exceptionHandling | string | 예외 처리 |
+| expectedEffect | string | 기대 효과 |
+
+#### 5.4 features 필드 구조 (ProjectFeature)
+
+"핵심 기능" 섹션에 나열되는 개별 기능 항목이다. `docs/CONTENT_GUIDE.md`에 이 항목의 세부 작성 규칙이 아직 없어, 기능을 식별하는 이름과 설명만 최소 구조로 정의한다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| name | string | 기능 이름 |
+| description | string | 기능 설명 |
+
+### 5.5 섹션 내부 지원 필드
+
+독립 섹션이 아니라 헤더 또는 위 9개 섹션 안에서 UI 요소로 쓰인다 (`docs/INFORMATION_ARCHITECTURE.md` §2.4 참고).
+
+| 필드 | 타입 | 사용 위치 | 설명 |
+|------|------|-----------|------|
+| skills | string[] | "2. 담당 역할" | Tag 목록으로 함께 표시 |
+| documents | ProjectDocument[] | "6. 시스템 설계" | Document Preview Card로 표시. 구조는 §5.6 참고 |
+| gallery | ProjectGalleryImage[] | "7. 핵심 기능" | 이미지 갤러리로 표시. 구조는 §5.7 참고 |
+| links | ProjectLink[] | 헤더 메타 정보 (§5.1) | ExternalLinks로 표시. 구조는 §5.8 참고 |
+
+#### 5.6 documents 필드 구조 (ProjectDocument)
+
+이전 필드명은 `pdf`였다. 단일 PDF 한 개만 가리키는 이름이었지만, 실제로는 시스템 기획서·경제 기획서 등 여러 문서를 첨부할 수 있어야 하므로 복수형 `documents`로 이름을 바꾸고 배열로 정의한다.
+
+문서 형식이 PDF 하나로 고정되어 있지 않다 (PPT, DOCX, Markdown, Notion export 등도 첨부 대상이다). 형식마다 미리보기/다운로드 방식이 달라질 수 있어 `type`으로 구분한다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| type | ProjectDocumentType | 문서 형식. `"pdf" \| "ppt" \| "docx" \| "markdown" \| "notion" \| "other"` |
+| title | string | 문서 제목 |
+| url | string | 문서 파일 경로 또는 링크 |
+
+`other`는 위 5가지로 분류되지 않는 문서 형식을 위한 예비 값이다. 특정 형식이 반복적으로 쓰이기 시작하면 그때 전용 값을 추가한다 — 당장 쓰이지 않는 형식을 미리 나열하지 않는다.
+
+#### 5.7 gallery 필드 구조 (ProjectGalleryImage)
+
+`docs/CONTENT_GUIDE.md` §7(이미지 사용 규칙)이 모든 이미지에 요구하는 설명·캡션·목적을 그대로 필드화했다. 이 규칙을 만족하지 않는 이미지는 데이터로 추가할 수 없다.
+
+와이어프레임, UML, ERD, 화면 캡처처럼 이미지 성격이 서로 달라 `type`으로 구분한다. GIF는 별도 타입이 아니라 `src`가 가리키는 파일 확장자로 표현한다 (정적 이미지와 렌더링 방식이 다르지 않다).
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| type | ProjectGalleryImageType | 이미지 종류. `"screenshot" \| "wireframe" \| "uml" \| "erd" \| "concept" \| "other"` |
+| src | string | 이미지(또는 GIF) 경로 |
+| description | string | 설명 — 이미지가 무엇을 보여주는지 |
+| caption | string | 캡션 — 짧은 요약 문구 |
+| purpose | string | 목적 — 이 이미지를 넣은 이유 |
+
+#### 5.8 links 필드 구조 (ProjectLink)
+
+GitHub, Figma, Notion, YouTube, 배포 URL 등 프로젝트와 관련된 외부 링크를 나열한다. 9개 공식 섹션 중 어디에도 속하지 않아(어느 한 섹션의 서술 내용이 아니라 프로젝트 전체에 대한 참고 자료다), 헤더 메타 정보 영역에서 ExternalLinks 컴포넌트로 노출한다 (`docs/INFORMATION_ARCHITECTURE.md` §2.4). 채용 담당자가 9개 섹션을 읽기 전에 라이브 데모·저장소로 바로 이동할 수 있어야 한다는 `docs/DESIGN_SYSTEM.md` §3(2분 스크리닝 원칙)의 요구와도 맞다.
+
+`label`은 자유 텍스트라 프로젝트마다 표기가 달라질 수 있다 ("깃허브" vs "GitHub" 등). UI가 플랫폼별 아이콘을 붙이거나 필터링할 수 있도록 `type`으로 플랫폼을 구분한다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| type | ProjectLinkType | 링크 플랫폼. `"github" \| "figma" \| "notion" \| "youtube" \| "deployment" \| "other"` |
+| label | string | 링크 설명 (예: "플레이 데모", "스토어 페이지") |
+| url | string | 링크 주소 |
 
 이 구조는 모든 프로젝트에 동일하게 적용된다.
+
+> **변경 이력**: 이전에는 `solution`, `contents`라는 필드명을 썼다. `solution`은 "접근 과정" 섹션의 의미(문제를 해결한 결과물이 아니라 해결해 나간 과정/방법론)와 더 정확히 맞도록 `approach`로 이름을 바꿨고, `contents`는 "게임 콘텐츠"처럼 읽혀 "핵심 기능"이라는 섹션 의도와 어긋나 `features`로 이름을 바꿨다. `goal`, `retrospective`는 9단계 구조에 있던 "목표", "회고" 섹션에 대응하는 필드가 없어 새로 추가했다. `types/project.ts`와 `app/projects/[slug]/page.tsx`도 이 이름으로 동기화되었다 (`data/projects.json`은 현재 빈 배열이라 실제 데이터 마이그레이션은 해당 없음).
+>
+> **변경 이력 (feature/projects-schema)**: `systems`, `features`, `gallery`, `pdf`가 `unknown`으로 남아있던 것을 완성했다. `pdf`는 여러 문서를 담을 수 있도록 `documents`로 이름을 바꿨다. `systems`는 `docs/CONTENT_GUIDE.md` §4를, `gallery`는 같은 문서 §7을 그대로 필드화해 문서 간 중복 정의 없이 하나의 규칙만 참조하도록 했다. 이전에 없던 `links` 필드를 새로 추가했으며, 노출 위치는 IA 결정 전까지 미정 상태로 문서에 명시했다.
+>
+> **변경 이력 (feature/projects-content)**: 실제 콘텐츠 작성 전, "프로젝트를 언제든 추가할 수 있는 구조"인지 재검토했다. `documents`/`gallery`/`links`가 각각 `url`/`src`만으로는 형식·종류·플랫폼을 구분하지 못해, 향후 PDF/PPT/DOCX/Markdown/Notion 문서, 와이어프레임/UML/ERD/스크린샷 이미지, GitHub/Figma/Notion/YouTube/배포 URL 링크를 추가해도 UI가 구분 렌더링할 수 있도록 세 필드 모두에 `type` 판별 필드를 추가했다. 각 `type`은 `"other"` 예비값을 포함한 닫힌 집합(union)으로 정의해, 알려진 값은 타입 안전하게 검사하면서도 새로운 형식이 필요할 때는 `"other"`로 우선 수용할 수 있게 했다. 이 변경은 문서와 Type에만 적용되며, `data/projects.json`은 여전히 빈 배열이라 마이그레이션 대상이 없다.
+>
+> **변경 이력 (feature/projects-detail-architecture)**: Project Detail의 정보 구조를 문서 수준에서 확정하면서, 그동안 미정이던 `links`의 노출 위치를 헤더 메타 정보로 확정했다 (9개 공식 섹션 중 어디에도 속하지 않는 프로젝트 전체 참고 자료이기 때문). `docs/INFORMATION_ARCHITECTURE.md` §2.4, `docs/DESIGN_SYSTEM.md`의 Component Architecture/Naming Convention/Shared Components 절과 함께 갱신했다. 데이터 구조(필드/타입) 자체는 변경하지 않았다.
 
 ---
 
 ## 6. 분석 데이터 모델
 
-게임 분석 콘텐츠는 다음 구조를 따른다:
+게임 분석 콘텐츠는 다음 구조를 따른다. `docs/CONTENT_GUIDE.md` §5(게임 분석 작성 규칙)를 그대로 필드화했다 — CONTENT_GUIDE §5의 "분석 대상/분석 목적"은 헤더 메타 정보로, "핵심 요소/장점/문제점/개선안" 4항목 템플릿은 3개 분석 관점(시스템/콘텐츠/UX)에 반복 적용되는 공통 하위 구조로, "배운 점"은 결론에 포함되는 내용으로 대응한다.
 
-- 기본 정보 (제목, 설명, 태그)
-- 분석 대상 게임
-- 시스템 분석
-- 콘텐츠 분석
-- UX 분석
-- 결론
+**Required/Optional 원칙**: Project Model(§5)과 동일하다 — 모든 필드는 Required이며, 콘텐츠가 없는 항목은 빈 문자열/빈 배열로 표현한다.
+
+### 6.1 헤더 메타 정보
+
+Analysis는 목록형 콘텐츠이므로 §4 공통 데이터 규칙을 Project Model(§5.1)과 동일한 방식으로 적용한다 (`docs/INFORMATION_ARCHITECTURE.md` §2.1의 featured 필터, §2.6의 라우팅 전제와 일치).
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | string | 고유 식별자 |
+| slug | string | URL 경로 (`/analysis/[slug]`) |
+| title | string | 제목 |
+| description | string | 설명 |
+| tags | string[] | 검색 및 분류용 태그 |
+| featured | boolean | 대표 분석 여부. Home의 featured 필터(§2.1)가 참조 |
+| targetGame | string | 분석 대상 게임 (`docs/CONTENT_GUIDE.md` §5 "분석 대상") |
+| purpose | string | 분석 목적 (`docs/CONTENT_GUIDE.md` §5 "분석 목적") |
+
+### 6.2 본문 섹션 (AnalysisDimension)
+
+시스템 분석(systemAnalysis) / 콘텐츠 분석(contentAnalysis) / UX 분석(uxAnalysis)은 서로 다른 대상을 다루지만 내부 구조는 동일하다 — `docs/CONTENT_GUIDE.md` §5의 4항목 템플릿을 공통 구조 `AnalysisDimension`으로 필드화했다.
+
+**AnalysisDimension**
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| keyElement | string | 핵심 요소 (시스템 분석 = "핵심 시스템", 콘텐츠 분석 = "핵심 콘텐츠", UX 분석 = "핵심 경험") |
+| strengths | string | 장점 |
+| weaknesses | string | 문제점 |
+| improvements | string | 개선안 |
+
+**본문 섹션 순서**
+
+| 순서 | 섹션명 | 필드명 | 타입 | 설명 |
+|------|--------|--------|------|------|
+| 1 | 시스템 분석 | systemAnalysis | AnalysisDimension | 시스템 관점 분석 |
+| 2 | 콘텐츠 분석 | contentAnalysis | AnalysisDimension | 콘텐츠 관점 분석 |
+| 3 | UX 분석 | uxAnalysis | AnalysisDimension | UX 관점 분석 |
+| 4 | 결론 | conclusion | string | 세 관점을 종합한 결론. `docs/CONTENT_GUIDE.md` §5 "배운 점"을 포함한다 |
+
+> **Architecture Decision (feature/analysis-alignment)**: `docs/CONTENT_GUIDE.md` §5(7항목 평면 목록), 이 절(4-섹션 구조), `types/analysis.ts`(all-`unknown`) 세 구조를 비교한 결과, 서로 다른 개념을 표현하고 있던 것이 아니라 CONTENT_GUIDE §5가 **두 추상화 수준을 하나의 목록으로 섞어 표현**하고 있었음을 확인했다 — ①분석 전체의 도입 정보(분석 대상/분석 목적)와 ②세 분석 관점 각각에 반복 적용되는 4항목 템플릿(핵심 요소/장점/문제점/개선안)이 구분 없이 나열되어 있었다. "콘텐츠 분석"/"UX 분석"이라는 관점 구분 자체는 CONTENT_GUIDE에 없었지만, `docs/PROJECT.md` §4(시스템 기획자·콘텐츠 기획자 이중 목표 직무)를 반영한 타당한 확장으로 판단해 유지했다. 실제 drift로 확인된 것은 두 가지뿐이다: (1) "분석 목적"이 DATA_MODEL/Type 어디에도 필드로 없었다 → `purpose` 필드 추가, (2) "핵심 시스템"이라는 표현이 콘텐츠·UX 관점에는 그대로 쓸 수 없었다 → `keyElement`로 일반화. 7개 항목을 4개로 줄이거나 4개를 7개로 늘리지 않고, 계층 관계(헤더 2개 + 반복 템플릿 4개 + 결론 1개 = 7개 그대로)만 세 문서에 동일하게 반영했다. `targetGame`도 CONTENT_GUIDE가 세부 구조를 요구하지 않는 단일 개념이라 `unknown` 대신 `string`으로 확정했다.
 
 ---
 
 ## 7. 이력서 데이터 모델
 
-이력서는 다음 정보를 포함한다:
+이력서는 다음 정보를 포함한다. Project Model(§5), Profile Model(§12)과 동일한 원칙(평면 구조, 실제로 소비하는 Feature가 있는 필드만 정의)으로 아래와 같이 구체화한다.
 
-- 개인 정보
-- 경력 사항
-- 프로젝트 경험
-- 기술 스택
-- 교육 정보
-- 수상 및 기타 활동
+**개인 정보 (personalInfo)** — `docs/INFORMATION_ARCHITECTURE.md` §2.8 "1. 개인 정보"를 ResumeHero(신원/연락처)와 ResumeSummary(요약 문단)로 나눠 사용한다.
+
+| 필드 | 설명 | 사용하는 Feature |
+|------|------|------|
+| name | 이름 | ResumeHero |
+| role | 역할/직무 | ResumeHero |
+| email | 이메일 | ResumeHero |
+| phone | 전화번호 | ResumeHero |
+| location | 거주 지역 | ResumeHero |
+| summary | 짧은 이력 요약 문단 | ResumeSummary |
+
+**경력 사항 (career)** — 항목 배열. 각 항목: `id`, `company`, `role`, `period`, `description`. (ExperienceTimeline)
+
+**프로젝트 경험 (projectExperience)** — 항목 배열. 각 항목: `id`, `title`, `role`, `period`, `description`. `projects.json`의 전체 케이스 스터디와는 다른, 이력서용 축약 목록이다. (ProjectExperience)
+
+**교육 정보 (education)** — 항목 배열. 각 항목: `id`, `school`, `degree`, `period`. (Education)
+
+**기술 스택** — 이 섹션은 별도 `resume.skills` 필드를 두지 않는다. `skills.json`(§8)을 `getSkills()`로 그대로 재사용한다 — About의 SkillOverview와 동일한 데이터 소스를 공유해, 스킬 데이터가 두 곳에서 따로 관리되며 어긋나는 것을 막는다.
+
+**수상 및 기타 활동 (awards)** — 항목 배열. 세부 필드는 아직 정의하지 않는다. 이 섹션을 렌더링하는 Feature가 `features/resume/`에 아직 없어(2026-XX Resume 페이지 1차 구현 범위 밖), 실제로 소비하는 곳이 생기기 전까지 구조를 추측하지 않는다. (`types/resume.ts`에도 동일한 TODO가 남아있다)
+
+이 구조는 `resume.json` 전체에 적용되며, 이력서(§7)와 프로필(§12)은 목록이 아닌 단일 레코드이므로 §4 공통 데이터 규칙(id/slug/tags/status/order 등)을 따르지 않는다. 다만 career/projectExperience/education처럼 내부에 항목 배열을 담는 필드는, 목록 렌더링 시 안정적인 React key로 쓸 `id`를 각 항목에 둔다.
 
 ---
 
@@ -173,6 +320,67 @@
 - 새로운 콘텐츠 타입 추가
 - 새로운 필터 구조 추가
 - 새로운 페이지 유형 추가
+
+---
+
+## 12. 프로필 데이터 모델
+
+profile.json은 §3에 이름만 있고 세부 필드가 정의되어 있지 않았다. Project Model(§5)과 동일한 수준(평면 구조, 문서에 근거한 필드만 정의)으로 아래와 같이 정의한다.
+
+필드는 `docs/INFORMATION_ARCHITECTURE.md` §2.2 About 페이지가 실제로 사용하는 것만 정의했다 — 임의로 발명한 필드는 없다.
+
+| 필드 | 설명 | 사용하는 Feature |
+|------|------|------|
+| name | 이름 | AboutHero |
+| targetRole | 희망 직무 | AboutHero |
+| tagline | 한 줄 소개 | AboutHero |
+| summary | 짧은 자기소개 | AboutSummary |
+| direction | 기획자로서의 방향성 | AboutSummary |
+| designApproach | 게임을 어떻게 설계하는지에 대한 관점 | DesignPhilosophy |
+| problemSolving | 문제 해결 방식 | DesignPhilosophy |
+| playerExperience | 플레이어 경험을 바라보는 관점 | DesignPhilosophy |
+| coreStrengths | 자기 서술형(정성적) 핵심 강점 목록 | CoreStrength |
+| email | 연락용 이메일 주소 | ContactInfo |
+| contactIntro | 연락 안내 문구 | ContactIntro |
+| links | 소셜/포트폴리오 링크 목록 | ContactInfo |
+
+profile.json은 이력서(§7)와 마찬가지로 목록이 아닌 단일 레코드이므로, §4 공통 데이터 규칙(id/slug/tags/status/order 등)을 따르지 않는다.
+
+`coreStrengths`는 `skills.json`(§8)이 관리하는 정량적 기술 분류와 역할이 다르다 — `skills.json`은 분류·숙련도를 데이터로 관리하는 반면, `coreStrengths`는 자기 서술형 강점 키워드 목록일 뿐이다.
+
+### 12.1 links 필드 구조 (ContactLink)
+
+LinkedIn, X(Twitter), 개인 포트폴리오, 블로그 등 연락처 페이지에서 노출할 외부 링크를 나열한다. Project Model의 `links`(§5.8, `ProjectLink`)와 형태는 비슷하지만 별도 타입으로 정의한다 — 하나는 프로젝트의 참고 자료(GitHub/Figma/Notion/YouTube/배포 URL)를, 다른 하나는 방문자가 후보자에게 연락하거나 팔로우하는 개인 채널을 가리켜 도메인이 다르다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| type | ContactLinkType | 링크 플랫폼. `"linkedin" \| "twitter" \| "portfolio" \| "blog" \| "other"` |
+| label | string | 링크 설명 (예: "LinkedIn", "개인 블로그") |
+| url | string | 링크 주소 |
+
+`email`은 `links` 배열에 포함하지 않고 별도 필드로 둔다 — "이메일 보내기" CTA(`docs/INFORMATION_ARCHITECTURE.md` §2.9)가 `mailto:` 링크로 항상 우선 노출되어야 하는 필수 연락 수단이라, 있을 수도 없을 수도 있는 소셜 링크 목록과 같은 배열에 섞지 않는다.
+
+> **Architecture Decision (`feature/contact-personal-infra`)**: Contact의 데이터 소스가 `docs/PROJECT.md` §11에 "미정(`profile.json` 확장 vs `resume.json.personalInfo` 재사용)"으로 남아있었다. `profile.json` 확장으로 결정했다 — About과 마찬가지로 Contact도 목록이 아닌 단일 레코드이고, `profile.json`은 이미 그 목적(정체성 정보의 단일 소스)으로 쓰이고 있어 새 파일을 만들 이유가 없다. `resume.json.personalInfo`(§7)는 이력서라는 문맥에 종속된 축약 정보(이력서 다운로드 대상)라, 연락처 페이지가 이를 재사용하면 "이력서 맥락"과 "연락 맥락"이 뒤섞인다. 새 필드는 `email`/`contactIntro`/`links` 3개뿐이며, 기존 9개 필드는 변경하지 않았다.
+
+---
+
+## 13. 개인 작업물 데이터 모델
+
+`personal.json`은 §3에 이름만 있고 세부 필드가 정의되어 있지 않았다. `docs/INFORMATION_ARCHITECTURE.md` §2.7이 실제로 사용하는 것만 정의한다 — Project Model(§5)·Profile Model(§12)과 동일한 원칙이다.
+
+**Required/Optional 원칙**: Project Model(§5)과 동일하다 — 모든 필드는 Required이며, 콘텐츠가 없는 항목은 빈 문자열/빈 배열로 표현한다.
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| id | string | 고유 식별자 (목록 렌더링 시 React key로 사용) |
+| title | string | 작업물 제목 |
+| description | string | 작업물 설명 |
+| tags | string[] | 검색 및 분류용 태그 |
+| link | string | 외부 링크 (저장소, 플레이 링크, 게시물 등) |
+
+**Personal Works에 없는 필드**: `slug`를 두지 않는다 — `docs/INFORMATION_ARCHITECTURE.md` §2.7이 "이번 IA 범위에는 Personal Work Detail 페이지가 포함되어 있지 않다"고 명시했고, 상세 라우트가 없으면 라우팅용 식별자가 필요 없다. 같은 이유로 `featured`도 두지 않는다 — Home의 featured 필터(§2.1)는 Project/Analysis만 대상으로 하며, Personal Works를 노출 대상으로 언급하지 않는다. 필요해지면 그때 이 문서를 먼저 갱신한다(§2.7 "범위 참고"와 동일한 원칙).
+
+`link`이 가리키는 대상 하나로 "항목별 상세 보기 또는 외부 링크"(§2.7 CTA)를 모두 처리한다 — 아코디언/모달 확장은 실제로 내용이 길어지는 사례가 생기기 전까지 배치하지 않는다(과설계 방지, `docs/DESIGN_SYSTEM.md` §6.2 ExternalLinks 항목 참고).
 
 ---
 

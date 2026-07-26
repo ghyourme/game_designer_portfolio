@@ -85,8 +85,10 @@ JSON 기반 데이터가 UI를 결정한다.
 - lib/ : 외부 연동
 - types/ : TypeScript 타입
 - data/ : JSON 데이터
-- docs/ : 설계 문서
+- docs/ : 설계 문서 (Source of Truth — 프로젝트 전체에 적용되는 규칙/구조만 다룬다)
+- docs/projects/ : 프로젝트별 콘텐츠 작업 자료 (예: Evidence Inventory). Source of Truth가 아니다 — `data/*.json`에 반영되기 전 개별 프로젝트 하나에 대해서만 유효한 작업 중 자료이며, `docs/CONTENT_GUIDE.md` §14 Traceability Rule의 "작성 워크시트" 개념을 실제 파일로 구현한 것이다. 프로젝트명이 확정되지 않은 동안에는 `docs/projects/evidence-template.md` 하나만 두고, 실제 프로젝트가 확정되어 `slug`(`docs/DATA_MODEL.md` §5.1)가 정해지면 그 시점에 템플릿을 `docs/projects/<slug>/evidence.md`로 복사해 개별 폴더를 만든다 — 근거 없는 프로젝트명으로 폴더를 미리 만들지 않는다
 - prompts/ : AI 프롬프트
+- tools/ : 배포되지 않는 로컬 전용 개발 도구. `tools/content-editor/`(§10 참고)가 첫 사례다 — Next.js 앱이 이 폴더를 import하지 않으며, `next build`/Vercel 배포 대상에도 포함되지 않는다
 
 ---
 
@@ -138,6 +140,328 @@ JSON 기반 데이터가 UI를 결정한다.
 - 관리자 페이지
 - CMS
 - 데이터베이스 설계
+
+**`tools/content-editor/`는 이 제외 목록과 충돌하지 않는다**: 배포되는 포트폴리오 사이트(이 아키텍처가 다루는 대상) 자체에는 여전히 백엔드/인증/관리자 페이지/CMS/DB가 없다. `tools/content-editor/`는 로컬(`127.0.0.1`)에서만 실행되는 별도의 개발 스크립트로, `npm run content-editor`로 직접 실행한 사람만 접근할 수 있어 인증이 필요 없다 — Next.js 라우트가 아니고, `next build` 결과물에 포함되지 않으며, Vercel에 배포되지 않는다. 데이터를 데이터베이스가 아닌 `data/*.json` 파일에 직접 읽고 쓴다는 점도 "JSON 우선" 원칙(CLAUDE.md §6)과 그대로 일치한다.
+
+---
+
+## 11. Project Identifier Rule
+
+Project를 참조하는 여러 시스템(Route, Branch, Folder, JSON, Loader, Documents, Gallery, Links, Evidence)이 각자 다른 식별자를 쓰면, 하나의 프로젝트를 가리키는 이름이 시스템마다 달라져 추적이 끊긴다. 이를 막기 위해 Project의 **유일한 식별자**를 하나로 고정한다.
+
+**Source of Truth**: `data/projects.json`의 각 프로젝트 레코드가 가진 `slug`(`docs/DATA_MODEL.md` §5.1) 하나만이 식별자다. 다른 어떤 시스템도 별도의 식별자를 새로 만들지 않고, 전부 이 `slug`를 그대로 가져다 쓴다.
+
+| 대상 | slug 사용 방식 | 근거 |
+|------|------------------|------|
+| Route | `/projects/[slug]` | `docs/INFORMATION_ARCHITECTURE.md` §2.4 |
+| Branch | `feature/projects-<slug>-content` | `docs/GIT_WORKFLOW.md` §1.1 |
+| Folder | `docs/projects/<slug>/evidence.md` | 본 문서 §6 |
+| JSON | `data/projects.json` 배열 항목 자체의 `slug` 필드 | `docs/DATA_MODEL.md` §5.1 |
+| Loader | slug로 단일 항목을 조회한다 (`find(p => p.slug === slug)`) | 본 문서 §5 |
+| Documents | 별도 식별자 없음 — 부모 프로젝트의 slug로 식별되는 레코드에 속한 `documents[]` 배열 항목이며, 항목끼리는 `title`로 구분한다 | `docs/DATA_MODEL.md` §5.6 |
+| Gallery | 별도 식별자 없음 — 동일하게 부모 프로젝트 slug에 종속되며, 항목끼리는 `caption`으로 구분한다 | `docs/DATA_MODEL.md` §5.7 |
+| Links | 별도 식별자 없음 — 동일 구조, 항목끼리는 `label`로 구분한다 | `docs/DATA_MODEL.md` §5.8 |
+| Evidence | 작성 워크시트 경로(`docs/projects/<slug>/evidence.md`)가 slug를 그대로 사용 | `docs/CONTENT_GUIDE.md` §14 |
+
+`documents`/`gallery`/`links`에 slug를 또 하나씩 부여하지 않는 이유: 이들은 독립된 엔터티가 아니라 이미 slug로 식별된 프로젝트 레코드 내부의 배열 항목이다. 여기에 별도 식별자를 추가하면 `docs/DATA_MODEL.md` §5의 "필드 추가 금지" 원칙과 충돌하고, 식별자가 두 겹이 되어 오히려 추적을 어렵게 만든다.
+
+**`id`와의 관계**: `docs/DATA_MODEL.md` §4의 `id`(공통 데이터 규칙)는 폐기되거나 대체되지 않는다. `id`는 모든 데이터 타입(Project, Analysis 등)에 공통으로 적용되는 일반 식별자이고, 이 절이 정의하는 것은 그중 Project에 한해 `slug`가 Route·Branch·Folder·Evidence까지 걸치는 **교차 시스템 식별자**로 격상된다는 사실이다.
+
+**Immutability**: `slug`는 프로젝트가 생성된 이후 변경하지 않는다. `title`은 언제든 변경할 수 있다. `slug`는 Route·Branch·Folder·Evidence 여러 시스템에 흩어져 참조되므로, 생성 후 바꾸면 이미 merge된 Branch 이름이나 기존 Folder 경로와의 연결이 끊긴다. `title`은 어느 시스템에도 참조되지 않는 순수 표시값이라 자유롭게 바꿀 수 있다.
+
+**적용 범위**: 이 규칙은 Project(`data/projects.json`)에 한정된다. Analysis도 `slug`(`docs/DATA_MODEL.md` §6.1)와 `/analysis/[slug]` 라우트를 갖지만, Analysis는 아직 개별 브랜치·Evidence 워크시트 체계가 없어(`docs/PROJECT.md` §12 Technical Debt) Branch/Folder/Evidence 열은 적용 대상이 아니다 — Analysis Content 단계 진입 시 별도로 검토한다.
+
+---
+
+## 12. Project Lifecycle
+
+Project 하나가 생성되어 포트폴리오에 실리기까지, 이미 각자 다른 문서에 정의된 규칙(§11 Project Identifier Rule, `docs/CONTENT_GUIDE.md` §11 Content Workflow, `docs/CONTENT_GUIDE.md` §10 Review Checklist, `docs/PROJECT.md` §10 Quality Gate)이 어떤 순서로 켜지는지 하나의 흐름으로 연결한다. **이 절은 새 규칙을 만들지 않는다** — 기존 규칙이 언제 적용되는지만 정의한다.
+
+```
+① Project 생성 (실제 프로젝트명·자료 확정)
+   ↓
+② slug 생성
+   ↓
+③ Evidence Template 인스턴스화
+   ↓
+④ Evidence 수집
+   ↓
+⑤ Content 작성
+   ↓
+⑥ Review
+   ↓
+⑦ Quality Gate 통과
+   ↓
+⑧ Completed
+   ↓
+⑨ Archive (필요 시)
+```
+
+| 단계 | 내용 | 근거 (원본 규칙 — 여기서는 재정의하지 않음) |
+|------|------|-----------------------------------------------|
+| ① Project 생성 | 실제 프로젝트명과 자료가 확정되는 시점 | 이 문서에서 처음 정의하는 시작점 — 다른 문서에 대응 규칙 없음 |
+| ② slug 생성 | `data/projects.json`에 넣을 slug 확정 | 본 문서 §11 |
+| ③ Evidence Template 인스턴스화 | `docs/projects/evidence-template.md` → `docs/projects/<slug>/evidence.md` 복사 | 본 문서 §6, §11 |
+| ④ Evidence 수집 | Evidence Inventory의 확보 여부 갱신 | `docs/CONTENT_GUIDE.md` §12(Evidence Rule)·§13(Content Source Rule), `evidence-template.md` §3 |
+| ⑤ Content 작성 | 초안 작성 → `docs/DATA_MODEL.md` §5 기준 JSON 작성 | `docs/CONTENT_GUIDE.md` §11 Content Workflow 2~3단계 |
+| ⑥ Review | Content/Recruiter/Senior Game Designer Review Checklist 통과 | `docs/CONTENT_GUIDE.md` §10.1~§10.3, §11 Content Workflow 4~7단계 |
+| ⑦ Quality Gate 통과 | Real Contents 3단계가 `data/projects.json`에 반영되기 직전, 세 체크리스트 통과 확정 | `docs/PROJECT.md` §10, `docs/CONTENT_GUIDE.md` §11 Content Workflow 8~9단계 |
+| ⑧ Completed | `data/projects.json` 반영 + 최종 검증(UX Review·Portfolio Quality 포함) | `docs/PROJECT.md` §10 8단계 전부 ✅, `docs/CONTENT_GUIDE.md` §11 Content Workflow 10단계 |
+| ⑨ Archive | 필요 시 — 정책 미정 | §12.4 참고 |
+
+### 12.1 Project State (표시용 별칭)
+
+9단계를 매번 그대로 부르면 길어서, 대화·문서에서 빠르게 참조할 수 있도록 5개 이름을 둔다. **새 필드나 새 상태 머신이 아니다** — 이미 존재하는 Lifecycle 단계에 붙이는 이름표일 뿐이다.
+
+| State | 대응 Lifecycle 단계 |
+|-------|----------------------|
+| Draft | ①~② |
+| Evidence | ③~④ |
+| Writing | ⑤ |
+| Review | ⑥~⑦ |
+| Completed | ⑧ |
+
+`data/projects.json`에 State 필드를 추가하지 않는다 — `docs/DATA_MODEL.md` §5의 "필드 추가 금지" 원칙과 정면으로 충돌한다. 어떤 프로젝트가 지금 어느 단계에 있는지는 실제로 존재하는 산출물로 확인한다: `docs/projects/<slug>/evidence.md`가 있으면 최소 Evidence 단계, `feature/projects-<slug>-content` 브랜치가 열려 있으면 Writing~Review 단계, `data/projects.json`에 반영되어 있으면 Completed다.
+
+### 12.2 slug Lifecycle
+
+```
+생성 (② Project 생성 시 확정)
+  ↓
+사용 (③~⑧ 전 단계에서 Route/Branch/Folder/Evidence의 식별자로 사용)
+  ↓
+변경 금지
+  ↓
+Archive (필요 시 — §12.4 참고)
+```
+
+"생성"과 "변경 금지"는 §11 Immutability와 동일한 내용이다 — 여기서는 그 두 지점이 Lifecycle 어디에 해당하는지만 표시하며, 정책을 다시 정의하지 않는다.
+
+### 12.3 기존 Rule과의 관계 (중복 확인)
+
+이 절이 실제로 새로 정의하는 것은 ①(Project 생성 시점)과 ⑨(Archive 자리)뿐이다. 나머지는 아래처럼 기존 문서를 그대로 가리킨다.
+
+| 이 절이 가리키는 개념 | 원래 정의된 곳 |
+|-------------------------|------------------|
+| slug 생성·불변성 | 본 문서 §11 |
+| Evidence 유형·매핑·수집 | `docs/CONTENT_GUIDE.md` §12~§13, `docs/projects/evidence-template.md` |
+| Content 작성 순서 | `docs/CONTENT_GUIDE.md` §11 |
+| Review Checklist | `docs/CONTENT_GUIDE.md` §10 |
+| Quality Gate 8단계 | `docs/PROJECT.md` §10 |
+| 브랜치 명명 | `docs/GIT_WORKFLOW.md` §1.1 |
+
+### 12.4 Archive — 미정 (과설계 방지)
+
+Archive 정책(프로젝트를 포트폴리오에서 내리거나 과거 이력으로만 남기는 것)은 정의하지 않는다. `data/projects.json`은 필드 추가가 금지된 고정 스키마라, Archive를 표현하려면 최소 하나의 새 필드나 별도 저장 위치가 필요하며 이는 그 자체로 Architecture Decision이다. 지금은 실제로 Archive할 프로젝트가 없으므로 미리 설계하지 않는다 — 실제로 필요해지는 시점에 별도 브랜치에서 다룬다 (`docs/PROJECT.md` §12 Technical Debt에 기록).
+
+---
+
+# Platform Architecture Chapter (§13~§18)
+
+이 프로젝트의 목적은 포트폴리오 콘텐츠 자체가 아니라, `data/*.json`을 갈아 끼우는 것만으로 계속 재사용할 수 있는 **Data Driven Portfolio Platform**을 완성하는 것이다(`docs/PROJECT.md` §1). §13~§18은 그 Platform이 지켜야 할 계약과 완료 기준을 하나의 장(Chapter)으로 모은다 — 새로 정의하는 규칙은 §17 Architecture Evolution Policy 하나뿐이고, 나머지는 이전 브랜치에서 이미 정의된 것을 이 장 안에 모으거나(§13, §14) PROJECT.md에서 옮겨온 것(§15, §16, §18)이다.
+
+| 절 | 내용 |
+|-----|------|
+| §13 Platform Resilience Contract | Data/Rendering/Navigation/Compatibility 보장 범위 |
+| §14 SEO & Performance Contract | 메타데이터·성능 요구 사항 |
+| §15 Platform Feature Definition of Done | Feature 하나가 만족해야 할 12개 기준 |
+| §16 Platform Release Definition of Done | Platform 전체가 배포 가능한지 판단하는 최종 게이트 |
+| §17 Architecture Evolution Policy | Architecture를 앞으로 어떻게(만) 바꿀 수 있는가 |
+| §18 Platform Branch Strategy | Technical Debt를 브랜치로 옮기는 원칙(실제 목록은 `docs/GIT_WORKFLOW.md` §1.2가 Source of Truth) |
+
+## 13. Platform Resilience Contract
+
+`data/*.json`이 비어 있거나 항목이 없어도 모든 페이지가 정상 동작해야 한다. 이 절은 그 보장 범위를 정의한다 — 새 검증 시스템을 만드는 것이 아니라, 이미 구조적으로 성립하는 보장과 실제로 비어 있는 보장을 구분한다.
+
+### 13.1 Data Resilience
+
+| 항목 | 보장 방식 | 현재 상태 |
+|------|------------|-------------|
+| Missing Field | `docs/DATA_MODEL.md` §5 "Required/Optional 원칙" — 모든 필드는 Required이며 빈 값은 `""`/`[]`로 표현한다. 옵셔널 필드가 없으므로 `undefined` 접근 자체가 구조적으로 발생하지 않는다 | 구조적으로 이미 보장됨 |
+| Invalid JSON | `data/*.json`은 런타임 fetch가 아니라 `import ... from "@/data/*.json"` 정적 ESM import로 로드된다(`lib/data/*.ts`). JSON 문법이 깨지면 런타임이 아니라 **빌드 타임에 실패**한다 — "런타임에 도달하는 Invalid JSON"은 이 아키텍처에서 구조적으로 발생할 수 없다 | 구조적으로 이미 보장됨 |
+| Empty Array | 목록형 컴포넌트(`ProjectGrid`, `AnalysisGrid`, `SkillSummary`, `ExperienceTimeline` 등)는 이미 길이 0을 확인해 Empty State 메시지를 렌더링한다(`docs/DESIGN_SYSTEM.md` §12 Empty States) | 이미 구현됨 |
+| Record Not Found (slug 조회 실패) | `app/projects/[slug]/page.tsx`, `app/analysis/[slug]/page.tsx`가 `findBySlug()` 결과가 없으면 `notFound()`를 호출하고, 각각 `app/projects/[slug]/not-found.tsx`·`app/analysis/[slug]/not-found.tsx`가 렌더링한다 | 이미 구현됨(`feature/platform-routing`) |
+| Loader 재사용 | slug 조회 로직이 `lib/data/findBySlug.ts`의 제네릭 헬퍼(`findBySlug<T extends { slug: string }>`)로 통합되어, `getProjects()`/`getAnalysis()` 어느 배열에든 재사용된다 | 이미 구현됨(`feature/platform-routing`) |
+
+### 13.2 Rendering Resilience
+
+| 항목 | 보장 방식 | 현재 상태 |
+|------|------------|-------------|
+| Loading State | 없음(`feature/platform-routing`에서 제거) — 아래 참고 | `app/loading.tsx` 없음 |
+| Error Boundary | Next.js App Router의 `error.tsx` 컨벤션이 라우트 세그먼트를 감싸는 Error Boundary 역할을 자동으로 수행한다 — 별도의 커스텀 React Error Boundary 클래스는 프레임워크 컨벤션과 중복이라 만들지 않는다 | 루트 `app/error.tsx` 존재(placeholder 문구) |
+
+**Loading State를 제거한 이유**: `app/loading.tsx`(루트)가 존재하면 Next.js가 하위 모든 비동기 Server Component를 자동으로 Suspense 경계로 감싼다. 이 경계가 있으면 스트리밍이 시작된 뒤에야 `notFound()`가 평가되므로, 실제 HTTP 응답 상태 코드가 이미 커밋된 200으로 굳어버린다 — `curl`/모니터링 도구/일부 크롤러처럼 JS를 실행하지 않는 클라이언트에는 잘못된 slug 요청도 200으로 보인다(`feature/platform-routing`에서 직접 재현·확인). `app/loading.tsx` 자신의 기존 주석도 "이 프로젝트는 전 페이지가 동기 SSG라 로딩 화면을 볼 일이 거의 없다"고 이미 밝히고 있었다 — 실사용 가치가 낮은 파일이 Record Not Found의 route safety를 깨고 있었으므로 제거했다. 제거 후 `/projects/[slug]`·`/analysis/[slug]`의 잘못된 slug가 정확히 404를 반환함을 프로덕션 빌드로 재현 확인했다. 향후 실제 클라이언트 사이드 비동기 요청이 생기면, 그 라우트에 한정된 지역 `loading.tsx`를 그때 다시 검토한다(전역 파일로 되돌리지 않는다).
+
+### 13.3 Navigation Resilience
+
+`docs/INFORMATION_ARCHITECTURE.md` §4(내비게이션 흐름)가 정의한 Header/Footer/상세 이동 구조가 실제로 끊김 없이 동작하는지의 계약이다.
+
+| 항목 | 보장 방식 | 현재 상태 |
+|------|------------|-------------|
+| Active Navigation | `components/layout/Header/Header.tsx`가 `usePathname()`과 `item.path`를 비교해 `aria-current="page"`를 부여한다. `/`만 완전 일치, 나머지는 완전 일치 또는 `${item.path}/`로 시작하는 하위 경로도 활성으로 판정한다 | 이미 구현됨(`feature/platform-routing`) — `/projects/[slug]`에서도 "Projects"가 정확히 활성 표시된다 |
+| Breadcrumb | `docs/INFORMATION_ARCHITECTURE.md` §4가 이미 "모든 흐름은 최대 2단계(목록→상세) 이내" + "언제든 Header/Footer로 다른 최상위 페이지 이동 가능"을 설계 원칙으로 명시했다 | Breadcrumb 컴포넌트 없음 — 이는 미구현이 아니라 **기존 IA 결정과 일치하는 상태다.** 깊이가 2단계로 고정되어 있는 한 새로 만들지 않는다(과설계 방지). 사이트 깊이가 실제로 늘어나는 시점에 재검토한다 |
+| Deep Link | 카드→상세 링크(`ProjectCard`/`AnalysisCard`)는 전부 `data/*.json`의 실제 `slug`로 생성되어 존재하지 않는 경로를 만들지 않는다 | 이미 보장됨 — §11 Identifier Rule과 동일한 slug 기반 구조 덕분 |
+| Back Navigation | `[slug]` 상세 페이지가 마지막에 목록으로 돌아가는 `Button`(secondary)을 렌더링한다 — `docs/INFORMATION_ARCHITECTURE.md` §2.4/§2.6의 "다른 프로젝트로 이동하는 내비게이션"에 대응 | 이미 구현됨(`feature/platform-routing`) |
+| Broken Link | 전체 코드베이스의 내부 `href`를 실제 라우트와 대조한 결과, 존재하지 않는 경로를 가리키는 링크는 없다 | 이미 보장됨 |
+| Footer 네비게이션 | `docs/INFORMATION_ARCHITECTURE.md` §4가 서술한 "글로벌 내비게이션과 동일한 핵심 링크 + Contact 강조"를 구현했다 — Home/Projects/Analysis/Resume는 `Link`, Contact는 `Button(primary)`으로 강조. `getNavigation()`을 Header와 동일하게 재사용해 라벨이 어긋나지 않는다 | 이미 구현됨(`feature/platform-routing`) — 이전에 기록된 Architecture Drift 해소 |
+
+### 13.4 Compatibility
+
+| 항목 | 요구 사항 | 현재 상태 |
+|------|-----------|-------------|
+| Cross Browser | Chrome/Edge/Firefox/Safari 최신 버전에서 레이아웃·인터랙션이 동일하게 동작해야 한다 | 미확인 — 실제 브라우저 교차 테스트가 수행된 적 없음. Tailwind CSS 기반이라 구조적 위험은 낮지만 검증되지는 않았다 |
+| Device | Desktop/Tablet/Mobile 반응형(`docs/DESIGN_SYSTEM.md` §5 Responsive Behavior)이 실제 기기에서 확인되어야 한다 | 미확인 — 반응형 원칙은 문서화되어 있으나(§5) 실기기/에뮬레이터 검증 기록 없음 |
+
+이 두 항목은 코드 계약이 아니라 **검증 절차**다 — 새 컴포넌트나 규칙을 만들지 않고, 본 문서 §16 Platform Release Definition of Done의 "Cross Browser QA" 단계에서 실행한다.
+
+### 13.5 Accessibility
+
+`docs/DESIGN_SYSTEM.md` §13이 정의한 5개 원칙(Keyboard Navigation/Color Contrast/Semantic HTML/Screen Readers/Focus Visibility)이 실제 코드에 반영되었는지의 계약이다. 새 원칙을 만들지 않는다 — DESIGN_SYSTEM §13을 그대로 구현했는지만 확인한다.
+
+| 항목 | 요구 사항(`docs/DESIGN_SYSTEM.md` §13) | 현재 상태 |
+|------|------------------------------------------|-------------|
+| Keyboard Navigation | 모든 인터랙션이 키보드만으로 논리적 순서에 따라 접근 가능해야 한다 | 이미 구현됨(`feature/platform-accessibility`) — Header/Footer/Card는 원래부터 네이티브 `<a>`/`<button>`이라 Tab/Enter/Space가 자동 동작했다. `Modal`에 Tab/Shift+Tab 포커스 트랩을 추가해 확대 보기 중 배경으로 포커스가 새는 문제를 없앴다 |
+| Focus Visibility | 키보드 사용자를 위한 포커스 표시가 항상 보여야 하고 미관상 억제하지 않는다 | 이미 보장됨 — `--color-focus` 토큰과 `focus-visible:outline-*`가 Button 등 상호작용 요소에 이미 적용되어 있었다(신규 아님). Skip Link도 동일 토큰을 재사용한다 |
+| Semantic HTML | 시맨틱 요소(heading/landmark/`button` vs `link`)로 구조와 의미를 전달한다 | 이미 보장됨 — 조사 결과 페이지당 `<h1>` 1개, `<h2>`(DetailSection)/`<h3>`(개별 항목) 계층이 이미 일관되고, `<div onClick>` 같은 비시맨틱 상호작용 요소는 발견되지 않았다(전부 `<button>`/`<a>`) |
+| Screen Readers | 비텍스트 콘텐츠에 의미 있는 대체 텍스트를 제공해 읽어도 이해할 수 있어야 한다 | 이미 구현됨 — Gallery/ExternalLinks/DocumentPreviewCard는 이미 `alt`/`aria-label`을 갖추고 있었다. `ProjectCard`/`AnalysisCard`의 반복되는 "자세히 보기"/"분석 보기" 링크만 서로 구분되지 않아 `aria-label`(제목 포함)을 추가했다. `Modal`에는 `aria-label`(호출자가 지정) prop을 추가해 다이얼로그가 "dialog"로만 읽히지 않게 했다 |
+| Color Contrast | 텍스트/의미 있는 UI가 충분한 대비를 유지한다 | 이미 보장됨 — `--color-text-secondary`(#4b5563)는 흰 배경 대비 AA 기준을 충족한다. `--color-text-disabled`(#9ca3af, 낮은 대비)는 현재 어떤 컴포넌트에서도 사용되지 않아 실제 저대비 텍스트가 없다 — 색 토큰을 새로 만들지 않았다 |
+| Skip Navigation | (DESIGN_SYSTEM §13에 없는 추가 항목) | 이미 구현됨 — `MainLayout`에 `#main-content`로 이동하는 skip link 추가. Header가 7개 항목이라 매 페이지 Tab 7회를 건너뛸 수 있는 실질적 효용이 있다고 판단했다(과설계 아님) |
+| Reduced Motion | (DESIGN_SYSTEM §13에 없는 추가 항목) | 이미 구현됨 — `prefers-reduced-motion: reduce`에서 `--duration-*` 토큰만 거의 0으로 재정의해, 그 토큰을 참조하는 모든 transition(Button/Card/Header/Gallery)에 자동 적용. 새 토큰이나 컴포넌트별 예외 없음 |
+
+**검토했으나 적용하지 않은 것**: `<section>`마다 `aria-labelledby`로 랜드마크를 명시하는 방안과, 카드 그리드를 `<ul>/<li>`로 감싸는 방안을 검토했다. 둘 다 이미 `<h1>`/`<h2>`/`<h3>` 계층이 완결되어 있어 스크린 리더의 "헤딩 목록" 탐색으로 동일한 효용을 이미 얻을 수 있고, 적용하려면 `Section`/`ProjectGrid`/`AnalysisGrid` 등 여러 페이지가 공유하는 컴포넌트의 Contract를 넓혀야 해 이득 대비 위험이 크다고 판단했다(과설계 방지) — 실제 스크린 리더 사용자 피드백 등 구체적 필요가 생기면 재검토한다.
+
+### 13.6 적용 범위
+
+이 계약(§13.1~§13.5)은 `data/*.json`을 사용하는 모든 Feature(Home/About/Projects/Analysis/Resume/Personal Works/Contact)에 동일하게 적용된다. `feature/platform-routing`→`platform-seo`→`platform-performance`→`platform-accessibility` 순서로 §13.1~§13.5의 실제 구현이 모두 끝났다(`docs/PROJECT.md` §12.1 Platform Debt).
+
+---
+
+## 14. SEO & Performance Contract
+
+### 14.1 SEO
+
+| 항목 | 요구 사항 | 현재 상태 |
+|------|-----------|-------------|
+| Metadata | 모든 `page.tsx`는 `metadata` 또는 `generateMetadata`를 통해 페이지별 제목/설명을 노출해야 한다. 목록형 페이지는 정적 `metadata`로, 상세 페이지(`[slug]`)는 `generateMetadata`로 실제 데이터(title/overview 등)를 반영한다 | 이미 구현됨(`feature/platform-seo`) — 9개 `page.tsx` 전부 `lib/seo/buildMetadata`로 구성. 상세 페이지는 `generateMetadata`가 `findBySlug` 조회 실패 시 페이지 본문과 동일하게 `notFound()`로 위임한다 |
+| OpenGraph | 위 metadata에 OpenGraph 필드(title/description/image)를 포함한다 | 이미 구현됨 — `buildMetadata`가 title/description/url/siteName/type을 항상 채우고, 실제 이미지가 있는 페이지(Project Detail의 `cover`)만 image를 추가한다. 이미지가 없는 페이지에 억지로 만들지 않는다 |
+| robots | `app/robots.ts`(Next.js 컨벤션)으로 크롤링 정책을 정의한다 | 이미 구현됨 — 전체 allow 하나. `data/*.json`에 반영된 콘텐츠는 이미 Quality Gate(`docs/PROJECT.md` §10)를 통과했으므로 noindex 대상이 없다 |
+| sitemap | `app/sitemap.ts`(Next.js 컨벤션)으로 전체 라우트를 노출한다 | 이미 구현됨 — 정적 라우트 7개 + `getProjects()`/`getAnalysis()`가 실제로 반환하는 slug만 반영(현재는 둘 다 `[]`이라 정적 라우트만 노출) |
+| canonical | 상세 페이지(`[slug]`)의 `metadata.alternates.canonical`을 설정한다 | 이미 구현됨 — `buildMetadata`가 모든 페이지에 자기 자신을 가리키는 canonical을 설정한다(목록/상세 공통) |
+| favicon | `app/favicon.ico` | 이미 존재 |
+
+**Shared SEO Utility**: `lib/seo/buildMetadata.ts`가 위 5개 항목을 한 곳에서 조립한다 — 페이지는 `title`/`description`/`path`(+선택적 `image`)만 넘긴다. `SITE_URL`(`lib/seo/siteUrl.ts`)은 `NEXT_PUBLIC_SITE_URL` 환경 변수를 유일한 출처로 삼으며, 커스텀 도메인이 미정인 지금은 로컬 기본값으로 대체한다(`docs/DEPLOYMENT.md` §2). Home은 그 자체가 `SITE_NAME`이라 `suffixTitle: false`로 중복("Game Designer Portfolio | Game Designer Portfolio")을 막는다.
+
+### 14.2 Performance
+
+| 항목 | 요구 사항 | 현재 상태 |
+|------|-----------|-------------|
+| Image Optimization | 콘텐츠 이미지는 실제로 이득이 있는 곳에 `next/image`를 사용한다 | 이미 구현됨(`feature/platform-performance`) — Gallery 썸네일(그리드, 이미 `aspect-video`로 비율 고정, 스크롤 하단이라 lazy loading 이득 있음)만 `fill`+`sizes`로 전환. 확대 보기 이미지는 `<img>` 유지 — 아래 참고 |
+| Dynamic Import | 초기 로드에 필요하지 않은 컴포넌트는 `next/dynamic`으로 지연 로드한다 | 검토 완료, 미적용 — `.next/static/chunks` 크기를 직접 확인한 결과 프로젝트 자체 코드(Modal 76줄, Gallery 등)는 전부 수 KB 수준이고 번들의 대부분(224K/148K/112K)은 React/Next 런타임 공유 청크라 code splitting으로 줄일 수 있는 부분이 아니다. 무거운 서드파티 의존성 자체가 없다(package.json에 next/react/react-dom 외 없음) — 지금 적용하면 실제 이득 없이 복잡도만 는다(과설계 방지) |
+| Bundle Size | 새 의존성 추가 시 번들 크기 영향을 검토한다(CLAUDE.md §4 "불필요한 의존성 추가 금지"와 동일한 원칙) | 기존 원칙 재확인, 신규 아님 |
+
+**확대 보기(Modal) 이미지를 `next/image`로 전환하지 않는 이유**: 스크린샷/와이어프레임/UML/ERD/컨셉 아트 등(`docs/DATA_MODEL.md` §5.7 `ProjectGalleryImageType`) 원본 비율이 제각각이라 `max-h-[70vh] w-full object-contain`으로 자연스러운 비율을 유지해야 한다. `next/image`의 `fill`은 고정 비율 컨테이너가 필요해 강제로 씌우면 세로로 긴 이미지가 레터박싱되는 시각적 회귀가 생긴다. 게다가 클릭 전에는 `{selected && ...}` 조건부 렌더링으로 아예 마운트되지 않아 초기 로드에 영향이 없다 — 전환해도 성능 이득이 없다.
+
+### 14.3 적용 범위와 우선순위
+
+이 계약도 Data Resilience(§13)와 동일하게 모든 Feature에 적용되며, 실제 구현은 후속 브랜치의 몫이다. 본 문서 §15 Platform Feature Definition of Done이 이 계약을 Feature별 완료 기준으로 연결한다.
+
+---
+
+## 15. Platform Feature Definition of Done
+
+`docs/PROJECT.md` §10(Feature 완료 기준)이 **콘텐츠** 완성도(Architecture→...→Portfolio Quality)를 정의한다면, 이 절은 **플랫폼(코드)** 완성도를 정의한다 — 그래서 이 축은 **콘텐츠가 비어 있어도 통과할 수 있어야 한다.** 두 축은 서로 독립적이다: 어떤 Feature는 Platform DoD를 통과했지만 Content Quality Gate(`docs/PROJECT.md` §10)는 아직 못 미쳤을 수 있고(지금의 Projects/Analysis), 반대로 실제 콘텐츠가 있어도 Platform 쪽이 미비할 수 있다.
+
+이 절도 새 규칙을 만들지 않는다 — 이미 다른 문서에 정의된 것을 Feature 완료 기준이라는 하나의 체크리스트로 묶을 뿐이다.
+
+| 기준 | 정의된 곳 |
+|------|-------------|
+| JSON 기반 렌더링 | §5 데이터 흐름 |
+| Empty State | §13.1, `docs/DESIGN_SYSTEM.md` §12 |
+| Loading | §13.2 |
+| Error | §13.2, `docs/DESIGN_SYSTEM.md` §12 |
+| Responsive | `docs/DESIGN_SYSTEM.md` §5 Layout System |
+| Accessibility / Keyboard Navigation | `docs/DESIGN_SYSTEM.md` §13 |
+| SEO / Metadata | §14.1 |
+| Performance(Image/Dynamic Import) | §14.2 |
+| Component 재사용 | `docs/DESIGN_SYSTEM.md` §6~§9 (Component Library/Naming/Shared/Dependency) |
+| Design System 준수 | `docs/DESIGN_SYSTEM.md` 전체 |
+| Architecture Rule 준수 | §11(Identifier)·§12(Lifecycle)·§13~§14(Resilience/SEO/Performance) |
+
+실제 진행 상태(Feature별로 지금 어디까지 왔는지)는 `docs/PROJECT.md` §11.1 Platform Readiness Status가 추적한다 — 이 절은 기준만 정의하고, 상태 추적은 PROJECT.md의 책임이다(§1 문서 책임 분리).
+
+---
+
+## 16. Platform Release Definition of Done
+
+§15(Feature 단위 완료 기준)를 전부 통과한 이후, Platform 전체가 배포 가능한 상태인지 판단하는 마지막 게이트다. 새 배포 절차를 만들지 않는다 — `docs/DEPLOYMENT.md`(배포 절차, 이번 7개 Source of Truth 문서에는 포함되지 않음)의 앞단에 QA 게이트를 붙이는 것뿐이다.
+
+```
+Feature Complete (§15 전체 Feature ✅)
+   ↓
+Platform QA (docs/GIT_WORKFLOW.md §7.2.1 Page QA)
+   ↓
+Accessibility QA (docs/DESIGN_SYSTEM.md §13)
+   ↓
+SEO 완료 (§14.1)
+   ↓
+Performance 완료 (§14.2)
+   ↓
+Cross Browser QA (§13.4)
+   ↓
+Build 성공 (docs/DEPLOYMENT.md §4)
+   ↓
+Deploy (docs/DEPLOYMENT.md §3, §6)
+   ↓
+Release
+```
+
+이 게이트는 `docs/PROJECT.md` §10 Content Quality Gate와 독립적이다 — Platform Release는 콘텐츠가 비어 있어도 통과할 수 있어야 한다(§1 목적). 실제로 배포하는 결정은 항상 사용자가 내리며(`docs/DEPLOYMENT.md` §8 "Claude Code는 배포 준비까지만 수행"), 이 절은 그 이전 단계에서 무엇을 확인해야 하는지만 정의한다.
+
+### 16.1 QA 실행 결과 (`feature/platform-qa`)
+
+위 게이트를 실제로 실행한 결과다. 각 단계를 통과(✅) / 부분 통과(🔶) / 미실행(⬜)으로 표시하고, 무엇을 근거로 판단했는지 남긴다 — 확인하지 않은 것을 확인했다고 기록하지 않는다.
+
+**Vercel 연결 및 배포**: 이번 브랜치 진행 중 사용자 승인을 받아 Vercel 프로젝트(`yourme/game-designer-portfolio`)를 생성하고 GitHub 저장소(`ghyourme/game_designer_portfolio`)와 연결했다(Login Connection은 사용자가 직접 추가). 최초 배포라 Vercel이 이 배포를 Production으로 처리했다 — `main` 병합 시 실제 Production이 갱신되는 `docs/DEPLOYMENT.md`의 흐름과는 별개로, 지금은 `feature/platform-qa`의 스냅샷이 Production 별칭에 올라가 있는 상태다.
+
+| 단계 | 결과 | 근거 |
+|------|------|------|
+| Feature Complete | 🔶 | Platform 축(§15)은 7개 Feature 전체 충족(`docs/PROJECT.md` §11.1). Content 축(§10)은 Projects/Analysis 등 대부분 미충족 — Platform Release는 이 축과 독립적이므로 게이트를 막지 않는다 |
+| Platform QA / Page QA / Global QA | ✅ | 로컬 프로덕션 빌드에 이어 **실제 배포 URL**(`https://game-designer-portfolio-yourme.vercel.app`)에서 7개 정적 페이지 전체를 curl로 재확인 — 전부 200, Skip Link·`<main id="main-content">`·Footer(Home/Projects/Analysis/Resume/Contact 동일)·Active Navigation(`aria-current="page"`) 렌더링 확인 |
+| Accessibility QA | 🔶 | Skip Link·`aria-current`·Footer/Header 구조는 실제 배포 URL에서 curl로 재확인. Modal 포커스 트랩·Tab 순환처럼 실제 키 입력이 필요한 항목은 브라우저 자동화 도구가 이 환경에 없어(Playwright 등 미설치) 코드 리뷰로만 재확인했다(실제 키 입력 시뮬레이션은 아님) |
+| Navigation QA | 🔶 | 실제 배포 URL에서 Header/Footer 링크 전체와 `/projects/x`·`/analysis/x` 모두 정상 404를 재확인. `/projects/[slug]`의 Active Navigation 하이라이트는 `data/projects.json`이 비어 있어 실제 상세 페이지가 없어 재확인 불가 — `feature/platform-routing`에서 동일 시나리오를 직접 관찰해 정상 동작을 이미 확인했고 이후 로직 변경 없음 |
+| SEO / Performance 완료 | ✅ | `feature/platform-seo`/`feature/platform-performance`에서 코드 검증 완료. **실제 배포에서 새로 발견한 버그**: `NEXT_PUBLIC_SITE_URL` 미설정으로 canonical/OG/sitemap/robots가 `localhost:3000`을 가리키고 있었다 — Vercel Production 환경 변수 설정 후 재배포해 해결(`docs/PROJECT.md` §12.1) |
+| Cross Browser QA | ⬜ | 미실행 — Chrome/Edge/Firefox/Safari를 실제로 구동할 브라우저 자동화 도구가 이 환경에 없다. Tailwind CSS와 표준 HTML/CSS API만 사용해 구조적 위험은 낮다고 판단하지만(§13.4), 실제 시각적 검증은 사람이 직접 하거나 별도 CI(BrowserStack 등) 도입이 필요하다 |
+| Device QA | ⬜ | 미실행 — 실 기기/에뮬레이터가 없다. `Container`/`Gallery`의 반응형 Tailwind 클래스(`sm:`/`lg:` 브레이크포인트)가 코드에 존재함을 확인했을 뿐, 실제 렌더링은 검증하지 못했다 |
+| Build 성공 | ✅ | `tsc --noEmit`/`eslint`/`next build` 전부 통과(§23 검증 결과) |
+| Deploy / Release | ✅ | 사용자 승인 하에 Vercel Preview/Production 배포 완료, 실제 URL에서 라우트 전체 재검증 완료 |
+
+**결론**: 코드·로컬·실제 배포 URL로 검증 가능한 항목은 전부 통과했고, 배포 과정에서 프로덕션 전용 버그(SITE_URL 미설정) 하나를 발견해 즉시 수정했다. 브라우저 자동화가 필요한 항목(Cross Browser/Device QA)만 이 환경의 도구 한계로 미실행 상태로 남아 있다 — 임의로 통과 처리하지 않는다.
+
+---
+
+## 17. Architecture Evolution Policy
+
+이 프로젝트의 Governance(Identifier Rule·Lifecycle·Content Workflow·Review System·Quality Gate·Evidence System·Platform Resilience/SEO/Performance Contract)는 완료 상태다. 이 절은 완료 이후 Architecture를 어떻게(만) 바꿀 수 있는지 정의한다 — Governance를 종료하면서도 Architecture가 영원히 고정되는 것은 아니라는 점을 명시하기 위함이다.
+
+**Architecture는 Stable 상태로 간주한다.** 다음 세 가지 경우에만 변경을 허용하며, 그 외에는 새로운 Rule을 원칙적으로 추가하지 않는다.
+
+| 허용 경로 | 의미 | 예시 |
+|-----------|------|------|
+| Architecture Decision | 실제로 필요한 새 구조적 결정이 생겼을 때 | Personal Works/Contact의 데이터 소스 확정 — `feature/contact-personal-infra`에서 해결됨(Contact는 `profile.json` 확장, Personal Works는 `docs/DATA_MODEL.md` §13 신규 정의, `docs/PROJECT.md` §11 참고) |
+| Architecture Drift | 문서와 코드가 실제로 어긋난 것을 발견했을 때 | `docs/INFORMATION_ARCHITECTURE.md` §4 vs 빈 `Footer.tsx`(`docs/PROJECT.md` §12.1) |
+| Technical Debt | 이미 기록된 부채를 실제로 해소할 때 | `docs/PROJECT.md` §12의 각 도메인 부채 항목 |
+
+이 세 경로 밖에서 "더 나은 방법이 떠올랐다"는 이유만으로 새 Rule이나 새 문서 섹션을 추가하지 않는다. Platform 완성(§13~§16)이 지금부터의 최우선 목표이며, Governance 확장은 이 정책으로 종료한다.
+
+---
+
+## 18. Platform Branch Strategy
+
+Technical Debt(`docs/PROJECT.md` §12.1 Platform Debt)를 우선순위 순서로 처리하는 책임 단위 브랜치 원칙이다. 실제 브랜치명·순서·목록의 **Source of Truth는 `docs/GIT_WORKFLOW.md` §1.2 하나뿐이다** — 여기서 다시 나열하면 두 문서가 서로 다른 목록을 갖게 될 위험(Drift)이 생기므로, 이 절은 원칙만 명시한다.
+
+- 브랜치 하나는 하나의 책임 영역만 다룬다(`docs/GIT_WORKFLOW.md` §1).
+- 순서는 Technical Debt의 우선순위(High → Medium → Low)를 그대로 따른다.
+- 실제 목록은 `docs/GIT_WORKFLOW.md` §1.2를 확인한다.
 
 ---
 

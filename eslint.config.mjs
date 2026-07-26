@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // tools/content-editor는 배포되지 않는 로컬 전용 plain Node(CommonJS) 스크립트라
+    // Next.js/TypeScript 앱 기준 lint 규칙(require 금지 등) 대상이 아니다 (docs/ARCHITECTURE.md §10).
+    "tools/**",
   ]),
 ]);
 
