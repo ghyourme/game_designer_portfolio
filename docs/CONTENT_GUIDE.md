@@ -383,6 +383,18 @@ PDF는 웹과 동일한 구조를 유지한다.
 
 근거의 구체적 출처 유형은 §13 Content Source Rule을, 근거를 콘텐츠에 연결하는 방법은 §14 Traceability Rule을 따른다.
 
+### 12.1 Analysis Evidence Mapping
+
+Analysis도 §2 "근거 중심으로 작성한다"는 동일한 원칙을 따르지만, 근거의 성격이 Project와 다르다 — Project의 근거는 "본인이 만든 산출물"이지만, Analysis의 근거는 "분석 대상 게임을 실제로 플레이·관찰한 경험"이다. 이 차이 때문에 위 표에 합치지 않고 별도 절로 둔다.
+
+| 섹션 | 요구되는 근거 | 근거가 없을 때 |
+|------|----------------|-----------------|
+| 분석 대상/목적 (`targetGame`/`purpose`) | 실제 플레이 경험 또는 공식 자료(공식 사이트, 패치노트, 개발자 인터뷰 등) | 플레이하거나 공식 자료를 확인하지 않은 게임은 분석 대상으로 삼지 않는다 |
+| 시스템 분석 (`systemAnalysis`) | 실제 플레이 중 관찰한 시스템 동작, 공식 문서 | 근거 없이 추측한 시스템 구조는 서술하지 않는다 |
+| 콘텐츠 분석 (`contentAnalysis`) | 실제 플레이한 콘텐츠(퀘스트, 아이템, 이벤트 등) 관찰 기록 | 플레이하지 않은 콘텐츠는 다루지 않는다 |
+| UX 분석 (`uxAnalysis`) | 실제 플레이 중 관찰한 사용자 경험(온보딩, 조작감, 피드백 등) | 실제 플레이 경험이 없으면 서술하지 않는다 |
+| 결론 (`conclusion`) | 위 세 관점의 근거로 뒷받침되는 종합 | 세 관점에 근거가 갖춰진 뒤 마지막에 작성한다 |
+
 ---
 
 ## 13. Content Source Rule
@@ -416,6 +428,28 @@ PPT
 
 체인 뒤쪽 자료(PPT, 실제 구현 화면)만 있고 앞쪽 원본(기획서, 개발 문서)이 없는 경우, 없는 원본을 지어내지 않는다 — 확보한 자료 범위 안에서만 근거를 표기한다(§14 Traceability Rule).
 
+### 13.1 Analysis Content Source Chain
+
+Project는 본인이 만든 산출물의 체인이지만, Analysis는 제3자(다른 개발사)가 만든 게임을 관찰하는 체인이라 성격이 다르다.
+
+```
+실제 플레이 경험
+  ↓
+공식 자료 (공식 사이트, 패치노트, 개발자 인터뷰 등)
+  ↓
+커뮤니티/리뷰 자료 (참고용 — 단독 근거로 쓰지 않는다)
+  ↓
+포트폴리오 콘텐츠
+```
+
+| 출처 | 성격 | 주로 뒷받침하는 섹션 |
+|------|------|------------------------|
+| 실제 플레이 경험 | 분석자가 직접 관찰한 1차 자료 | 시스템 분석, 콘텐츠 분석, UX 분석 전체 |
+| 공식 자료 | 개발사가 공개한 의도·스펙 정보 | 분석 목적, 시스템 분석(설계 의도 검증) |
+| 커뮤니티/리뷰 자료 | 다른 플레이어의 경험 — 교차 검증 보조 자료일 뿐 단독 근거로 쓰지 않는다 | 결론(다른 시각과 대조할 때만 보조적으로) |
+
+커뮤니티/리뷰 자료만으로, 즉 직접 플레이하지 않은 게임으로 분석을 작성하지 않는다 — Project의 "체인 뒤쪽 자료만 있고 앞쪽 원본이 없으면 지어내지 않는다"는 원칙과 동일하게, Analysis도 1차 자료(실제 플레이) 없이 작성하지 않는다.
+
 ---
 
 ## 14. Traceability Rule
@@ -429,4 +463,65 @@ PPT
 - `documents`(§5.6)에 첨부되는 자료는 워크시트의 출처 표기와 반드시 일치해야 한다 — 워크시트에 없는 자료를 `documents`에만 첨부하지 않는다(둘은 같은 근거를 가리켜야 한다).
 - 워크시트 파일이 실제로 어디에 위치하는지(`docs/projects/<slug>/evidence.md`)는 `docs/ARCHITECTURE.md` §11 Project Identifier Rule을 따른다 — 이 문서는 워크시트의 내용 규칙만 정의하고, 위치·명명 규칙은 중복 정의하지 않는다.
 
-이 규칙은 Projects에 한정된다. Analysis 등 다른 콘텐츠 유형의 Evidence/Source/Traceability 매핑은 아직 정의되지 않았다 (`docs/PROJECT.md` §12 Technical Debt 참고).
+### 14.1 Analysis Traceability
+
+Analysis도 Project와 동일한 원칙(작성 워크시트로 관리, `data/analysis.json`에 출처 필드를 추가하지 않음)을 따른다. 다만 워크시트가 실제로 어디에 위치하는지는 이 절에서 정하지 않는다 — Project의 워크시트 위치(`docs/projects/<slug>/evidence.md`)는 `docs/ARCHITECTURE.md` §11 Project Identifier Rule의 slug 기반 폴더 체계를 그대로 따른 것인데, 같은 문서 §11이 "Analysis는 아직 개별 Branch·Evidence 워크시트 체계가 없다"고 명시하고 있기 때문이다. 폴더 규칙은 Analysis Content 단계 진입 시점(별도 브랜치)에 정한다 — 지금 미리 만들지 않는다(과설계 방지).
+
+- 작성 워크시트는 위 5개 항목(분석 대상/목적, 시스템 분석, 콘텐츠 분석, UX 분석, 결론)마다 인용한 출처를 `[출처유형: 구체적 식별자]` 형태로 표기한다.
+  - 예: `[실제 플레이: 2024-05~2024-06 플레이 기록]`, `[공식 자료: 개발자 인터뷰 링크]`
+- Analysis Content Review Checklist(§15.1)를 적용하기 전, 각 항목에 최소 하나 이상의 출처가 표기되어 있는지 먼저 확인한다 — 출처가 없는 항목은 §12.1 Analysis Evidence Mapping 위반으로 우선 반려한다.
+
+---
+
+이 규칙(§12~§14)은 이제 Projects와 Analysis 모두를 다룬다 — Analysis는 각 절의 §12.1/§13.1/§14.1을 참고한다(`docs/PROJECT.md` §12.3, `docs/analysis-content-governance`에서 해결됨). Personal Works/Contact/Resume 등 다른 콘텐츠 유형의 Evidence/Source/Traceability 매핑은 아직 정의되지 않았다 (`docs/PROJECT.md` §12 Technical Debt 참고).
+
+---
+
+## 15. Analysis Review Checklist (작성 완료 후 검수 기준)
+
+§10 Project Review Checklist와 동일한 목적이다 — §9는 "작성 전에 확인하는 것", 이 절은 "작성 완료 후 통과해야 하는 것"이다. 모든 분석은 `data/analysis.json`에 반영되기 전 아래 세 체크리스트를 모두 통과해야 한다 (`docs/PROJECT.md` §10 Quality Gate의 Content Review / Recruiter Review / Senior Planner Review 단계에 각각 대응). §5(게임 분석 작성 규칙)를 기준으로 하며, 세 체크리스트를 순서대로 적용하는 이유도 §10과 동일하다 — Content Review가 §5 기준 자체 충족 여부를 먼저 확인하고, 통과한 분석만 Recruiter Review와 Senior Planner Review 대상이 된다.
+
+### 15.1 Content Review Checklist
+
+■ Target & Purpose (`targetGame`/`purpose`)
+- [ ] 분석 대상 게임이 명확한가
+- [ ] 분석 목적이 단순 감상이 아니라 기획자 관점(무엇을 보여주려는 분석인지)으로 서술되는가
+
+■ System Analysis (`systemAnalysis`)
+- [ ] 핵심 시스템(`keyElement`)이 명확히 식별되는가
+- [ ] 장점(`strengths`)/문제점(`weaknesses`)/개선안(`improvements`)이 모두 근거를 갖고 서술되는가 (§12.1 Analysis Evidence Mapping)
+
+■ Content Analysis (`contentAnalysis`)
+- [ ] 핵심 콘텐츠(`keyElement`)가 명확히 식별되는가
+- [ ] 장점/문제점/개선안이 모두 근거를 갖고 서술되는가
+
+■ UX Analysis (`uxAnalysis`)
+- [ ] 핵심 경험(`keyElement`)이 명확히 식별되는가
+- [ ] 장점/문제점/개선안이 모두 근거를 갖고 서술되는가
+
+■ Conclusion (`conclusion`)
+- [ ] 세 관점을 단순 나열이 아니라 종합했는가
+- [ ] 배운 점이 다른 프로젝트/분석에도 적용 가능한 형태로 서술되는가
+
+이 체크리스트를 통과하지 못한 분석은 Quality Gate의 Content Review 단계를 통과할 수 없다.
+
+### 15.2 Recruiter Review Checklist
+
+채용담당자의 빠른 스크리닝 흐름(`docs/INFORMATION_ARCHITECTURE.md` §2.6 User Flow "빠른 스크리닝")을 기준으로 검증한다.
+
+- [ ] 헤더(분석 대상, 태그)만 보고 무엇을 분석했는지 즉시 파악할 수 있는가
+- [ ] 결론만 읽어도 분석의 핵심 통찰을 알 수 있는가
+- [ ] 지원 직무(시스템/콘텐츠 기획자, `docs/PROJECT.md` §4)와의 관련성이 명확한가
+- [ ] 문장이 간결한가 (§6 문체 기준)
+
+### 15.3 Senior Game Designer Review Checklist
+
+시니어 기획자의 심층 검토 흐름(`docs/INFORMATION_ARCHITECTURE.md` §2.6 User Flow "심층 검토")을 기준으로 검증한다.
+
+- [ ] 세 관점(시스템/콘텐츠/UX)이 서로 다른 각도에서 분석되었는가 — 같은 내용을 관점만 바꿔 반복하지 않는가
+- [ ] 문제점 지적이 표면적 불만이 아니라 설계 원리에 근거하는가
+- [ ] 개선안이 실행 가능한 구체적 대안으로 제시되는가 (막연한 소망이 아닌가)
+- [ ] 근거 없는 추측이 아니라 실제 플레이 경험에 기반하는가 (§12.1/§13.1)
+- [ ] 결론이 세 관점의 통찰을 실제로 종합하는가 — 마지막 관점의 재요약에 그치지 않는가
+
+이 절(§15)로 `docs/PROJECT.md` §12.3의 "Analysis Review Checklist 미구축" 부채가 해소된다.

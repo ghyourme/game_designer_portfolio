@@ -258,8 +258,8 @@ Architecture → Implementation → Real Contents → Content Review
 
 | 항목 | 상태 | 설명 |
 |------|------|------|
-| Analysis Review Checklist 미구축 | 잔존 | Projects의 §10 체크리스트는 Projects 전용이다. Analysis가 Content Review 단계(§10 4번)에 도달하려면 `docs/CONTENT_GUIDE.md` §5(게임 분석 작성 규칙) 기준의 별도 Review Checklist가 필요하다 |
-| Analysis Evidence/Traceability 매핑 미구축 | 잔존 | `docs/CONTENT_GUIDE.md` §12~§14는 Projects 9개 섹션에만 매핑되어 있다. Analysis(`docs/CONTENT_GUIDE.md` §5)의 근거·출처·추적성 규칙은 아직 없으며, Analysis Content 단계 진입 전 별도 브랜치가 필요하다 |
+| Analysis Review Checklist 미구축 | 해결됨 (`docs/analysis-content-governance`) | `docs/CONTENT_GUIDE.md` §15에 Content/Recruiter/Senior Game Designer Review Checklist 정의 — §10 Project Review Checklist와 동일한 3단계 구조를 §5(게임 분석 작성 규칙) 기준으로 적용했다 |
+| Analysis Evidence/Traceability 매핑 미구축 | 해결됨 (`docs/analysis-content-governance`) | `docs/CONTENT_GUIDE.md` §12.1(Evidence Mapping)·§13.1(Content Source Chain)·§14.1(Traceability)에 정의. Project의 근거는 "본인이 만든 산출물"이지만 Analysis의 근거는 "실제 플레이 경험"이라 표는 공유하지 않고 별도 하위 절로 분리했다. 워크시트 위치(폴더 규칙)는 Analysis Content 단계 진입 시점으로 계속 미룬다(과설계 방지) |
 
 ### 12.4 Resume Debt
 
