@@ -17,11 +17,17 @@ export function ResumeHero() {
   return (
     <Section>
       <Container>
-        <h1>{personalInfo.name}</h1>
-        <p>{personalInfo.role}</p>
-        <p>{personalInfo.email}</p>
-        <p>{personalInfo.phone}</p>
-        <p>{personalInfo.location}</p>
+        <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl lg:text-5xl">
+          {personalInfo.name}
+        </h1>
+        <p className="mt-3 text-lg font-medium text-brand-primary sm:text-xl">
+          {personalInfo.role}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-text-secondary">
+          <span>{personalInfo.email}</span>
+          <span>{personalInfo.phone}</span>
+          <span>{personalInfo.location}</span>
+        </div>
       </Container>
     </Section>
   );

@@ -26,9 +26,15 @@ export default function PersonalPage() {
   return (
     <Section>
       <Container>
-        <h1>Personal Works</h1>
-        <p>정식 프로젝트 외에 개인적으로 진행한 작업물을 소개하는 페이지입니다.</p>
-        <PersonalGrid works={works} />
+        <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+          Personal Works
+        </h1>
+        <p className="mt-3 max-w-2xl text-lg text-text-secondary">
+          정식 프로젝트 외에 개인적으로 진행한 작업물을 소개하는 페이지입니다.
+        </p>
+        <div className="mt-8">
+          <PersonalGrid works={works} />
+        </div>
       </Container>
     </Section>
   );

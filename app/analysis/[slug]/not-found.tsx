@@ -15,9 +15,15 @@ export default function AnalysisNotFound() {
   return (
     <Section>
       <Container>
-        <h1>분석을 찾을 수 없습니다</h1>
-        <p>요청한 분석이 존재하지 않거나 삭제되었습니다.</p>
-        <Button href="/analysis">Analysis 목록으로</Button>
+        <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+          분석을 찾을 수 없습니다
+        </h1>
+        <p className="mt-3 text-lg text-text-secondary">
+          요청한 분석이 존재하지 않거나 삭제되었습니다.
+        </p>
+        <div className="mt-6">
+          <Button href="/analysis">Analysis 목록으로</Button>
+        </div>
       </Container>
     </Section>
   );

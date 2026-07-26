@@ -22,9 +22,15 @@ export function Hero() {
   return (
     <Section>
       <Container>
-        <h1>{profile.name}</h1>
-        <p>{profile.targetRole}</p>
-        <p>{profile.tagline}</p>
+        <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl lg:text-5xl">
+          {profile.name}
+        </h1>
+        <p className="mt-3 text-lg font-medium text-brand-primary sm:text-xl">
+          {profile.targetRole}
+        </p>
+        <p className="mt-2 max-w-2xl text-base text-text-secondary leading-relaxed sm:text-lg">
+          {profile.tagline}
+        </p>
       </Container>
     </Section>
   );

@@ -18,9 +18,13 @@ export function ResumeDownload() {
     <Section>
       <Container>
         <Card>
-          <p>PDF 미리보기가 표시될 영역입니다.</p>
+          <p className="text-base text-text-secondary">
+            PDF 미리보기가 표시될 영역입니다.
+          </p>
         </Card>
-        <Button>PDF 다운로드</Button>
+        <div className="mt-6">
+          <Button>PDF 다운로드</Button>
+        </div>
         {/* TODO: 실제 PDF 파일 업로드 및 다운로드 연결 예정 */}
       </Container>
     </Section>

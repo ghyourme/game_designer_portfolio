@@ -21,7 +21,7 @@ export interface AnalysisConclusionProps {
 export function AnalysisConclusion({ conclusion }: AnalysisConclusionProps) {
   return (
     <Card>
-      <p>{conclusion}</p>
+      <p className="text-base text-text-primary leading-relaxed">{conclusion}</p>
     </Card>
   );
 }

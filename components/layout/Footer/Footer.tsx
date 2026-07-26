@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getNavigation } from "@/lib/data";
 import { Button } from "@/components/ui/Button";
+import { Container } from "@/components/ui/Container";
 
 /**
  * Footer
@@ -25,19 +26,28 @@ export function Footer() {
     .sort((a, b) => a.order - b.order);
 
   return (
-    <footer>
-      <nav aria-label="Footer navigation">
-        <ul>
-          {items.map((item) => (
-            <li key={item.path}>
-              <Link href={item.path}>{item.label}</Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-      <Button href="/contact" variant="primary">
-        Contact
-      </Button>
+    <footer className="border-t border-border-default bg-background-muted">
+      <Container>
+        <div className="flex flex-col items-start gap-6 py-8 sm:flex-row sm:items-center sm:justify-between">
+          <nav aria-label="Footer navigation">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
+              {items.map((item) => (
+                <li key={item.path}>
+                  <Link
+                    href={item.path}
+                    className="text-sm text-text-secondary transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:text-text-primary"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <Button href="/contact" variant="primary">
+            Contact
+          </Button>
+        </div>
+      </Container>
     </footer>
   );
 }

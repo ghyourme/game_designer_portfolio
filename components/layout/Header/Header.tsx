@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getNavigation } from "@/lib/data";
+import { Container } from "@/components/ui/Container";
 
 /**
  * Header
@@ -26,7 +27,9 @@ import { getNavigation } from "@/lib/data";
  *   사용자도 같은 정보를 시각적으로 확인할 수 있게 했다(새 색 토큰 없이 기존
  *   `font-semibold` 유틸리티만 사용, feature/platform-accessibility).
  *
- * 스타일은 최소 구조 이상으로 구현하지 않는다.
+ * 활성 상태는 밑줄 대신 브랜드 색상 + 굵기로 표현한다(feature/platform-visual-design) —
+ * 다른 곳의 링크(Button 등)는 밑줄을 쓰지 않아, 밑줄만으로는 "활성 상태"와 "일반 링크"가
+ * 혼동될 여지가 있었다.
  */
 export function Header() {
   const pathname = usePathname();
@@ -35,29 +38,31 @@ export function Header() {
     .sort((a, b) => a.order - b.order);
 
   return (
-    <header>
-      <nav aria-label="Global navigation">
-        <ul>
-          {items.map((item) => {
-            const isCurrentPage =
-              item.path === "/"
-                ? pathname === "/"
-                : pathname === item.path ||
-                  pathname.startsWith(`${item.path}/`);
-            return (
-              <li key={item.path}>
-                <Link
-                  href={item.path}
-                  aria-current={isCurrentPage ? "page" : undefined}
-                  className='aria-[current="page"]:font-semibold aria-[current="page"]:underline'
-                >
-                  {item.label}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
+    <header className="border-b border-border-default bg-background-base">
+      <Container>
+        <nav aria-label="Global navigation" className="flex h-16 items-center">
+          <ul className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            {items.map((item) => {
+              const isCurrentPage =
+                item.path === "/"
+                  ? pathname === "/"
+                  : pathname === item.path ||
+                    pathname.startsWith(`${item.path}/`);
+              return (
+                <li key={item.path}>
+                  <Link
+                    href={item.path}
+                    aria-current={isCurrentPage ? "page" : undefined}
+                    className='text-sm font-medium text-text-secondary transition-colors duration-[var(--duration-fast)] ease-[var(--ease-standard)] hover:text-text-primary aria-[current="page"]:font-semibold aria-[current="page"]:text-brand-primary'
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+      </Container>
     </header>
   );
 }

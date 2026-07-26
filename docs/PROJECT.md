@@ -279,6 +279,7 @@ Architecture → Implementation → Real Contents → Content Review
 | 콘텐츠 일관성 검증 자동화 없음 | 잔존 | 현재 체크리스트는 전부 수동 검토 절차다. 실제 콘텐츠가 아직 없는 지금은 충분하지만, 콘텐츠 수가 늘어나면(§2 목표 3 "최소 3개 시스템 설계 문서" 등) 체크리스트 위반을 자동 감지하는 스크립트가 필요할 수 있다 — 지금은 만들지 않는다(과설계 방지) |
 | 브랜치명 대상-중심 원칙 위반 사례 | 해결됨(교훈으로 기록) | `docs/evidence-structure-generalization`의 "generalization"은 작업 대상이 아니라 방법론이라 `docs/GIT_WORKFLOW.md` §1의 대상-중심 네이밍과 어긋났다. 이미 `develop`에 병합되어 브랜치 자체를 rename하지는 않으며, 이후 브랜치부터 대상 중심 명명을 적용한다 |
 | DATA_MODEL §4/§5 필드 범위 불일치(관찰) | 잔존(낮은 우선순위) | `docs/DATA_MODEL.md` §4는 "모든 데이터"에 `status`/`description`/`createdAt`/`updatedAt`/`order`가 공통 적용된다고 서술하지만, Project(§5.1)·Analysis(§6.1) 실제 필드 목록에는 없다. `docs/ARCHITECTURE.md` §12.1의 Project State를 이 `status` 필드로 표현하고 싶은 유혹이 있었으나, 필드 추가 금지 원칙에 따라 다루지 않는다 — §4가 실제로 "선택적 공통 어휘"인지 "필수 규칙"인지는 별도로 명확히 할 필요가 있다 |
+| 전역 시각 디자인(타이포그래피/내비게이션) 미적용 (Architecture Drift) | 해결됨 (`feature/platform-visual-design`) | `docs/DESIGN_SYSTEM.md` §4가 정의한 타입 스케일·색상 토큰(`styles/typography.ts`, `styles/colors.ts`, `app/globals.css`)이 Tailwind `@theme`까지는 연결되어 있었지만, 실제 컴포넌트의 `h1`~`h4`/`p` 태그와 `Header`/`Footer` 내비게이션에는 전혀 적용되지 않아 프로덕션 배포본이 타이포그래피 없이 브라우저 기본값으로만 렌더링되고 있었다(실제 배포 URL의 CSS를 확인해 유틸리티 클래스 자체는 정상 컴파일됨을 먼저 확인 — 빌드 문제가 아니라 마크업에 클래스가 없는 문제였다). `Header`/`Footer`가 각각 "스타일은 최소 구조 이상으로 구현하지 않는다"고 명시하고 있던 것 자체가 이 Drift의 근거였다. 이미 정의된 토큰만 재사용해 전체 40여개 컴포넌트의 제목/본문 타이포그래피와 `Header`/`Footer`의 레이아웃(가로 배치, 여백, 활성 상태 색상)을 적용했다 — 새 색상/타입 스케일 값은 추가하지 않았다 |
 
 ---
 

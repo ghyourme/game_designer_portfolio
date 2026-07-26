@@ -28,22 +28,24 @@ export function ProjectCard({ project }: ProjectCardProps) {
   return (
     <Card>
       {project.featured && <Badge variant="featured">Featured</Badge>}
-      <h3>{project.title}</h3>
-      <p>{project.subtitle}</p>
+      <h3 className="mt-2 text-lg font-semibold text-text-primary">{project.title}</h3>
+      <p className="mt-1 text-sm text-text-secondary">{project.subtitle}</p>
       {project.tags.length > 0 && (
-        <div>
+        <div className="mt-3 flex flex-wrap gap-2">
           {project.tags.map((tag) => (
             <Tag key={tag}>{tag}</Tag>
           ))}
         </div>
       )}
-      <Button
-        href={`/projects/${project.slug}`}
-        variant="tertiary"
-        aria-label={`${project.title} 자세히 보기`}
-      >
-        자세히 보기
-      </Button>
+      <div className="mt-4">
+        <Button
+          href={`/projects/${project.slug}`}
+          variant="tertiary"
+          aria-label={`${project.title} 자세히 보기`}
+        >
+          자세히 보기
+        </Button>
+      </div>
     </Card>
   );
 }

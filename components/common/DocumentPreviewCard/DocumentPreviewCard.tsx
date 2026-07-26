@@ -35,17 +35,21 @@ export interface DocumentPreviewCardProps {
 export function DocumentPreviewCard({ document: doc }: DocumentPreviewCardProps) {
   return (
     <Card>
-      <h4>{doc.title}</h4>
-      <Tag>{TYPE_LABEL[doc.type]}</Tag>
-      <Button
-        href={doc.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        variant="secondary"
-        aria-label={`${doc.title} 열기 (새 창)`}
-      >
-        열기
-      </Button>
+      <h4 className="text-base font-semibold text-text-primary">{doc.title}</h4>
+      <div className="mt-2">
+        <Tag>{TYPE_LABEL[doc.type]}</Tag>
+      </div>
+      <div className="mt-4">
+        <Button
+          href={doc.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          variant="secondary"
+          aria-label={`${doc.title} 열기 (새 창)`}
+        >
+          열기
+        </Button>
+      </div>
     </Card>
   );
 }

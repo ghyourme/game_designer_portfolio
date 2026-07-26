@@ -22,25 +22,23 @@ export function ContactInfo() {
   return (
     <Section>
       <Container>
-        <Button href={`mailto:${profile.email}`} variant="primary">
-          이메일 보내기
-        </Button>
-        {profile.links.length > 0 && (
-          <div>
-            {profile.links.map((link) => (
-              <Button
-                key={link.url}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                variant="secondary"
-                aria-label={`${link.label} (새 창)`}
-              >
-                {link.label}
-              </Button>
-            ))}
-          </div>
-        )}
+        <div className="flex flex-wrap gap-4">
+          <Button href={`mailto:${profile.email}`} variant="primary">
+            이메일 보내기
+          </Button>
+          {profile.links.map((link) => (
+            <Button
+              key={link.url}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="secondary"
+              aria-label={`${link.label} (새 창)`}
+            >
+              {link.label}
+            </Button>
+          ))}
+        </div>
       </Container>
     </Section>
   );

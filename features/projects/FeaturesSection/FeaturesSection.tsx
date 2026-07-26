@@ -28,8 +28,10 @@ export function FeaturesSection({ features, gallery }: FeaturesSectionProps) {
     <div className="space-y-8">
       {features.map((feature) => (
         <article key={feature.name}>
-          <h3>{feature.name}</h3>
-          <p>{feature.description}</p>
+          <h3 className="text-lg font-semibold text-text-primary">{feature.name}</h3>
+          <p className="mt-2 max-w-2xl text-base text-text-secondary leading-relaxed">
+            {feature.description}
+          </p>
         </article>
       ))}
       <Gallery images={gallery} />

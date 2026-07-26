@@ -17,10 +17,20 @@ export function DesignPhilosophy() {
   return (
     <Section>
       <Container>
-        <h2>Design Philosophy</h2>
-        <p>{profile.designApproach}</p>
-        <p>{profile.problemSolving}</p>
-        <p>{profile.playerExperience}</p>
+        <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+          Design Philosophy
+        </h2>
+        <div className="mt-6 flex flex-col gap-4">
+          <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+            {profile.designApproach}
+          </p>
+          <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+            {profile.problemSolving}
+          </p>
+          <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+            {profile.playerExperience}
+          </p>
+        </div>
       </Container>
     </Section>
   );

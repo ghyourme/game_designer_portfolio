@@ -23,7 +23,7 @@ export function ProjectGrid({
   emptyMessage = "표시할 프로젝트가 없습니다.",
 }: ProjectGridProps) {
   if (projects.length === 0) {
-    return <p>{emptyMessage}</p>;
+    return <p className="text-base text-text-secondary">{emptyMessage}</p>;
   }
 
   return (

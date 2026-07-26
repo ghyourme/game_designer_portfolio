@@ -19,16 +19,20 @@ export function CallToAction() {
   return (
     <Section>
       <Container>
-        <p>프로젝트, 이력서, 연락처로 이어지는 CTA 영역입니다.</p>
-        <Button href="/projects" variant="primary">
-          프로젝트 보기
-        </Button>
-        <Button href="/resume" variant="secondary">
-          이력서 다운로드
-        </Button>
-        <Button href="/contact" variant="tertiary">
-          연락하기
-        </Button>
+        <p className="text-lg text-text-secondary">
+          프로젝트, 이력서, 연락처로 이어지는 CTA 영역입니다.
+        </p>
+        <div className="mt-6 flex flex-wrap gap-4">
+          <Button href="/projects" variant="primary">
+            프로젝트 보기
+          </Button>
+          <Button href="/resume" variant="secondary">
+            이력서 다운로드
+          </Button>
+          <Button href="/contact" variant="tertiary">
+            연락하기
+          </Button>
+        </div>
       </Container>
     </Section>
   );

@@ -72,12 +72,16 @@ export default async function ProjectDetailPage({
     <>
       <ProjectHero project={project} />
       <DetailSection title="프로젝트 개요">
-        <p>{project.overview}</p>
+        <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+          {project.overview}
+        </p>
       </DetailSection>
       <DetailSection title="담당 역할">
-        <p>{project.contribution}</p>
+        <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+          {project.contribution}
+        </p>
         {project.skills.length > 0 && (
-          <div>
+          <div className="mt-4 flex flex-wrap gap-2">
             {project.skills.map((skill) => (
               <Tag key={skill}>{skill}</Tag>
             ))}
@@ -85,13 +89,19 @@ export default async function ProjectDetailPage({
         )}
       </DetailSection>
       <DetailSection title="목표">
-        <p>{project.goal}</p>
+        <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+          {project.goal}
+        </p>
       </DetailSection>
       <DetailSection title="문제 정의">
-        <p>{project.problem}</p>
+        <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+          {project.problem}
+        </p>
       </DetailSection>
       <DetailSection title="접근 과정">
-        <p>{project.approach}</p>
+        <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+          {project.approach}
+        </p>
       </DetailSection>
       <DetailSection title="시스템 설계">
         <SystemsSection systems={project.systems} documents={project.documents} />
@@ -100,10 +110,14 @@ export default async function ProjectDetailPage({
         <FeaturesSection features={project.features} gallery={project.gallery} />
       </DetailSection>
       <DetailSection title="결과">
-        <p>{project.result}</p>
+        <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+          {project.result}
+        </p>
       </DetailSection>
       <DetailSection title="회고">
-        <p>{project.retrospective}</p>
+        <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+          {project.retrospective}
+        </p>
       </DetailSection>
       <Section>
         <Container>

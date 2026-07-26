@@ -25,11 +25,15 @@ export function SkillOverview() {
   return (
     <Section>
       <Container>
-        <h2>Skill Overview</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+          Skill Overview
+        </h2>
         {allSkills.length === 0 ? (
-          <p>등록된 기술 정보가 없습니다.</p>
+          <p className="mt-6 text-base text-text-secondary">
+            등록된 기술 정보가 없습니다.
+          </p>
         ) : (
-          <div>
+          <div className="mt-6 flex flex-wrap gap-2">
             {allSkills.map((skill) => (
               <Tag key={skill.name}>{skill.name}</Tag>
             ))}

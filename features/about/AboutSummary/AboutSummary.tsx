@@ -17,8 +17,12 @@ export function AboutSummary() {
   return (
     <Section>
       <Container>
-        <p>{profile.summary}</p>
-        <p>{profile.direction}</p>
+        <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+          {profile.summary}
+        </p>
+        <p className="mt-4 max-w-2xl text-base text-text-secondary leading-relaxed">
+          {profile.direction}
+        </p>
       </Container>
     </Section>
   );

@@ -25,25 +25,27 @@ export interface PersonalCardProps {
 export function PersonalCard({ work }: PersonalCardProps) {
   return (
     <Card>
-      <h3>{work.title}</h3>
-      <p>{work.description}</p>
+      <h3 className="text-lg font-semibold text-text-primary">{work.title}</h3>
+      <p className="mt-1 text-sm text-text-secondary">{work.description}</p>
       {work.tags.length > 0 && (
-        <div>
+        <div className="mt-3 flex flex-wrap gap-2">
           {work.tags.map((tag) => (
             <Tag key={tag}>{tag}</Tag>
           ))}
         </div>
       )}
       {work.link !== "" && (
-        <Button
-          href={work.link}
-          target="_blank"
-          rel="noopener noreferrer"
-          variant="tertiary"
-          aria-label={`${work.title} 자세히 보기 (새 창)`}
-        >
-          자세히 보기
-        </Button>
+        <div className="mt-4">
+          <Button
+            href={work.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            variant="tertiary"
+            aria-label={`${work.title} 자세히 보기 (새 창)`}
+          >
+            자세히 보기
+          </Button>
+        </div>
       )}
     </Card>
   );

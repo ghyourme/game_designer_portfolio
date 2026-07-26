@@ -27,14 +27,16 @@ export function AnalysisHero({ analysis }: AnalysisHeroProps) {
     <Section>
       <Container>
         {analysis.featured && <Badge variant="featured">Featured</Badge>}
-        <h1>{analysis.title}</h1>
-        <p>{analysis.description}</p>
-        <dl>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+          {analysis.title}
+        </h1>
+        <p className="mt-2 max-w-2xl text-lg text-text-secondary">{analysis.description}</p>
+        <dl className="mt-6 grid grid-cols-2 gap-x-6">
           <MetaInfo label="분석 대상" value={analysis.targetGame} />
           <MetaInfo label="분석 목적" value={analysis.purpose} />
         </dl>
         {analysis.tags.length > 0 && (
-          <div>
+          <div className="mt-4 flex flex-wrap gap-2">
             {analysis.tags.map((tag) => (
               <Tag key={tag}>{tag}</Tag>
             ))}

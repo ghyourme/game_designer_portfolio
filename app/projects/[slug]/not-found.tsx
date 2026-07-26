@@ -15,9 +15,15 @@ export default function ProjectNotFound() {
   return (
     <Section>
       <Container>
-        <h1>프로젝트를 찾을 수 없습니다</h1>
-        <p>요청한 프로젝트가 존재하지 않거나 삭제되었습니다.</p>
-        <Button href="/projects">Projects 목록으로</Button>
+        <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+          프로젝트를 찾을 수 없습니다
+        </h1>
+        <p className="mt-3 text-lg text-text-secondary">
+          요청한 프로젝트가 존재하지 않거나 삭제되었습니다.
+        </p>
+        <div className="mt-6">
+          <Button href="/projects">Projects 목록으로</Button>
+        </div>
       </Container>
     </Section>
   );

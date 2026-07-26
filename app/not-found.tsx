@@ -15,9 +15,13 @@ export default function NotFound() {
   return (
     <Section>
       <Container>
-        <h1>404</h1>
-        <p>페이지를 찾을 수 없습니다.</p>
-        <Button href="/">홈으로 돌아가기</Button>
+        <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+          404
+        </h1>
+        <p className="mt-3 text-lg text-text-secondary">페이지를 찾을 수 없습니다.</p>
+        <div className="mt-6">
+          <Button href="/">홈으로 돌아가기</Button>
+        </div>
       </Container>
     </Section>
   );

@@ -24,7 +24,7 @@ export function AnalysisGrid({
   emptyMessage = "표시할 분석이 없습니다.",
 }: AnalysisGridProps) {
   if (analyses.length === 0) {
-    return <p>{emptyMessage}</p>;
+    return <p className="text-base text-text-secondary">{emptyMessage}</p>;
   }
 
   return (

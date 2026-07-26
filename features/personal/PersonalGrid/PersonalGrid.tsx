@@ -24,7 +24,7 @@ export function PersonalGrid({
   emptyMessage = "표시할 개인 작업물이 없습니다.",
 }: PersonalGridProps) {
   if (works.length === 0) {
-    return <p>{emptyMessage}</p>;
+    return <p className="text-base text-text-secondary">{emptyMessage}</p>;
   }
 
   return (

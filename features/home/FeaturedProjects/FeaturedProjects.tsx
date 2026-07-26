@@ -20,11 +20,15 @@ export function FeaturedProjects() {
   return (
     <Section>
       <Container>
-        <h2>Featured Projects</h2>
-        <ProjectGrid
-          projects={featuredProjects}
-          emptyMessage="아직 대표 프로젝트가 없습니다."
-        />
+        <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+          Featured Projects
+        </h2>
+        <div className="mt-6">
+          <ProjectGrid
+            projects={featuredProjects}
+            emptyMessage="아직 대표 프로젝트가 없습니다."
+          />
+        </div>
       </Container>
     </Section>
   );

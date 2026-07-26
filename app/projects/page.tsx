@@ -25,10 +25,16 @@ export default function ProjectsPage() {
   return (
     <Section>
       <Container>
-        <h1>Projects</h1>
-        <p>진행한 프로젝트를 모아볼 수 있는 페이지입니다.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+          Projects
+        </h1>
+        <p className="mt-3 max-w-2xl text-lg text-text-secondary">
+          진행한 프로젝트를 모아볼 수 있는 페이지입니다.
+        </p>
         {/* TODO: 필터/검색(역할·장르·플랫폼·태그) 구현 예정 */}
-        <ProjectGrid projects={projects} />
+        <div className="mt-8">
+          <ProjectGrid projects={projects} />
+        </div>
       </Container>
     </Section>
   );

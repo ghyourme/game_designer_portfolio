@@ -24,11 +24,15 @@ export function FeaturedAnalysis() {
   return (
     <Section>
       <Container>
-        <h2>Featured Analysis</h2>
-        <AnalysisGrid
-          analyses={featuredAnalyses}
-          emptyMessage="아직 대표 분석이 없습니다."
-        />
+        <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+          Featured Analysis
+        </h2>
+        <div className="mt-6">
+          <AnalysisGrid
+            analyses={featuredAnalyses}
+            emptyMessage="아직 대표 분석이 없습니다."
+          />
+        </div>
       </Container>
     </Section>
   );

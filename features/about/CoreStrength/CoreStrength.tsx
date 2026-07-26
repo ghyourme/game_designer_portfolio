@@ -22,9 +22,13 @@ export function CoreStrength() {
   return (
     <Section>
       <Container>
-        <h2>Core Strength</h2>
-        <Badge variant="neutral">자기 서술형</Badge>
-        <div>
+        <div className="flex items-center gap-3">
+          <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+            Core Strength
+          </h2>
+          <Badge variant="neutral">자기 서술형</Badge>
+        </div>
+        <div className="mt-6 flex flex-wrap gap-2">
           {profile.coreStrengths.map((strength) => (
             <Tag key={strength}>{strength}</Tag>
           ))}

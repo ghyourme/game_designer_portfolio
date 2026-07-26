@@ -29,22 +29,24 @@ export function AnalysisCard({ analysis }: AnalysisCardProps) {
   return (
     <Card>
       {analysis.featured && <Badge variant="featured">Featured</Badge>}
-      <h3>{analysis.title}</h3>
-      <p>{analysis.description}</p>
+      <h3 className="mt-2 text-lg font-semibold text-text-primary">{analysis.title}</h3>
+      <p className="mt-1 text-sm text-text-secondary">{analysis.description}</p>
       {analysis.tags.length > 0 && (
-        <div>
+        <div className="mt-3 flex flex-wrap gap-2">
           {analysis.tags.map((tag) => (
             <Tag key={tag}>{tag}</Tag>
           ))}
         </div>
       )}
-      <Button
-        href={`/analysis/${analysis.slug}`}
-        variant="tertiary"
-        aria-label={`${analysis.title} 분석 보기`}
-      >
-        분석 보기
-      </Button>
+      <div className="mt-4">
+        <Button
+          href={`/analysis/${analysis.slug}`}
+          variant="tertiary"
+          aria-label={`${analysis.title} 분석 보기`}
+        >
+          분석 보기
+        </Button>
+      </div>
     </Card>
   );
 }

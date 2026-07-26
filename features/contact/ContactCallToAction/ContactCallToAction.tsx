@@ -16,12 +16,14 @@ export function ContactCallToAction() {
   return (
     <Section>
       <Container>
-        <Button href="/resume" variant="secondary">
-          이력서 다운로드
-        </Button>
-        <Button href="/projects" variant="tertiary">
-          프로젝트 보기
-        </Button>
+        <div className="flex flex-wrap gap-4">
+          <Button href="/resume" variant="secondary">
+            이력서 다운로드
+          </Button>
+          <Button href="/projects" variant="tertiary">
+            프로젝트 보기
+          </Button>
+        </div>
       </Container>
     </Section>
   );

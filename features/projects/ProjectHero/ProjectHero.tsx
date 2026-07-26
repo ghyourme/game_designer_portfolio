@@ -26,9 +26,11 @@ export function ProjectHero({ project }: ProjectHeroProps) {
     <Section>
       <Container>
         {project.featured && <Badge variant="featured">Featured</Badge>}
-        <h1>{project.title}</h1>
-        <p>{project.subtitle}</p>
-        <dl>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+          {project.title}
+        </h1>
+        <p className="mt-2 max-w-2xl text-lg text-text-secondary">{project.subtitle}</p>
+        <dl className="mt-6 grid grid-cols-2 gap-x-6 sm:grid-cols-3 lg:grid-cols-5">
           <MetaInfo label="담당 역할" value={project.role} />
           <MetaInfo label="장르" value={project.genre} />
           <MetaInfo label="플랫폼" value={project.platform} />
@@ -36,13 +38,15 @@ export function ProjectHero({ project }: ProjectHeroProps) {
           <MetaInfo label="팀 규모" value={project.team} />
         </dl>
         {project.tags.length > 0 && (
-          <div>
+          <div className="mt-4 flex flex-wrap gap-2">
             {project.tags.map((tag) => (
               <Tag key={tag}>{tag}</Tag>
             ))}
           </div>
         )}
-        <ExternalLinks links={project.links} />
+        <div className="mt-6">
+          <ExternalLinks links={project.links} />
+        </div>
       </Container>
     </Section>
   );

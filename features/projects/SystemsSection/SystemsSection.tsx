@@ -31,8 +31,8 @@ export function SystemsSection({ systems, documents }: SystemsSectionProps) {
     <div className="space-y-8">
       {systems.map((system) => (
         <article key={system.name}>
-          <h3>{system.name}</h3>
-          <dl>
+          <h3 className="text-lg font-semibold text-text-primary">{system.name}</h3>
+          <dl className="mt-4 grid gap-x-6 sm:grid-cols-2">
             <MetaInfo label="목적" value={system.purpose} />
             <MetaInfo label="플레이어 경험" value={system.playerExperience} />
             <MetaInfo label="시스템 구조" value={system.structure} />

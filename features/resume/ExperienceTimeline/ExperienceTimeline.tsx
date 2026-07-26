@@ -21,17 +21,26 @@ export function ExperienceTimeline() {
   return (
     <Section>
       <Container>
-        <h2>Career</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+          Career
+        </h2>
         {career.length === 0 ? (
-          <p>등록된 경력 정보가 없습니다.</p>
+          <p className="mt-6 text-base text-text-secondary">
+            등록된 경력 정보가 없습니다.
+          </p>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="mt-6 flex flex-col gap-4">
             {career.map((entry) => (
               <Card key={entry.id}>
-                <h3>{entry.company}</h3>
-                <p>{entry.role}</p>
-                <p>{entry.period}</p>
-                <p>{entry.description}</p>
+                <h3 className="text-lg font-semibold text-text-primary">
+                  {entry.company}
+                </h3>
+                <p className="mt-1 text-sm font-medium text-text-secondary">
+                  {entry.role} · {entry.period}
+                </p>
+                <p className="mt-3 text-base text-text-secondary leading-relaxed">
+                  {entry.description}
+                </p>
               </Card>
             ))}
           </div>

@@ -17,7 +17,9 @@ export function ResumeSummary() {
   return (
     <Section>
       <Container>
-        <p>{personalInfo.summary}</p>
+        <p className="max-w-2xl text-base text-text-secondary leading-relaxed">
+          {personalInfo.summary}
+        </p>
       </Container>
     </Section>
   );

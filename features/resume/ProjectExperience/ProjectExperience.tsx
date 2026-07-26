@@ -21,17 +21,26 @@ export function ProjectExperience() {
   return (
     <Section>
       <Container>
-        <h2>Project Experience</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+          Project Experience
+        </h2>
         {projectExperience.length === 0 ? (
-          <p>등록된 프로젝트 경험이 없습니다.</p>
+          <p className="mt-6 text-base text-text-secondary">
+            등록된 프로젝트 경험이 없습니다.
+          </p>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="mt-6 flex flex-col gap-4">
             {projectExperience.map((entry) => (
               <Card key={entry.id}>
-                <h3>{entry.title}</h3>
-                <p>{entry.role}</p>
-                <p>{entry.period}</p>
-                <p>{entry.description}</p>
+                <h3 className="text-lg font-semibold text-text-primary">
+                  {entry.title}
+                </h3>
+                <p className="mt-1 text-sm font-medium text-text-secondary">
+                  {entry.role} · {entry.period}
+                </p>
+                <p className="mt-3 text-base text-text-secondary leading-relaxed">
+                  {entry.description}
+                </p>
               </Card>
             ))}
           </div>

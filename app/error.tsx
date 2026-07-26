@@ -17,10 +17,14 @@ export default function Error({ reset }: { error: Error; reset: () => void }) {
   return (
     <Section>
       <Container>
-        <h1>오류가 발생했습니다.</h1>
-        <Button type="button" onClick={() => reset()}>
-          다시 시도
-        </Button>
+        <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+          오류가 발생했습니다.
+        </h1>
+        <div className="mt-6">
+          <Button type="button" onClick={() => reset()}>
+            다시 시도
+          </Button>
+        </div>
       </Container>
     </Section>
   );

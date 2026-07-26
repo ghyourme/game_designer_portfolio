@@ -24,12 +24,14 @@ export function WorkingProcess() {
   return (
     <Section>
       <Container>
-        <h2>Working Process</h2>
-        <ol>
+        <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+          Working Process
+        </h2>
+        <ol className="mt-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap">
           {WORKING_PROCESS_STEPS.map((step) => (
-            <li key={step}>
+            <li key={step} className="flex items-center gap-3">
               <Tag>{step}</Tag>
-              <p>설명이 표시될 영역입니다.</p>
+              <p className="text-sm text-text-secondary">설명이 표시될 영역입니다.</p>
             </li>
           ))}
         </ol>

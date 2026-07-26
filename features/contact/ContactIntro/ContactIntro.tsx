@@ -17,8 +17,12 @@ export function ContactIntro() {
   return (
     <Section>
       <Container>
-        <h1>Contact</h1>
-        <p>{profile.contactIntro}</p>
+        <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl lg:text-5xl">
+          Contact
+        </h1>
+        <p className="mt-3 max-w-2xl text-lg text-text-secondary leading-relaxed">
+          {profile.contactIntro}
+        </p>
       </Container>
     </Section>
   );

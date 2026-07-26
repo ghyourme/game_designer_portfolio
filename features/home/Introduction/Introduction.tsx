@@ -29,18 +29,22 @@ export function Introduction() {
     <Section>
       <Container>
         {allSkills.length === 0 ? (
-          <p>등록된 기술 정보가 없습니다.</p>
+          <p className="text-base text-text-secondary">등록된 기술 정보가 없습니다.</p>
         ) : (
-          <div>
+          <div className="flex flex-wrap gap-2">
             {allSkills.map((skill) => (
               <Tag key={skill.name}>{skill.name}</Tag>
             ))}
           </div>
         )}
-        <p>{profile.summary}</p>
-        <Button href="/about" variant="tertiary">
-          자세히 보기
-        </Button>
+        <p className="mt-6 max-w-2xl text-base text-text-secondary leading-relaxed">
+          {profile.summary}
+        </p>
+        <div className="mt-6">
+          <Button href="/about" variant="tertiary">
+            자세히 보기
+          </Button>
+        </div>
       </Container>
     </Section>
   );

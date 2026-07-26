@@ -25,10 +25,16 @@ export default function AnalysisPage() {
   return (
     <Section>
       <Container>
-        <h1>Analysis</h1>
-        <p>진행한 게임 분석을 모아볼 수 있는 페이지입니다.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-text-primary sm:text-4xl">
+          Analysis
+        </h1>
+        <p className="mt-3 max-w-2xl text-lg text-text-secondary">
+          진행한 게임 분석을 모아볼 수 있는 페이지입니다.
+        </p>
         {/* TODO: 태그 기준 필터/검색 구현 예정 */}
-        <AnalysisGrid analyses={analyses} />
+        <div className="mt-8">
+          <AnalysisGrid analyses={analyses} />
+        </div>
       </Container>
     </Section>
   );

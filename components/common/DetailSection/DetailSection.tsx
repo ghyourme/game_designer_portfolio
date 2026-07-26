@@ -26,8 +26,10 @@ export function DetailSection({ title, children }: DetailSectionProps) {
   return (
     <Section>
       <Container>
-        <h2>{title}</h2>
-        {children}
+        <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+          {title}
+        </h2>
+        <div className="mt-6">{children}</div>
       </Container>
     </Section>
   );

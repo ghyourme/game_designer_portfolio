@@ -19,16 +19,23 @@ export function Education() {
   return (
     <Section>
       <Container>
-        <h2>Education</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-text-primary sm:text-3xl">
+          Education
+        </h2>
         {education.length === 0 ? (
-          <p>등록된 교육 정보가 없습니다.</p>
+          <p className="mt-6 text-base text-text-secondary">
+            등록된 교육 정보가 없습니다.
+          </p>
         ) : (
-          <div className="flex flex-col gap-4">
+          <div className="mt-6 flex flex-col gap-4">
             {education.map((entry) => (
               <Card key={entry.id}>
-                <h3>{entry.school}</h3>
-                <p>{entry.degree}</p>
-                <p>{entry.period}</p>
+                <h3 className="text-lg font-semibold text-text-primary">
+                  {entry.school}
+                </h3>
+                <p className="mt-1 text-sm font-medium text-text-secondary">
+                  {entry.degree} · {entry.period}
+                </p>
               </Card>
             ))}
           </div>
